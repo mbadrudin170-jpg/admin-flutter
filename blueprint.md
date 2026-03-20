@@ -55,4 +55,4 @@ Dokumentasi ini mencakup semua gaya, desain, dan fitur yang diimplementasikan da
 
 ## 3. Rencana yang harus kita kerjakan
 
-(Tidak ada rencana aktif saat ini)
+1. buatkan file lib/data/sqlite.dart dan buatkan table berdasarkan yang ada di folder lib/model masukkan semuanya
