@@ -1,4 +1,4 @@
-import 'package:myapp/pelanggan.dart';
+import 'package:myapp/model/pelanggan.dart';
 import 'package:myapp/model/paket.dart';
 
 class Transaksi {

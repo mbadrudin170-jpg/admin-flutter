@@ -1,4 +1,4 @@
-import 'package:myapp/pelanggan.dart';
+import 'package:myapp/model/pelanggan.dart';
 
 final List<Pelanggan> daftarPelanggan = [
   Pelanggan(

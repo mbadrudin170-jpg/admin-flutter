@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/pelanggan.dart';
+import 'package:myapp/model/pelanggan.dart';
 
 class DetailPelanggan extends StatelessWidget {
   final Pelanggan pelanggan;

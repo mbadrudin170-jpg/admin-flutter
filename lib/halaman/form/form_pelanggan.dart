@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/pelanggan.dart';
+import 'package:myapp/model/pelanggan.dart';
 import 'package:myapp/data/pelanggan_data.dart';
 
 class FormPelanggan extends StatefulWidget {
@@ -24,7 +24,7 @@ class _FormPelangganState extends State<FormPelanggan> {
         alamat: _alamatController.text,
       );
       // Logika untuk menyimpan data pelanggan baru
-      print('Pelanggan baru: ${newPelanggan.nama}');
+      // print('Pelanggan baru: ${newPelanggan.nama}');
       Navigator.pop(context);
     }
   }
