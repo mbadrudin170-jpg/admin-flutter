@@ -39,7 +39,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Pelanggan Aktif')),
+      appBar: AppBar(title: const Text('Tambah Pelanggan Aktif'), leading: BackButton()),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

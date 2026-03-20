@@ -2,7 +2,7 @@
 import 'dart:developer' as developer;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myapp/data/operasi/kategori_operasi.dart';
-import 'package:myapp/model/kategori.dart'; // <--- PERBAIKAN: Menggunakan path yang benar
+import 'package:myapp/model/kategori.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -13,8 +13,9 @@ class FirebaseService {
     try {
       QuerySnapshot snapshot = await _firestore.collection('kategori').get();
       return snapshot.docs.map((doc) {
-        // Pastikan untuk menangani kemungkinan ID yang tidak ada atau salah
         final data = doc.data() as Map<String, dynamic>;
+        // Set ID dokumen dari Firestore ke objek Kategori
+        data['id'] = doc.id;
         return Kategori.fromMap(data);
       }).toList();
     } catch (e, s) {
@@ -27,8 +28,8 @@ class FirebaseService {
   Future<void> unggahKategori(List<Kategori> kategoriList) async {
     final WriteBatch batch = _firestore.batch();
     for (var kategori in kategoriList) {
-      // Gunakan ID unik dari objek kategori jika tersedia, jika tidak, biarkan Firestore yang membuatnya
-      DocumentReference docRef = _firestore.collection('kategori').doc(kategori.id?.toString());
+      // Jika ID ada, gunakan, jika tidak, biarkan Firestore membuatnya
+      DocumentReference docRef = _firestore.collection('kategori').doc(kategori.id);
       batch.set(docRef, kategori.toMap());
     }
     try {
@@ -41,7 +42,8 @@ class FirebaseService {
   // Membaca semua kategori dari SQLite dan mengunggahnya ke Firebase
   Future<void> sinkronkanKategoriKeFirebase() async {
     try {
-      List<Kategori> allKategori = await _kategoriOperasi.ambilSemuaKategori(); // <--- PERBAIKAN: Nama metode yang benar
+      // Menggunakan nama metode yang benar dari KategoriOperasi
+      List<Kategori> allKategori = await _kategoriOperasi.getKategori();
       await unggahKategori(allKategori);
       developer.log('Sinkronisasi kategori ke Firebase berhasil.', name: 'myapp.firebase');
     } catch (e, s) {
@@ -59,9 +61,11 @@ class FirebaseService {
       await sinkronkanKategoriKeFirebase();
     } else {
       developer.log('Data kategori ditemukan di Firebase. Memperbarui SQLite...', name: 'myapp.firebase');
-      await _kategoriOperasi.hapusSemuaKategori(); // <--- PERBAIKAN: Nama metode yang benar
+      // Menggunakan metode baru hapusSemuaKategori
+      await _kategoriOperasi.hapusSemuaKategori();
       for (var kategori in kategoriFirebase) {
-        await _kategoriOperasi.buatKategori(kategori);
+        // Menggunakan nama metode yang benar dari KategoriOperasi
+        await _kategoriOperasi.createKategori(kategori);
       }
       developer.log('SQLite diperbarui dengan data dari Firebase.', name: 'myapp.firebase');
     }

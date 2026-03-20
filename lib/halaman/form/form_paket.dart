@@ -49,6 +49,7 @@ class _FormPaketPageState extends State<FormPaketPage> {
         title: const Text('Tambah Paket Baru'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
+        leading: BackButton(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

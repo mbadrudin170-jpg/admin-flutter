@@ -46,6 +46,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Form Transaksi'),
+        leading: BackButton(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -55,8 +56,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
             DropdownButtonFormField<TipeTransaksi>(
               initialValue: _tipeTransaksi,
               decoration: const InputDecoration(labelText: 'Tipe Transaksi'),
-              items:
-                  TipeTransaksi.values.map((TipeTransaksi tipe) {
+              items: TipeTransaksi.values.map((TipeTransaksi tipe) {
                 return DropdownMenuItem<TipeTransaksi>(
                   value: tipe,
                   child: Text(tipe.toString().split('.').last),

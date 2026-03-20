@@ -8,22 +8,26 @@ class KategoriOperasi {
 
   Future<void> createKategori(Kategori kategori) async {
     final db = await dbHelper.database;
+    final timestamp = DateTime.now().toIso8601String();
     await db.insert('kategori', {
       'id': kategori.id,
       'nama': kategori.nama,
       'tipe': kategori.tipe.toString().split('.').last,
+      'diperbarui': timestamp, // <-- Mengisi timestamp saat ini
     });
     for (var sub in kategori.subKategori) {
-      await createSubKategori(sub, kategori.id);
+      await createSubKategori(sub, kategori.id!); 
     }
   }
 
   Future<void> createSubKategori(SubKategori subKategori, String idKategori) async {
     final db = await dbHelper.database;
+    final timestamp = DateTime.now().toIso8601String();
     await db.insert('sub_kategori', {
       'id': subKategori.id,
       'nama': subKategori.nama,
       'id_kategori': idKategori,
+      'diperbarui': timestamp, // <-- Mengisi timestamp saat ini
     });
   }
 
@@ -39,6 +43,7 @@ class KategoriOperasi {
         nama: map['nama'],
         tipe: TipeKategori.values.firstWhere((e) => e.toString().split('.').last == map['tipe']),
         subKategori: subKategori,
+        diperbarui: DateTime.parse(map['diperbarui']), // <-- Membaca timestamp
       ));
     }
     return kategoriList;
@@ -56,17 +61,20 @@ class KategoriOperasi {
       return SubKategori(
         id: maps[i]['id'],
         nama: maps[i]['nama'],
+        diperbarui: DateTime.parse(maps[i]['diperbarui']), // <-- Membaca timestamp
       );
     });
   }
 
   Future<void> updateKategori(Kategori kategori) async {
     final db = await dbHelper.database;
+    final timestamp = DateTime.now().toIso8601String();
     await db.update(
       'kategori',
       {
         'nama': kategori.nama,
         'tipe': kategori.tipe.toString().split('.').last,
+        'diperbarui': timestamp, // <-- Memperbarui timestamp saat ini
       },
       where: 'id = ?',
       whereArgs: [kategori.id],
@@ -75,9 +83,13 @@ class KategoriOperasi {
 
   Future<void> updateSubKategori(SubKategori subKategori) async {
     final db = await dbHelper.database;
+    final timestamp = DateTime.now().toIso8601String();
     await db.update(
       'sub_kategori',
-      {'nama': subKategori.nama},
+      {
+        'nama': subKategori.nama,
+        'diperbarui': timestamp, // <-- Memperbarui timestamp saat ini
+      },
       where: 'id = ?',
       whereArgs: [subKategori.id],
     );
@@ -95,6 +107,12 @@ class KategoriOperasi {
       where: 'id_kategori = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<void> hapusSemuaKategori() async {
+    final db = await dbHelper.database;
+    await db.delete('sub_kategori');
+    await db.delete('kategori');
   }
 
   Future<void> deleteSubKategori(String id) async {

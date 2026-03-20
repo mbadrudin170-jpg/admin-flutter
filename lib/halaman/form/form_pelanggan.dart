@@ -50,6 +50,7 @@ class _FormPelangganState extends State<FormPelanggan> {
         title: const Text('Tambah Pelanggan'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
+        leading: BackButton(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

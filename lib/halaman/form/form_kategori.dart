@@ -34,6 +34,7 @@ class _FormKategoriPageState extends State<FormKategoriPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Form Kategori'),
+        leading: BackButton(),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
