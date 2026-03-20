@@ -136,7 +136,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
               },
             ),
             DropdownButtonFormField<Kategori>(
-              value: _selectedKategori,
+              initialValue: _selectedKategori,
               decoration: const InputDecoration(labelText: 'Kategori'),
               items: kategoriData
                   .where((k) =>
@@ -160,7 +160,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
             if (_selectedKategori != null &&
                 _selectedKategori!.subKategori.isNotEmpty)
               DropdownButtonFormField<SubKategori>(
-                value: _selectedSubKategori,
+                initialValue: _selectedSubKategori,
                 decoration: const InputDecoration(labelText: 'Sub Kategori'),
                 items: _selectedKategori!.subKategori
                     .map((SubKategori subKategori) {
