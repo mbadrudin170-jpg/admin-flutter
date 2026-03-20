@@ -1,0 +1,3 @@
+1. membaut file lib/halaman/detail/ untuk mengelompokan file yang namanya di awali dengan kata detail.
+2. membuat file lib/model/transaksi_model.dart dan lib/data/transaksi_data.dart untuk membuat data(id, keterangan, tanggal, jumlah, tipe(Pemasukan,Pengeluaran dan Transfer), namaDompet, kategori dan subKategori)
+3. membuat file lib/transaksi.dart untuk menampilkan data dari no 3. tapi yang ditampilkan sebelah kiri bungkus dengan column dan tampilkan kategori dan sub kategori, tengah bungkus dengan column untuk menampilkan keterangan dan namaDompet, sebelah kanan bungkus dengan jumlah dan jam, lalu kelompokan berdasarkan tanggal dan buat header section nya sebelah kiri tanggal contoh 'jumat, 26 februari 2026, kanan total jumlah pada tanggal itu.
