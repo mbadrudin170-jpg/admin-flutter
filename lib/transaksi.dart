@@ -1,6 +1,7 @@
+// lib/transaksi.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:myapp/data/transaksi_data.dart';
+import 'package:myapp/data/operasi/transaksi_operasi.dart';
 import 'package:myapp/halaman/form/form_transaksi.dart';
 import 'package:myapp/model/transaksi_model.dart';
 import 'package:myapp/utils/format_tanggal.dart';
@@ -15,76 +16,93 @@ class TransaksiPage extends StatefulWidget {
 }
 
 class _TransaksiPageState extends State<TransaksiPage> {
-  double pemasukan = 0;
-  double pengeluaran = 0;
-  double transfer = 0;
+  final TransaksiOperasi _transaksiOperasi = TransaksiOperasi();
+  late Future<List<Transaksi>> _listaTransaksiFuture;
 
   @override
   void initState() {
     super.initState();
-    _hitungTotal();
+    _loadTransaksi();
   }
 
-  void _hitungTotal() {
-    pemasukan = transaksiData
-        .where((t) => t.tipe == TipeTransaksi.pemasukan)
-        .fold(0, (sum, item) => sum + item.jumlah);
-    pengeluaran = transaksiData
-        .where((t) => t.tipe == TipeTransaksi.pengeluaran)
-        .fold(0, (sum, item) => sum + item.jumlah);
-    transfer = transaksiData
-        .where((t) => t.tipe == TipeTransaksi.transfer)
-        .fold(0, (sum, item) => sum + item.jumlah);
-    setState(() {});
+  void _loadTransaksi() {
+    setState(() {
+      _listaTransaksiFuture = _transaksiOperasi.getTransaksi();
+    });
+  }
+
+  void _tambahTransaksi() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FormTransaksiPage()),
+    );
+    if (result == true) {
+      _loadTransaksi();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final groupedTransaksi = _groupTransaksiByDate(transaksiData);
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transaksi'),
-      ),
-      body: Column(
-        children: [
-          _bangunRingkasan(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: groupedTransaksi.length,
-              itemBuilder: (context, index) {
-                final tanggal = groupedTransaksi.keys.elementAt(index);
-                final transaksiPadaTanggal = groupedTransaksi[tanggal]!;
-                final totalPadaTanggal = transaksiPadaTanggal.fold(
-                    0.0,
-                    (sum, item) =>
-                        sum + (item.tipe == TipeTransaksi.pemasukan ? item.jumlah : -item.jumlah));
+      body: FutureBuilder<List<Transaksi>>(
+        future: _listaTransaksiFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Tidak ada transaksi ditemukan.'));
+          } else {
+            final transaksiData = snapshot.data!;
+            final groupedTransaksi = _groupTransaksiByDate(transaksiData);
+            final pemasukan = transaksiData
+                .where((t) => t.tipe == TipeTransaksi.pemasukan)
+                .fold(0.0, (sum, item) => sum + item.jumlah);
+            final pengeluaran = transaksiData
+                .where((t) => t.tipe == TipeTransaksi.pengeluaran)
+                .fold(0.0, (sum, item) => sum + item.jumlah);
+            final transfer = transaksiData
+                .where((t) => t.tipe == TipeTransaksi.transfer)
+                .fold(0.0, (sum, item) => sum + item.jumlah);
 
-                return Column(
-                  children: [
-                    _bangunHeaderSeksi(tanggal, totalPadaTanggal),
-                    ...transaksiPadaTanggal
-                        .map((transaksi) => _bangunItemTransaksi(transaksi))
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
+            return Column(
+              children: [
+                _bangunRingkasan(pemasukan, pengeluaran, transfer),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: groupedTransaksi.length,
+                    itemBuilder: (context, index) {
+                      final tanggal = groupedTransaksi.keys.elementAt(index);
+                      final transaksiPadaTanggal = groupedTransaksi[tanggal]!;
+                      final totalPadaTanggal = transaksiPadaTanggal.fold(
+                          0.0,
+                          (sum, item) =>
+                              sum + (item.tipe == TipeTransaksi.pemasukan ? item.jumlah : -item.jumlah));
+
+                      return Column(
+                        children: [
+                          _bangunHeaderSeksi(tanggal, totalPadaTanggal),
+                          ...transaksiPadaTanggal
+                              .map((transaksi) => _bangunItemTransaksi(transaksi))
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          }
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const FormTransaksiPage()),
-          ).then((_) => _hitungTotal());
-        },
+        onPressed: _tambahTransaksi,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _bangunRingkasan() {
+  Widget _bangunRingkasan(double pemasukan, double pengeluaran, double transfer) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
