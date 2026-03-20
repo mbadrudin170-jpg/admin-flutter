@@ -4,7 +4,7 @@ Dokumen ini melacak arsitektur, fitur, dan rencana pengembangan untuk aplikasi F
 
 ## 1. Gambaran Umum
 
-Aplikasi ini adalah dasbor sederhana yang dibuat dengan Flutter. Tujuan utamanya adalah untuk menampilkan data bisnis dalam antarmuka berbasis tab yang bersih. Saat ini, aplikasi menampilkan daftar "Pelanggan Aktif", "Pelanggan", dan "Paket" dalam tab terpisah.
+Aplikasi ini adalah dasbor sederhana yang dibuat dengan Flutter. Tujuan utamanya adalah untuk menampilkan data bisnis dalam antarmuka berbasis tab yang bersih. Saat ini, aplikasi menampilkan daftar "Pelanggan Aktif", "Pelanggan", "Paket", "Kategori", dan "Transaksi" dalam tab terpisah.
 
 ## 2. Kerangka Proyek
 
@@ -32,16 +32,27 @@ Dokumentasi ini mencakup semua gaya, desain, dan fitur yang diimplementasikan da
     *   **CRUD Pelanggan**:
         *   Tab "Pelanggan" menampilkan daftar semua pelanggan dari data dummy.
         *   Model data `Pelanggan` (`model/pelanggan.dart`) dan data dummy (`data/pelanggan_data.dart`) telah dibuat.
-        *   Halaman daftar (`lib/pelanggan.dart`), detail (`lib/detail_pelanggan.dart`), dan formulir (`lib/form_pelanggan.dart`) telah dibuat dan dihubungkan.
+        *   Halaman daftar (`lib/pelanggan.dart`), detail (`lib/halaman/detail/detail_pelanggan.dart`), dan formulir (`lib/halaman/form/form_pelanggan.dart`) telah dibuat dan dihubungkan.
     *   **CRUD Paket**:
         *   Tab "Paket" menampilkan daftar paket yang tersedia.
         *   Detail paket dapat dilihat dan paket baru dapat ditambahkan.
+    *   **CRUD Kategori**:
+        *   Tab "Kategori" menampilkan daftar kategori pemasukan dan pengeluaran.
+        *   Pengguna dapat beralih antara tampilan pemasukan dan pengeluaran.
+        *   Kategori dan subkategori baru dapat ditambahkan melalui formulir.
+        *   Model data `Kategori` dan `SubKategori` (`model/kategori.dart`) dan data dummy (`data/kategori_data.dart`) telah dibuat.
+        *   Halaman daftar (`lib/kategori.dart`) dan formulir (`lib/halaman/form/form_kategori.dart`) telah dibuat.
+    *   **CRUD Transaksi**:
+        *   Tab "Transaksi" menampilkan daftar transaksi yang dikelompokkan berdasarkan tanggal.
+        *   Menampilkan ringkasan bulanan untuk pemasukan, pengeluaran, dan transfer.
+        *   Detail transaksi dapat dilihat dan transaksi baru dapat ditambahkan.
+        *   Model data `Transaksi` (`model/transaksi_model.dart`) dan data dummy (`data/transaksi_data.dart`) telah dibuat.
+        *   Halaman daftar (`lib/transaksi.dart`), detail (`lib/halaman/detail/detail_transaksi.dart`), dan formulir (`lib/halaman/form/form_transaksi.dart`) telah dibuat.
     *   **Pengalih Tema**: Tombol di AppBar memungkinkan pengguna beralih antara mode terang dan gelap.
-    *   **Navigasi Tab**: Pengguna dapat beralih antara layar "Home", "Pelanggan", "Paket", dan "Profile" menggunakan `BottomNavigationBar`.
+    *   **Navigasi Tab**: Pengguna dapat beralih antara layar "Home", "Pelanggan", "Kategori", "Transaksi", "Paket", dan "Profile" menggunakan `BottomNavigationBar`.
+    *   **Utilitas Pemformatan**: Fungsi untuk memformat tanggal dan waktu telah dibuat di `lib/utils/format_tanggal.dart`.
+    *   **Fokus Input pada Formulir**: Formulir di seluruh aplikasi sekarang mendukung perpindahan fokus otomatis. Menekan "Enter" pada `TextField` akan memindahkan fokus ke input berikutnya, dan keyboard akan ditutup setelah input terakhir.
 
-## 3. Rencana Saat Ini
+## 3. Rencana yang harus kita kerjakan
 
-(Tidak ada rencana aktif saat ini.)
-1. membuat file untuk menampilkan kategori dan sub kategori dan buat file baru lib/kategori.dart tambahkan dua tombol di atas dengan tipe pemasukan dan pengeluaran serta warna teks nya bedakan,  lalu buatkan file model dan datanya.
-2. membbaut file lib/form_kategori.dart utnuk membuat kategori dan sub kategori baru berdasarkan tipe pengelauran dan pemasukan serta tambahkan tombol di lib/kategori.dart untuk menuju ke halaman ini.
-3. membuat file lib/halaman/form/ untuk mengelompokan file berdasarkan nama filenya yang awalan form
+(Tidak ada rencana aktif saat ini)

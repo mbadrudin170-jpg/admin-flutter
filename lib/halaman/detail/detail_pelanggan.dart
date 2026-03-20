@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/model/pelanggan.dart';
 
-class DetailPelanggan extends StatelessWidget {
+class DetailPelangganPage extends StatelessWidget {
   final Pelanggan pelanggan;
-  const DetailPelanggan({super.key, required this.pelanggan});
+  const DetailPelangganPage({super.key, required this.pelanggan});
 
   @override
   Widget build(BuildContext context) {

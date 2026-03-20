@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/data/pelanggan_data.dart';
-import 'package:myapp/detail_pelanggan.dart';
 import 'package:myapp/halaman/form/form_pelanggan.dart';
+import 'package:myapp/halaman/detail/detail_pelanggan.dart';
 
 class PelangganPage extends StatelessWidget {
   const PelangganPage({super.key});
@@ -30,7 +30,7 @@ class PelangganPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DetailPelanggan(pelanggan: pelanggan),
+                    builder: (context) => DetailPelangganPage(pelanggan: pelanggan),
                   ),
                 );
               },

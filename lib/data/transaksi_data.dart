@@ -1,27 +1,46 @@
+import 'package:myapp/data/kategori_data.dart';
+import 'package:myapp/model/kategori.dart';
 import 'package:myapp/model/transaksi_model.dart';
-import 'package:myapp/data/pelanggan_data.dart';
-import 'package:myapp/data/paket_data.dart';
 
-final List<Transaksi> daftarTransaksi = [
+final List<Transaksi> transaksiData = [
   Transaksi(
-    id: 'TRX001',
-    pelanggan: daftarPelanggan[0],
-    paket: daftarPaket[0],
-    tanggal: DateTime(2024, 5, 1),
-    status: StatusTransaksi.berhasil,
+    id: '1',
+    keterangan: 'Gaji Karyawan',
+    tanggal: DateTime(2024, 7, 26),
+    jumlah: 5000000,
+    tipe: TipeTransaksi.pengeluaran,
+    namaDompet: 'Kas',
+    kategori: kategoriData[2], // Biaya Operasional
+    subKategori: kategoriData[2].subKategori[0], // Listrik
   ),
   Transaksi(
-    id: 'TRX002',
-    pelanggan: daftarPelanggan[1],
-    paket: daftarPaket[1],
-    tanggal: DateTime(2024, 5, 12),
-    status: StatusTransaksi.pending,
+    id: '2',
+    keterangan: 'Penjualan Kiloan',
+    tanggal: DateTime(2024, 7, 26),
+    jumlah: 200000,
+    tipe: TipeTransaksi.pemasukan,
+    namaDompet: 'Kas',
+    kategori: kategoriData[1], // Penjualan
+    subKategori: kategoriData[1].subKategori[0], // Penjualan Kiloan
   ),
   Transaksi(
-    id: 'TRX003',
-    pelanggan: daftarPelanggan[2],
-    paket: daftarPaket[2],
-    tanggal: DateTime(2024, 5, 2),
-    status: StatusTransaksi.gagal,
+    id: '3',
+    keterangan: 'Beli Deterjen',
+    tanggal: DateTime(2024, 7, 25),
+    jumlah: 100000,
+    tipe: TipeTransaksi.pengeluaran,
+    namaDompet: 'Kas',
+    kategori: kategoriData[3], // Bahan Baku
+    subKategori: kategoriData[3].subKategori[0], // Deterjen
+  ),
+  Transaksi(
+    id: '4',
+    keterangan: 'Transfer ke Bank',
+    tanggal: DateTime(2024, 7, 25),
+    jumlah: 1000000,
+    tipe: TipeTransaksi.transfer,
+    namaDompet: 'Kas',
+    kategori: kategoriData[0], // Gaji (sebagai contoh, bisa disesuaikan)
+    subKategori: SubKategori(id: '0', nama: 'Transfer'), // Contoh subkategori
   ),
 ];

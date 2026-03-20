@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/data/pelanggan_aktif_data.dart';
-import 'package:myapp/detail_pelanggan_aktif.dart';
+import 'package:myapp/halaman/detail/detail_pelanggan_aktif.dart';
 import 'package:myapp/halaman/form/form_pelanggan_aktif.dart';
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class PelangganAktifPage extends StatelessWidget {
+  const PelangganAktifPage({super.key});
 
   @override
   Widget build(BuildContext context) {

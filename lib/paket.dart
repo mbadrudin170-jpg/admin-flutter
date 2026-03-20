@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/data/paket_data.dart';
-import 'package:myapp/detail_paket.dart';
+import 'package:myapp/halaman/detail/detail_paket.dart';
 import 'package:myapp/halaman/form/form_paket.dart'; // Impor halaman form
 
 class PaketPage extends StatelessWidget {
@@ -15,9 +15,9 @@ class PaketPage extends StatelessWidget {
         foregroundColor: Colors.white,
       ),
       body: ListView.builder(
-        itemCount: daftarPaket.length,
+        itemCount: paketData.length,
         itemBuilder: (context, index) {
-          final paket = daftarPaket[index];
+          final paket = paketData[index];
           return InkWell(
             onTap: () {
               Navigator.push(

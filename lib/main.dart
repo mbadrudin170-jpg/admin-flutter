@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/halaman/dashboard.dart';
-import 'package:myapp/halaman/laporan.dart';
-import 'package:myapp/pelanggan.dart'; // Import halaman pelanggan
+import 'package:myapp/kategori.dart';
+import 'package:myapp/pelanggan.dart';
+import 'package:myapp/transaksi.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,9 +34,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const DashboardPage(),
-    const PelangganPage(), // Tambahkan halaman pelanggan di sini
-    const LaporanPage(),
+    const PelangganPage(),
+    const KategoriPage(),
+    const TransaksiPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -55,17 +55,21 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.dashboard),
             label: 'Dashboard',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Pelanggan'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Pelanggan',
+            icon: Icon(Icons.category),
+            label: 'Kategori',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.receipt),
-            label: 'Laporan',
+            icon: Icon(Icons.swap_horiz),
+            label: 'Transaksi',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Laporan'),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
       ),
     );
   }

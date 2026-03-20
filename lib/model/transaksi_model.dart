@@ -1,24 +1,29 @@
-import 'package:myapp/model/pelanggan.dart';
-import 'package:myapp/model/paket.dart';
+import 'package:myapp/model/kategori.dart';
+
+enum TipeTransaksi {
+  pemasukan,
+  pengeluaran,
+  transfer,
+}
 
 class Transaksi {
   final String id;
-  final Pelanggan pelanggan;
-  final Paket paket;
+  final String keterangan;
   final DateTime tanggal;
-  final StatusTransaksi status;
+  final double jumlah;
+  final TipeTransaksi tipe;
+  final String namaDompet;
+  final Kategori kategori;
+  final SubKategori subKategori;
 
   Transaksi({
     required this.id,
-    required this.pelanggan,
-    required this.paket,
+    required this.keterangan,
     required this.tanggal,
-    required this.status,
+    required this.jumlah,
+    required this.tipe,
+    required this.namaDompet,
+    required this.kategori,
+    required this.subKategori,
   });
-}
-
-enum StatusTransaksi {
-  berhasil,
-  pending,
-  gagal,
 }

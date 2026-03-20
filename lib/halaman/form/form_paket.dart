@@ -1,3 +1,4 @@
+// lib/halaman/form/form_paket.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:myapp/model/paket.dart';
@@ -16,11 +17,18 @@ class _FormPaketPageState extends State<FormPaketPage> {
   final _durasiController = TextEditingController();
   TipeDurasi _selectedTipe = TipeDurasi.bulan;
 
+  final _namaFocusNode = FocusNode();
+  final _hargaFocusNode = FocusNode();
+  final _durasiFocusNode = FocusNode();
+
   @override
   void dispose() {
     _namaController.dispose();
     _hargaController.dispose();
     _durasiController.dispose();
+    _namaFocusNode.dispose();
+    _hargaFocusNode.dispose();
+    _durasiFocusNode.dispose();
     super.dispose();
   }
 
@@ -50,10 +58,15 @@ class _FormPaketPageState extends State<FormPaketPage> {
             children: [
               TextFormField(
                 controller: _namaController,
+                focusNode: _namaFocusNode,
                 decoration: const InputDecoration(
                   labelText: 'Nama Paket',
                   border: OutlineInputBorder(),
                 ),
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) {
+                  FocusScope.of(context).requestFocus(_hargaFocusNode);
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Nama paket tidak boleh kosong';
@@ -64,6 +77,7 @@ class _FormPaketPageState extends State<FormPaketPage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _hargaController,
+                focusNode: _hargaFocusNode,
                 decoration: const InputDecoration(
                   labelText: 'Harga',
                   border: OutlineInputBorder(),
@@ -71,6 +85,10 @@ class _FormPaketPageState extends State<FormPaketPage> {
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) {
+                  FocusScope.of(context).requestFocus(_durasiFocusNode);
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Harga tidak boleh kosong';
@@ -81,12 +99,18 @@ class _FormPaketPageState extends State<FormPaketPage> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _durasiController,
+                focusNode: _durasiFocusNode,
                 decoration: const InputDecoration(
                   labelText: 'Durasi',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) {
+                  // Menutup keyboard karena ini adalah input teks terakhir
+                  _durasiFocusNode.unfocus();
+                },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Durasi tidak boleh kosong';

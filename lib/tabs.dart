@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/halaman/transaksi_page.dart';
+import 'package:myapp/transaksi.dart';
 import 'package:myapp/home.dart';
 import 'package:myapp/paket.dart';
 import 'package:myapp/pelanggan.dart';
@@ -15,7 +15,7 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    const Home(),
+    const PelangganAktifPage(),
     const PelangganPage(),
     const PaketPage(),
     const TransaksiPage(),
