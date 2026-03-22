@@ -13,6 +13,12 @@ class DetailPaketPage extends StatelessWidget {
         title: Text(paket.nama),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),

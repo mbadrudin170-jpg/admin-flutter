@@ -12,6 +12,12 @@ class DetailPelangganPage extends StatelessWidget {
         title: Text(pelanggan.nama),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -48,7 +48,11 @@ Dokumentasi ini mencakup semua gaya, desain, dan fitur yang diimplementasikan da
     *   **Utilitas Pemformatan**: Fungsi untuk memformat tanggal dan waktu tersedia di `lib/utils/format_tanggal.dart`.
     *   **Fokus Input pada Formulir**: Formulir di seluruh aplikasi mendukung perpindahan fokus otomatis.
 
-## 3. Tugas Selesai
+## 3. Rencana Saat Ini
+
+1.  **Menambahkan Tombol Kembali**: Menambahkan tombol kembali pada `AppBar` di semua file yang relevan di dalam folder `lib/halaman` untuk meningkatkan navigasi.
+
+## 4. Tugas Selesai
 
 Berdasarkan permintaan sebelumnya, fitur-fitur berikut telah berhasil diimplementasikan:
 
