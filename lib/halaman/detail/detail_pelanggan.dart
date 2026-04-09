@@ -1,6 +1,6 @@
 // lib/halaman/detail/detail_pelanggan.dart
 import 'package:flutter/material.dart';
-import 'package:admin/model/pelanggan.dart';
+import 'package:admin/model/pelanggan_model.dart';
 
 class DetailPelangganPage extends StatefulWidget {
   final Pelanggan pelanggan;

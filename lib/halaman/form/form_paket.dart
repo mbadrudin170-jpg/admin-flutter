@@ -1,7 +1,7 @@
 // lib/halaman/form/form_paket.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:admin/model/paket.dart';
+import 'package:admin/model/paket_model.dart';
 
 class FormPaketPage extends StatefulWidget {
   const FormPaketPage({super.key});

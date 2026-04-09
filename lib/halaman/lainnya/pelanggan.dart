@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:admin/data/operasi/pelanggan_operasi.dart';
 import 'package:admin/halaman/form/form_pelanggan.dart';
 import 'package:admin/halaman/detail/detail_pelanggan.dart';
-import 'package:admin/model/pelanggan.dart';
+import 'package:admin/model/pelanggan_model.dart';
 
 class PelangganPage extends StatefulWidget {
   const PelangganPage({super.key});

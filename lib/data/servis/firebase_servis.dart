@@ -10,11 +10,11 @@ import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin/data/operasi/pelanggan_operasi.dart';
 import 'package:admin/data/operasi/transaksi_operasi.dart';
 import 'package:admin/model/dompet_model.dart';
-import 'package:admin/model/kategori.dart';
-import 'package:admin/model/paket.dart';
-import 'package:admin/model/pelanggan.dart';
+import 'package:admin/model/kategori_model.dart';
+import 'package:admin/model/paket_model.dart';
+import 'package:admin/model/pelanggan_model.dart';
 import 'package:admin/model/pelanggan_aktif.dart';
-import 'package:admin/model/transaksi.dart';
+import 'package:admin/model/transaksi_model.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

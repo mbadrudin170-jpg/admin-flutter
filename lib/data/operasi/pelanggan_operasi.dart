@@ -1,6 +1,6 @@
 // lib/data/operasi/pelanggan_operasi.dart
 import 'package:admin/data/sqlite.dart';
-import 'package:admin/model/pelanggan.dart';
+import 'package:admin/model/pelanggan_model.dart';
 
 class PelangganOperasi {
   final DatabaseHelper dbHelper = DatabaseHelper();

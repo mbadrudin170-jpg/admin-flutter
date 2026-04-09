@@ -1,6 +1,6 @@
 // lib/halaman/form/form_kategori.dart
 import 'package:flutter/material.dart';
-import 'package:admin/model/kategori.dart';
+import 'package:admin/model/kategori_model.dart';
 
 class FormKategoriPage extends StatefulWidget {
   const FormKategoriPage({super.key});

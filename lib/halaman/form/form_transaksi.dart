@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:admin/data/kategori_data.dart';
-import 'package:admin/model/kategori.dart';
+import 'package:admin/model/kategori_model.dart';
 import 'package:admin/model/transaksi_model.dart';
 
 class FormTransaksiPage extends StatefulWidget {

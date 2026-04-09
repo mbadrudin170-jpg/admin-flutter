@@ -1,6 +1,6 @@
 // lib/halaman/form/form_pelanggan.dart
 import 'package:flutter/material.dart';
-import 'package:admin/model/pelanggan.dart';
+import 'package:admin/model/pelanggan_model.dart';
 import 'package:admin/data/operasi/pelanggan_operasi.dart';
 
 class FormPelanggan extends StatefulWidget {
