@@ -1,11 +1,9 @@
-
 // lib/halaman/halaman_utama.dart
 import 'package:flutter/material.dart';
-import 'package:myapp/halaman/lainnya/kategori.dart';
-import 'package:myapp/halaman/lainnya/paket.dart';
-import 'package:myapp/halaman/lainnya/pelanggan.dart';
-import 'package:myapp/halaman/lainnya/pelanggan_aktif.dart';
-import 'package:myapp/halaman/tab/dompet_tab.dart';
+import 'package:admin/halaman/lainnya/pelanggan_aktif.dart';
+import 'package:admin/halaman/tab/dompet.dart';
+import 'package:admin/halaman/tab/lainnya.dart';
+import 'package:admin/halaman/tab/transaksi.dart';
 
 class HalamanUtama extends StatefulWidget {
   const HalamanUtama({super.key});
@@ -18,19 +16,17 @@ class _HalamanUtamaState extends State<HalamanUtama> {
   int _selectedIndex = 0;
 
   static const List<Widget> _widgetOptions = <Widget>[
-    DompetTab(),
-    PelangganPage(),
+    DompetPage(),
     PelangganAktifPage(),
-    PaketPage(),
-    KategoriPage(),
+    TransaksiPage(),
+    LainnyaPage(),
   ];
 
   static const List<String> _appBarTitles = [
     'Dompet',
-    'Pelanggan',
     'Pelanggan Aktif',
-    'Paket',
-    'Kategori'
+    'Transaksi',
+    'Lainnya',
   ];
 
   void _onItemTapped(int index) {
@@ -42,12 +38,8 @@ class _HalamanUtamaState extends State<HalamanUtama> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_appBarTitles[_selectedIndex]),
-      ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      appBar: AppBar(title: Text(_appBarTitles[_selectedIndex])),
+      body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -55,21 +47,14 @@ class _HalamanUtamaState extends State<HalamanUtama> {
             label: 'Dompet',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Pelanggan',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.person_pin_circle),
             label: 'Aktif',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.card_giftcard),
-            label: 'Paket',
+            icon: Icon(Icons.receipt_long),
+            label: 'Transaksi',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'Kategori',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.apps), label: 'Lainnya'),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Theme.of(context).primaryColor,

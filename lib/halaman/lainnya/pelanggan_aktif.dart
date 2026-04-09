@@ -1,9 +1,9 @@
 // lib/halaman/lainnya/pelanggan_aktif.dart
 import 'package:flutter/material.dart';
-import 'package:myapp/data/operasi/pelanggan_aktif_operasi.dart';
-import 'package:myapp/halaman/detail/detail_pelanggan_aktif.dart';
-import 'package:myapp/halaman/form/form_pelanggan_aktif.dart';
-import 'package:myapp/model/pelanggan_aktif.dart';
+import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
+import 'package:admin/halaman/detail/detail_pelanggan_aktif.dart';
+import 'package:admin/halaman/form/form_pelanggan_aktif.dart';
+import 'package:admin/model/pelanggan_aktif.dart';
 
 class PelangganAktifPage extends StatefulWidget {
   const PelangganAktifPage({super.key});

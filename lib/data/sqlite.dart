@@ -86,6 +86,8 @@ class DatabaseHelper {
         nama TEXT NOT NULL,
         telepon TEXT NOT NULL,
         alamat TEXT NOT NULL,
+        password TEXT NOT NULL,
+        mac_address TEXT NOT NULL,
         diperbarui TEXT NOT NULL
       )
     ''');

@@ -1,4 +1,4 @@
-import 'package:myapp/model/kategori.dart';
+import 'package:admin/model/kategori.dart';
 
 enum TipeTransaksi {
   pemasukan,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/model/paket.dart';
+import 'package:admin/model/paket.dart';
 
 class DetailPaketPage extends StatelessWidget {
   final Paket paket;

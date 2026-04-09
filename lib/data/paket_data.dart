@@ -1,4 +1,4 @@
-import 'package:myapp/model/paket.dart';
+import 'package:admin/model/paket.dart';
 
 final List<Paket> paketData = [
   Paket(

@@ -1,7 +1,7 @@
 
 // lib/data/operasi/kategori_operasi.dart
-import 'package:myapp/data/sqlite.dart';
-import 'package:myapp/model/kategori.dart';
+import 'package:admin/data/sqlite.dart';
+import 'package:admin/model/kategori.dart';
 
 class KategoriOperasi {
   final DatabaseHelper dbHelper = DatabaseHelper();

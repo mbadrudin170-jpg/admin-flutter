@@ -1,5 +1,7 @@
 // lib/halaman/form/form_pelanggan.dart
 import 'package:flutter/material.dart';
+import 'package:admin/model/pelanggan.dart';
+import 'package:admin/data/operasi/pelanggan_operasi.dart';
 
 class FormPelanggan extends StatefulWidget {
   const FormPelanggan({super.key});
@@ -13,33 +15,44 @@ class _FormPelangganState extends State<FormPelanggan> {
   final _namaController = TextEditingController();
   final _teleponController = TextEditingController();
   final _alamatController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _macAddressController = TextEditingController();
 
   final _namaFocusNode = FocusNode();
   final _teleponFocusNode = FocusNode();
   final _alamatFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _macAddressFocusNode = FocusNode();
 
   @override
   void dispose() {
     _namaController.dispose();
     _teleponController.dispose();
     _alamatController.dispose();
+    _passwordController.dispose();
+    _macAddressController.dispose();
     _namaFocusNode.dispose();
     _teleponFocusNode.dispose();
     _alamatFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _macAddressFocusNode.dispose();
     super.dispose();
   }
 
-  void _simpanForm() {
+  void _simpanForm() async {
     if (_formKey.currentState!.validate()) {
-      // Logika untuk menyimpan data pelanggan baru
-      // final newPelanggan = Pelanggan(
-      //   id: (daftarPelanggan.length + 1).toString(),
-      //   nama: _namaController.text,
-      //   telepon: _teleponController.text,
-      //   alamat: _alamatController.text,
-      // );
-      // print('Pelanggan baru: ${newPelanggan.nama}');
-      Navigator.pop(context);
+      final newPelanggan = Pelanggan(
+        id: DateTime.now().toString(),
+        nama: _namaController.text,
+        telepon: _teleponController.text,
+        alamat: _alamatController.text,
+        password: _passwordController.text,
+        macAddress: _macAddressController.text,
+      );
+      await PelangganOperasi().createPelanggan(newPelanggan);
+      if (mounted) {
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -93,14 +106,44 @@ class _FormPelangganState extends State<FormPelanggan> {
                 controller: _alamatController,
                 focusNode: _alamatFocusNode,
                 decoration: const InputDecoration(labelText: 'Alamat'),
-                textInputAction: TextInputAction.done,
+                textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_) {
-                  // Menutup keyboard karena ini adalah input teks terakhir
-                  _alamatFocusNode.unfocus();
+                  FocusScope.of(context).requestFocus(_passwordFocusNode);
                 },
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Alamat tidak boleh kosong';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _passwordController,
+                focusNode: _passwordFocusNode,
+                decoration: const InputDecoration(labelText: 'Password'),
+                obscureText: true,
+                textInputAction: TextInputAction.next,
+                onFieldSubmitted: (_) {
+                  FocusScope.of(context).requestFocus(_macAddressFocusNode);
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Password tidak boleh kosong';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _macAddressController,
+                focusNode: _macAddressFocusNode,
+                decoration: const InputDecoration(labelText: 'MAC Address'),
+                textInputAction: TextInputAction.done,
+                onFieldSubmitted: (_) {
+                  _macAddressFocusNode.unfocus();
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'MAC Address tidak boleh kosong';
                   }
                   return null;
                 },

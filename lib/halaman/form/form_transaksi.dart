@@ -1,9 +1,9 @@
 // lib/halaman/form/form_transaksi.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:myapp/data/kategori_data.dart';
-import 'package:myapp/model/kategori.dart';
-import 'package:myapp/model/transaksi_model.dart';
+import 'package:admin/data/kategori_data.dart';
+import 'package:admin/model/kategori.dart';
+import 'package:admin/model/transaksi_model.dart';
 
 class FormTransaksiPage extends StatefulWidget {
   const FormTransaksiPage({super.key});

@@ -1,6 +1,6 @@
 // lib/data/operasi/dompet_operasi.dart
-import 'package:myapp/data/sqlite.dart';
-import 'package:myapp/model/dompet_model.dart';
+import 'package:admin/data/sqlite.dart';
+import 'package:admin/model/dompet_model.dart';
 
 class DompetOperasi {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -11,6 +11,7 @@ class DompetOperasi {
       'id': dompet.id,
       'namaDompet': dompet.namaDompet,
       'saldo': dompet.saldo,
+      'diperbarui': dompet.diperbarui,
     });
   }
 
@@ -23,6 +24,7 @@ class DompetOperasi {
         id: maps[i]['id'],
         namaDompet: maps[i]['namaDompet'],
         saldo: maps[i]['saldo'],
+        diperbarui: maps[i]['diperbarui'],
       );
     });
   }
@@ -34,6 +36,7 @@ class DompetOperasi {
       {
         'namaDompet': dompet.namaDompet,
         'saldo': dompet.saldo,
+        'diperbarui': dompet.diperbarui,
       },
       where: 'id = ?',
       whereArgs: [dompet.id],
@@ -47,5 +50,10 @@ class DompetOperasi {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<void> hapusSemuaDompet() async {
+    final db = await dbHelper.database;
+    await db.delete('dompet');
   }
 }

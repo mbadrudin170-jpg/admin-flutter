@@ -1,9 +1,8 @@
 // lib/lainnya.dart
 import 'package:flutter/material.dart';
-import 'package:myapp/halaman/lainnya/kategori.dart';
-import 'package:myapp/halaman/lainnya/paket.dart';
-import 'package:myapp/halaman/lainnya/pelanggan.dart';
-import 'package:myapp/halaman/lainnya/pelanggan_aktif.dart';
+import 'package:admin/halaman/lainnya/kategori.dart';
+import 'package:admin/halaman/lainnya/paket.dart';
+import 'package:admin/halaman/lainnya/pelanggan.dart';
 
 class LainnyaPage extends StatelessWidget {
   const LainnyaPage({super.key});
@@ -33,18 +32,17 @@ class LainnyaPage extends StatelessWidget {
             title: 'Pelanggan',
             page: const PelangganPage(),
           ),
-          _buildMenuItem(
-            context,
-            icon: Icons.person_pin_circle,
-            title: 'Pelanggan Aktif',
-            page: const PelangganAktifPage(),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, {required IconData icon, required String title, required Widget page}) {
+  Widget _buildMenuItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required Widget page,
+  }) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.symmetric(vertical: 6),

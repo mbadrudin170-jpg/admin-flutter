@@ -1,12 +1,12 @@
 // lib/transaksi.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:myapp/data/operasi/transaksi_operasi.dart';
-import 'package:myapp/halaman/form/form_transaksi.dart';
-import 'package:myapp/model/transaksi_model.dart';
-import 'package:myapp/utils/format_tanggal.dart';
+import 'package:admin/data/operasi/transaksi_operasi.dart';
+import 'package:admin/halaman/form/form_transaksi.dart';
+import 'package:admin/model/transaksi_model.dart';
+import 'package:admin/utils/format_tanggal.dart';
 
-import 'halaman/detail/detail_transaksi.dart';
+import '../detail/detail_transaksi.dart';
 
 class TransaksiPage extends StatefulWidget {
   const TransaksiPage({super.key});

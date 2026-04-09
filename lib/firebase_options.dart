@@ -3,45 +3,34 @@
 // Untuk mempelajari lebih lanjut, lihat: https://firebase.google.com/docs/flutter/setup#configure-your-app
 
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-/// Opsi Firebase default untuk platform saat ini.
-///
-/// **PENTING**: Ganti konten file ini dengan file yang Anda hasilkan
-/// dari Firebase Console. Menjalankan `flutterfire configure` akan secara otomatis
-/// menghasilkan file ini dengan konfigurasi yang benar untuk proyek Anda.
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      // Konfigurasi Web - GANTI DENGAN KONFIGURASI ANDA
       return const FirebaseOptions(
-        apiKey: 'GANTI-INI-DENGAN-API-KEY-ANDA',
-        appId: 'GANTI-INI-DENGAN-APP-ID-ANDA',
-        messagingSenderId: 'GANTI-INI-DENGAN-SENDER-ID-ANDA',
-        projectId: 'GANTI-INI-DENGAN-PROJECT-ID-ANDA',
-        authDomain: 'GANTI-INI-DENGAN-AUTH-DOMAIN-ANDA',
-        storageBucket: 'GANTI-INI-DENGAN-STORAGE-BUCKET-ANDA',
+        apiKey: 'AIzaSyDX0t3xU8zelxYj0oAz10PG4u4iUzb6QG4',
+        appId: '1:816519063489:web:2eab7119b29bee88ce7140',
+        messagingSenderId: '816519063489',
+        projectId: 'management-wifi-3acc7',
+        authDomain: 'management-wifi-3acc7.firebaseapp.com',
+        storageBucket: 'management-wifi-3acc7.firebasestorage.app',
+        measurementId: 'G-V2VNZ1XKLJ',
       );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        // Konfigurasi Android - GANTI DENGAN KONFIGURASI ANDA
         return const FirebaseOptions(
-          apiKey: 'GANTI-INI-DENGAN-API-KEY-ANDA',
-          appId: 'GANTI-INI-DENGAN-APP-ID-ANDA',
-          messagingSenderId: 'GANTI-INI-DENGAN-SENDER-ID-ANDA',
-          projectId: 'GANTI-INI-DENGAN-PROJECT-ID-ANDA',
-          storageBucket: 'GANTI-INI-DENGAN-STORAGE-BUCKET-ANDA',
+          apiKey: 'AIzaSyAcXaRHRpoSDGS_ZcMAUSZLNy_64CvaADA',
+          appId: '1:816519063489:android:034d3103dcedc1a3ce7140',
+          messagingSenderId: '816519063489',
+          projectId: 'management-wifi-3acc7',
+          storageBucket: 'management-wifi-3acc7.firebasestorage.app',
         );
       case TargetPlatform.iOS:
-        // Konfigurasi iOS - GANTI DENGAN KONFIGURASI ANDA
-        return const FirebaseOptions(
-          apiKey: 'GANTI-INI-DENGAN-API-KEY-ANDA',
-          appId: 'GANTI-INI-DENGAN-APP-ID-ANDA',
-          messagingSenderId: 'GANTI-INI-DENGAN-SENDER-ID-ANDA',
-          projectId: 'GANTI-INI-DENGAN-PROJECT-ID-ANDA',
-          storageBucket: 'GANTI-INI-DENGAN-STORAGE-BUCKET-ANDA',
-          iosBundleId: 'GANTI-INI-DENGAN-BUNDLE-ID-ANDA',
+        throw UnsupportedError(
+          'DefaultFirebaseOptions for iOS have not been configured but could be.',
         );
       default:
         throw UnsupportedError(

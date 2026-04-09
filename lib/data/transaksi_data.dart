@@ -1,6 +1,6 @@
-import 'package:myapp/data/kategori_data.dart';
-import 'package:myapp/model/kategori.dart';
-import 'package:myapp/model/transaksi_model.dart';
+import 'package:admin/data/kategori_data.dart';
+import 'package:admin/model/kategori.dart';
+import 'package:admin/model/transaksi_model.dart';
 
 final List<Transaksi> transaksiData = [
   Transaksi(

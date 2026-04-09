@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/data/paket_data.dart';
-import 'package:myapp/halaman/detail/detail_paket.dart';
-import 'package:myapp/halaman/form/form_paket.dart'; // Impor halaman form
+import 'package:admin/data/paket_data.dart';
+import 'package:admin/halaman/detail/detail_paket.dart';
+import 'package:admin/halaman/form/form_paket.dart'; // Impor halaman form
 
 class PaketPage extends StatelessWidget {
   const PaketPage({super.key});

@@ -1,9 +1,9 @@
 // lib/halaman/lainnya/pelanggan.dart
 import 'package:flutter/material.dart';
-import 'package:myapp/data/operasi/pelanggan_operasi.dart';
-import 'package:myapp/halaman/form/form_pelanggan.dart';
-import 'package:myapp/halaman/detail/detail_pelanggan.dart';
-import 'package:myapp/model/pelanggan.dart';
+import 'package:admin/data/operasi/pelanggan_operasi.dart';
+import 'package:admin/halaman/form/form_pelanggan.dart';
+import 'package:admin/halaman/detail/detail_pelanggan.dart';
+import 'package:admin/model/pelanggan.dart';
 
 class PelangganPage extends StatefulWidget {
   const PelangganPage({super.key});
@@ -41,6 +41,7 @@ class _PelangganPageState extends State<PelangganPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Pelanggan')),
       body: FutureBuilder<List<Pelanggan>>(
         future: _listaPelangganFuture,
         builder: (context, snapshot) {
@@ -56,7 +57,10 @@ class _PelangganPageState extends State<PelangganPage> {
               itemBuilder: (context, index) {
                 final pelanggan = snapshot.data![index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   child: ListTile(
                     title: Text(
                       pelanggan.nama,
@@ -67,7 +71,8 @@ class _PelangganPageState extends State<PelangganPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetailPelangganPage(pelanggan: pelanggan),
+                          builder: (context) =>
+                              DetailPelangganPage(pelanggan: pelanggan),
                         ),
                       );
                     },

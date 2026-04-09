@@ -1,8 +1,8 @@
 // lib/halaman/lainnya/kategori.dart
 import 'package:flutter/material.dart';
-import 'package:myapp/data/operasi/kategori_operasi.dart';
-import 'package:myapp/halaman/form/form_kategori.dart';
-import 'package:myapp/model/kategori.dart';
+import 'package:admin/data/operasi/kategori_operasi.dart';
+import 'package:admin/halaman/form/form_kategori.dart';
+import 'package:admin/model/kategori.dart';
 
 class KategoriPage extends StatefulWidget {
   const KategoriPage({super.key});
@@ -41,6 +41,9 @@ class _KategoriPageState extends State<KategoriPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Kategori'),
+      ),
       body: Column(
         children: [
           Row(

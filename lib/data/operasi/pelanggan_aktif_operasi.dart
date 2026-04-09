@@ -1,20 +1,14 @@
 
 // lib/data/operasi/pelanggan_aktif_operasi.dart
-import 'package:myapp/data/sqlite.dart';
-import 'package:myapp/model/pelanggan_aktif.dart';
+import 'package:admin/data/sqlite.dart';
+import 'package:admin/model/pelanggan_aktif.dart';
 
 class PelangganAktifOperasi {
   final DatabaseHelper dbHelper = DatabaseHelper();
 
   Future<void> createPelangganAktif(PelangganAktif pelanggan) async {
     final db = await dbHelper.database;
-    await db.insert('pelanggan_aktif', {
-      'nama': pelanggan.nama,
-      'paket': pelanggan.paket,
-      'tanggalBerakhir': pelanggan.tanggalBerakhir,
-      'status': pelanggan.status.toString().split('.').last,
-      'avatar': pelanggan.avatar,
-    });
+    await db.insert('pelanggan_aktif', pelanggan.toMap());
   }
 
   Future<List<PelangganAktif>> getPelangganAktif() async {
@@ -22,14 +16,7 @@ class PelangganAktifOperasi {
     final List<Map<String, dynamic>> maps = await db.query('pelanggan_aktif');
 
     return List.generate(maps.length, (i) {
-      return PelangganAktif(
-        id: maps[i]['id'],
-        nama: maps[i]['nama'],
-        paket: maps[i]['paket'],
-        tanggalBerakhir: maps[i]['tanggalBerakhir'],
-        status: StatusMasaAktif.values.firstWhere((e) => e.toString().split('.').last == maps[i]['status']),
-        avatar: maps[i]['avatar'] ?? '',
-      );
+      return PelangganAktif.fromMap(maps[i]);
     });
   }
 
@@ -37,24 +24,23 @@ class PelangganAktifOperasi {
     final db = await dbHelper.database;
     await db.update(
       'pelanggan_aktif',
-      {
-        'nama': pelanggan.nama,
-        'paket': pelanggan.paket,
-        'tanggalBerakhir': pelanggan.tanggalBerakhir,
-        'status': pelanggan.status.toString().split('.').last,
-        'avatar': pelanggan.avatar,
-      },
+      pelanggan.toMap(),
       where: 'id = ?',
       whereArgs: [pelanggan.id],
     );
   }
 
-  Future<void> deletePelangganAktif(int id) async {
+  Future<void> deletePelangganAktif(String id) async {
     final db = await dbHelper.database;
     await db.delete(
       'pelanggan_aktif',
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<void> hapusSemuaPelangganAktif() async {
+    final db = await dbHelper.database;
+    await db.delete('pelanggan_aktif');
   }
 }

@@ -1,7 +1,7 @@
 
 // lib/data/operasi/paket_operasi.dart
-import 'package:myapp/data/sqlite.dart';
-import 'package:myapp/model/paket.dart';
+import 'package:admin/data/sqlite.dart';
+import 'package:admin/model/paket.dart';
 
 class PaketOperasi {
   final DatabaseHelper dbHelper = DatabaseHelper();
@@ -52,5 +52,10 @@ class PaketOperasi {
       where: 'nama = ?',
       whereArgs: [nama],
     );
+  }
+
+  Future<void> hapusSemuaPaket() async {
+    final db = await dbHelper.database;
+    await db.delete('paket');
   }
 }

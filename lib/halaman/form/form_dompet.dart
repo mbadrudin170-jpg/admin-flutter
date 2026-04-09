@@ -1,7 +1,8 @@
 // lib/halaman/form/form_dompet.dart
 import 'package:flutter/material.dart';
-import 'package:myapp/data/operasi/dompet_operasi.dart';
-import 'package:myapp/model/dompet_model.dart';
+import 'package:admin/data/operasi/dompet_operasi.dart';
+import 'package:admin/model/dompet_model.dart';
+import 'package:admin/utils/format_tanggal.dart';
 import 'package:uuid/uuid.dart';
 
 class FormDompet extends StatefulWidget {
@@ -22,7 +23,8 @@ class _FormDompetState extends State<FormDompet> {
       final nuevoDompet = Dompet(
         id: const Uuid().v4(),
         namaDompet: _namaController.text,
-        saldo: double.parse(_saldoController.text),
+        saldo: double.parse(_saldoController.text.replaceAll('.', '')),
+        diperbarui: DateTime.now().toIso8601String(),
       );
       await _dompetOperasi.createDompet(nuevoDompet);
       if (!mounted) return;
@@ -57,11 +59,12 @@ class _FormDompetState extends State<FormDompet> {
                 controller: _saldoController,
                 decoration: const InputDecoration(labelText: 'Saldo Awal'),
                 keyboardType: TextInputType.number,
+                inputFormatters: [CurrencyInputFormatter()],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Saldo tidak boleh kosong';
                   }
-                  if (double.tryParse(value) == null) {
+                  if (double.tryParse(value.replaceAll('.', '')) == null) {
                     return 'Masukkan angka yang valid';
                   }
                   return null;
