@@ -48,6 +48,7 @@ class _FormPelangganState extends State<FormPelanggan> {
         alamat: _alamatController.text,
         password: _passwordController.text,
         macAddress: _macAddressController.text,
+        diperbarui: DateTime.now().toIso8601String(),
       );
       await PelangganOperasi().createPelanggan(newPelanggan);
       if (mounted) {

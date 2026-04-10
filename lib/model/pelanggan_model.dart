@@ -7,6 +7,7 @@ class Pelanggan {
   final String alamat;
   final String password;
   final String macAddress;
+  final String diperbarui;
 
   Pelanggan({
     required this.id,
@@ -15,6 +16,7 @@ class Pelanggan {
     required this.alamat,
     required this.password,
     required this.macAddress,
+    required this.diperbarui,
   });
 
   // Tambahkan metode fromMap dan toMap jika belum ada
@@ -26,6 +28,7 @@ class Pelanggan {
       alamat: map['alamat'],
       password: map['password'],
       macAddress: map['mac_address'],
+      diperbarui: map['diperbarui'],
     );
   }
 
@@ -37,6 +40,7 @@ class Pelanggan {
       'alamat': alamat,
       'password': password,
       'mac_address': macAddress,
+      'diperbarui': diperbarui,
     };
   }
 }
