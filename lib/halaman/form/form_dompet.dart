@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:admin/data/operasi/dompet_operasi.dart';
 import 'package:admin/model/dompet_model.dart';
-import 'package:admin/utils/format_tanggal.dart';
+import 'package:admin/utils/format.dart';
 import 'package:uuid/uuid.dart';
 
 class FormDompet extends StatefulWidget {

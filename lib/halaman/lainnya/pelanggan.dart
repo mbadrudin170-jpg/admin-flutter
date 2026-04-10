@@ -66,7 +66,7 @@ class _PelangganPageState extends State<PelangganPage> {
                       pelanggan.nama,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    subtitle: Text(pelanggan.alamat),
+                    subtitle: Text(pelanggan.macAddress),
                     onTap: () {
                       Navigator.push(
                         context,

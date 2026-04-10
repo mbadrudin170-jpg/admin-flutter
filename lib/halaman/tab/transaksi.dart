@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:admin/data/operasi/transaksi_operasi.dart';
 import 'package:admin/halaman/form/form_transaksi.dart';
 import 'package:admin/model/transaksi_model.dart';
-import 'package:admin/utils/format_tanggal.dart';
+import 'package:admin/utils/format.dart';
 
 import '../detail/detail_transaksi.dart';
 
@@ -135,7 +135,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            FormatTanggal.formatTanggal(tanggal),
+            Format.formatTanggal(tanggal),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Text(
@@ -185,7 +185,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                   : (transaksi.tipe == TipeTransaksi.pengeluaran ? Colors.red : Colors.blue),
             ),
           ),
-          Text(FormatTanggal.formatJam(transaksi.tanggal)),
+          Text(Format.formatJam(transaksi.tanggal)),
         ],
       ),
     );

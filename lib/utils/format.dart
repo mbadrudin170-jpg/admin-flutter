@@ -1,8 +1,9 @@
-// lib/utils/format_tanggal.dart
+ // Path: lib/utils/format.dart
+
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-class FormatTanggal {
+class Format {
   static String formatTanggal(DateTime tanggal) {
     return DateFormat.yMMMEd('id_ID').format(tanggal);
   }
@@ -20,14 +21,19 @@ class FormatTanggal {
 class CurrencyInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
     if (newValue.text.isEmpty) {
       return newValue.copyWith(text: '');
     }
 
     String cleanText = newValue.text.replaceAll(RegExp(r'[^0-g]'), '');
     if (cleanText.isEmpty) {
-      return const TextEditingValue(text: "", selection: TextSelection.collapsed(offset: 0));
+      return const TextEditingValue(
+        text: "",
+        selection: TextSelection.collapsed(offset: 0),
+      );
     }
 
     double number = double.parse(cleanText);

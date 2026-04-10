@@ -1,4 +1,5 @@
-// lib/halaman/form/form_pelanggan_aktif.dart
+// Path: lib/halaman/form/form_pelanggan_aktif.dart
+import 'package:admin/utils/format.dart';
 import 'package:flutter/material.dart';
 
 class FormPelangganAktif extends StatefulWidget {
@@ -9,101 +10,79 @@ class FormPelangganAktif extends StatefulWidget {
 }
 
 class _FormPelangganAktifState extends State<FormPelangganAktif> {
-  final _formKey = GlobalKey<FormState>();
-  final _namaController = TextEditingController();
-  final _statusController = TextEditingController();
-  final _avatarController = TextEditingController();
-
-  final _namaFocusNode = FocusNode();
-  final _statusFocusNode = FocusNode();
-  final _avatarFocusNode = FocusNode();
+  DateTime? _selectedDate;
+  TimeOfDay? _selectedTime;
 
   @override
-  void dispose() {
-    _namaController.dispose();
-    _statusController.dispose();
-    _avatarController.dispose();
-    _namaFocusNode.dispose();
-    _statusFocusNode.dispose();
-    _avatarFocusNode.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    // 3. Ambil tanggal dan waktu TERBARU saat widget pertama kali dibuat
+    _selectedDate = DateTime.now();
+    _selectedTime = TimeOfDay.now();
   }
 
-  void _simpanForm() {
-    if (_formKey.currentState!.validate()) {
-      // Logika untuk menyimpan data akan ditambahkan di sini
-      Navigator.pop(context);
+  // Fungsi untuk menampilkan dialog pemilih tanggal
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        // `setState` memberitahu Flutter untuk membangun ulang UI dengan data baru
+        _selectedDate = picked;
+      });
+    }
+  }
+
+  // Fungsi untuk menampilkan dialog pemilih waktu
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _selectedTime ?? TimeOfDay.now(),
+    );
+    if (picked != null && picked != _selectedTime) {
+      setState(() {
+        _selectedTime = picked;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Pelanggan Aktif'), leading: BackButton()),
+      appBar: AppBar(title: const Text('Form Pelanggan Aktif')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _namaController,
-                focusNode: _namaFocusNode,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Pelanggan',
-                  border: OutlineInputBorder(),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton.icon(
+                  onPressed: () => _selectDate(context),
+                  icon: const Icon(Icons.calendar_today),
+                  label: Text(
+                    _selectedDate == null
+                        ? 'Pilih Tanggal'
+                        : Format.formatTanggal(_selectedDate!),
+                  ),
                 ),
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_statusFocusNode);
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Nama tidak boleh kosong';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _statusController,
-                focusNode: _statusFocusNode,
-                decoration: const InputDecoration(
-                  labelText: 'Status',
-                  border: OutlineInputBorder(),
+                TextButton.icon(
+                  onPressed: () =>
+                      _selectTime(context), // DIUBAH: Memanggil fungsi
+                  icon: const Icon(Icons.access_time),
+                  label: Text(
+                    _selectedTime == null
+                        ? 'Pilih Jam'
+                        : _selectedTime!.format(context),
+                  ),
                 ),
-                textInputAction: TextInputAction.next,
-                onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_avatarFocusNode);
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Status tidak boleh kosong';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _avatarController,
-                focusNode: _avatarFocusNode,
-                decoration: const InputDecoration(
-                  labelText: 'URL Avatar (Opsional)',
-                  border: OutlineInputBorder(),
-                ),
-                textInputAction: TextInputAction.done,
-                onFieldSubmitted: (_) {
-                  // Menutup keyboard karena ini adalah input teks terakhir
-                  _avatarFocusNode.unfocus();
-                },
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _simpanForm,
-                child: const Text('Simpan'),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
       ),
     );

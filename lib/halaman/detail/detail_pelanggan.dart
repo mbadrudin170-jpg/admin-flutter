@@ -68,10 +68,32 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10),
-            Text(
-              'MAC Address: ${widget.pelanggan.macAddress}',
-              style: const TextStyle(fontSize: 16),
+            // lib/halaman/detail/detail_pelanggan.dart
+            Row(
+              children: [
+                Text(
+                  'MAC Address: ${widget.pelanggan.macAddress}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const Spacer(), // Mendorong ikon ke ujung kanan
+                IconButton(
+                  icon: const Icon(Icons.content_copy, size: 20.0),
+                  onPressed: () {
+                    Clipboard.setData(
+                      ClipboardData(text: widget.pelanggan.macAddress),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('MAC Address berhasil disalin!'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  tooltip: 'Salin MAC Address',
+                ),
+              ],
             ),
+
             const SizedBox(height: 10),
             Row(
               children: [

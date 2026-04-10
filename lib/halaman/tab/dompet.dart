@@ -4,7 +4,7 @@ import 'package:admin/data/operasi/dompet_operasi.dart';
 import 'package:admin/halaman/detail/detail_dompet.dart';
 import 'package:admin/halaman/form/form_dompet.dart';
 import 'package:admin/model/dompet_model.dart';
-import 'package:admin/utils/format_tanggal.dart';
+import 'package:admin/utils/format.dart';
 
 class DompetPage extends StatefulWidget {
   const DompetPage({super.key});
@@ -132,7 +132,7 @@ class RingkasanKeuangan extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Rp ${FormatTanggal.formatAngka(amount)}',
+          'Rp ${Format.formatAngka(amount)}',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -168,7 +168,7 @@ class DompetCard extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         subtitle: Text(
-          'Saldo: Rp ${FormatTanggal.formatAngka(dompet.saldo)}',
+          'Saldo: Rp ${Format.formatAngka(dompet.saldo)}',
           style: const TextStyle(fontSize: 16, color: Colors.black54),
         ),
         onTap: onTap,
