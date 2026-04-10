@@ -1,6 +1,7 @@
 // lib/halaman/detail/detail_pelanggan.dart
 import 'package:flutter/material.dart';
 import 'package:admin/model/pelanggan_model.dart';
+import 'package:flutter/services.dart';
 
 class DetailPelangganPage extends StatefulWidget {
   final Pelanggan pelanggan;
@@ -33,20 +34,44 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'ID: ${widget.pelanggan.id}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              'Nama: ${widget.pelanggan.nama}',
+              style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10),
-            Text('Nama: ${widget.pelanggan.nama}', style: const TextStyle(fontSize: 16)),
+            Row(
+              children: [
+                Text(
+                  'Telepon: ${widget.pelanggan.telepon}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const Spacer(), // Ini akan mendorong ikon ke ujung kanan
+                IconButton(
+                  icon: const Icon(Icons.content_copy, size: 20.0),
+                  onPressed: () {
+                    Clipboard.setData(
+                      ClipboardData(text: widget.pelanggan.telepon),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Nomor telepon berhasil disalin!'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
+                  tooltip: 'Salin nomor telepon',
+                ),
+              ],
+            ),
             const SizedBox(height: 10),
-            Text('Telepon: ${widget.pelanggan.telepon}',
-                style: const TextStyle(fontSize: 16)),
+            Text(
+              'Alamat: ${widget.pelanggan.alamat}',
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 10),
-            Text('Alamat: ${widget.pelanggan.alamat}',
-                style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 10),
-            Text('MAC Address: ${widget.pelanggan.macAddress}',
-                style: const TextStyle(fontSize: 16)),
+            Text(
+              'MAC Address: ${widget.pelanggan.macAddress}',
+              style: const TextStyle(fontSize: 16),
+            ),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -56,7 +81,9 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
                 ),
                 IconButton(
                   icon: Icon(
-                    _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                    _isPasswordVisible
+                        ? Icons.visibility_off
+                        : Icons.visibility,
                   ),
                   onPressed: () {
                     setState(() {
