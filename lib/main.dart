@@ -1,10 +1,18 @@
 // lib/main.dart
 import 'package:admin/data/servis/firebase_servis.dart';
 import 'package:admin/data/sqlite.dart';
+import 'package:admin/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Inisialisasi Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Inisialisasi database
   final dbHelper = DatabaseHelper();
@@ -29,23 +37,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Panel'),
-      ),
-      body: const Center(
-        child: Text('Selamat datang di Admin Panel!'),
-      ),
+      home: const SplashScreen(), // Tampilkan SplashScreen sebagai halaman pertama
     );
   }
 }

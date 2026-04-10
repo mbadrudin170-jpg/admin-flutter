@@ -1,4 +1,5 @@
-// lib/halaman/halaman_utama.dart
+// Path: lib/halaman_utama.dart
+
 import 'package:flutter/material.dart';
 import 'package:admin/halaman/lainnya/pelanggan_aktif.dart';
 import 'package:admin/halaman/tab/dompet.dart';
