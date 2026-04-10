@@ -52,7 +52,8 @@ class _FormPelangganState extends State<FormPelanggan> {
       );
       await PelangganOperasi().createPelanggan(newPelanggan);
       if (mounted) {
-        Navigator.pop(context);
+        // Kembalikan nilai true untuk menandakan ada perubahan
+        Navigator.pop(context, true); 
       }
     }
   }
@@ -64,7 +65,12 @@ class _FormPelangganState extends State<FormPelanggan> {
         title: const Text('Tambah Pelanggan'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
-        leading: BackButton(),
+        leading: BackButton(
+          onPressed: () {
+            // Pastikan tidak ada nilai yang dikembalikan saat tombol kembali ditekan
+            Navigator.pop(context, false);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
