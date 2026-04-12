@@ -13,7 +13,7 @@ import 'package:admin/model/dompet_model.dart';
 import 'package:admin/model/kategori_model.dart';
 import 'package:admin/model/paket_model.dart';
 import 'package:admin/model/pelanggan_model.dart';
-import 'package:admin/model/pelanggan_aktif.dart';
+import 'package:admin/model/pelanggan_aktif_model.dart';
 import 'package:admin/model/transaksi_model.dart';
 
 class FirebaseService {

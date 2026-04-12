@@ -1,21 +1,21 @@
 // lib/model/pelanggan_aktif.dart
-enum StatusMasaAktif { lunas, tidakLunas }
+enum StatusPembayaran { lunas, tidakLunas }
 
 class PelangganAktif {
   final String id; // Diubah dari int ke String
   final String nama;
   final String paket;
+  final String tanggalMulai;
   final String tanggalBerakhir;
-  final StatusMasaAktif status;
-  final String avatar;
+  final StatusPembayaran status;
 
   PelangganAktif({
     required this.id,
     required this.nama,
     required this.paket,
+    required this.tanggalMulai,
     required this.tanggalBerakhir,
     required this.status,
-    this.avatar = '',
   });
 
   // Konversi dari Map (Firestore) ke objek PelangganAktif
@@ -24,12 +24,13 @@ class PelangganAktif {
       id: map['id'].toString(), // Pastikan id selalu string
       nama: map['nama'],
       paket: map['paket'],
+      tanggalMulai: map['tanggalMulai'],
       tanggalBerakhir: map['tanggalBerakhir'],
-      status: StatusMasaAktif.values.firstWhere(
+      status: StatusPembayaran.values.firstWhere(
         (e) => e.toString().split('.').last == map['status'],
-        orElse: () => StatusMasaAktif.tidakLunas, // Default jika tidak ditemukan
+        orElse: () =>
+            StatusPembayaran.tidakLunas, // Default jika tidak ditemukan
       ),
-      avatar: map['avatar'] ?? '',
     );
   }
 
@@ -39,9 +40,9 @@ class PelangganAktif {
       'id': id,
       'nama': nama,
       'paket': paket,
+      'tanggalMulai': tanggalMulai,
       'tanggalBerakhir': tanggalBerakhir,
       'status': status.toString().split('.').last,
-      'avatar': avatar,
     };
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin/halaman/detail/detail_pelanggan_aktif.dart';
 import 'package:admin/halaman/form/form_pelanggan_aktif.dart';
-import 'package:admin/model/pelanggan_aktif.dart';
+import 'package:admin/model/pelanggan_aktif_model.dart';
 
 class PelangganAktifPage extends StatefulWidget {
   const PelangganAktifPage({super.key});
@@ -49,32 +49,31 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Tidak ada pelanggan aktif ditemukan.'));
+            return const Center(
+              child: Text('Tidak ada pelanggan aktif ditemukan.'),
+            );
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final pelanggan = snapshot.data![index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetailPelangganAktif(pelanggan: pelanggan),
+                          builder: (context) =>
+                              DetailPelangganAktif(pelanggan: pelanggan),
                         ),
                       );
                     },
                     child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(pelanggan.avatar),
-                        onBackgroundImageError: (exception, stackTrace) {},
-                        child: pelanggan.avatar.isEmpty
-                            ? const Icon(Icons.person, size: 24)
-                            : null,
-                      ),
                       title: Text(
                         pelanggan.nama,
                         style: const TextStyle(fontWeight: FontWeight.bold),

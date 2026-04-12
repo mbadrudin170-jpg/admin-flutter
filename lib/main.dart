@@ -1,10 +1,12 @@
 // lib/main.dart
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'firebase_options.dart';
+
 import 'package:admin/data/servis/firebase_servis.dart';
 import 'package:admin/data/sqlite.dart';
 import 'package:admin/splash_screen.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +15,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Inisialisasi data lokalisasi
+  await initializeDateFormatting('id_ID', null);
 
   // Inisialisasi database
   final dbHelper = DatabaseHelper();

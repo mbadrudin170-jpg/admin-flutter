@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:admin/model/pelanggan_aktif.dart';
+import 'package:admin/model/pelanggan_aktif_model.dart';
 
 class DetailPelangganAktif extends StatelessWidget {
   final PelangganAktif pelanggan;
@@ -23,17 +23,7 @@ class DetailPelangganAktif extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(pelanggan.avatar),
-                onBackgroundImageError: (exception, stackTrace) {},
-                child: pelanggan.avatar.isEmpty
-                    ? const Icon(Icons.person, size: 50)
-                    : null,
-              ),
-            ),
-            const SizedBox(height: 24),
+            
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(

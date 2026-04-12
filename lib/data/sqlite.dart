@@ -97,9 +97,11 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nama TEXT NOT NULL,
         paket TEXT NOT NULL,
+        durasi TEXT NOT NULL,
+        tipeDurasi TEXT NOT NULL,
+        tanggalMulai TEXT NOT NULL,
         tanggalBerakhir TEXT NOT NULL,
         status TEXT NOT NULL,
-        avatar TEXT,
         diperbarui TEXT NOT NULL
       )
     ''');

@@ -1,6 +1,6 @@
 
 // lib/data/pelanggan_aktif_data.dart
-import 'package:admin/model/pelanggan_aktif.dart';
+import 'package:admin/model/pelanggan_aktif_model.dart';
 
 List<PelangganAktif> pelangganAktifList = [
   PelangganAktif(
