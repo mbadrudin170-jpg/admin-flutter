@@ -75,7 +75,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                     },
                     child: ListTile(
                       title: Text(
-                        pelanggan.nama,
+                        pelanggan.idPelanggan,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text("Status: ${pelanggan.status.name}"),

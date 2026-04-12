@@ -95,14 +95,14 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE pelanggan_aktif(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nama TEXT NOT NULL,
-        paket TEXT NOT NULL,
-        durasi TEXT NOT NULL,
-        tipeDurasi TEXT NOT NULL,
+        id_pelanggan TEXT NOT NULL,
+        id_paket TEXT NOT NULL,
         tanggalMulai TEXT NOT NULL,
         tanggalBerakhir TEXT NOT NULL,
         status TEXT NOT NULL,
-        diperbarui TEXT NOT NULL
+        diperbarui TEXT NOT NULL,
+        FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE ON UPDATE CASCADE
       )
     ''');
 

@@ -10,7 +10,7 @@ class DetailPelangganAktif extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(pelanggan.nama),
+        title: Text(pelanggan.idPelanggan),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -35,7 +35,7 @@ class DetailPelangganAktif extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Nama: ${pelanggan.nama}',
+                      'Nama: ${pelanggan.idPelanggan}',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),

@@ -2,17 +2,17 @@
 enum StatusPembayaran { lunas, tidakLunas }
 
 class PelangganAktif {
-  final int? id; 
-  final String nama;
-  final String paket;
+  final int? id;
+  final String idPaket;
+  final String idPelanggan;
   final String tanggalMulai;
   final String tanggalBerakhir;
   final StatusPembayaran status;
 
   PelangganAktif({
     this.id,
-    required this.nama,
-    required this.paket,
+    required this.idPelanggan,
+    required this.idPaket,
     required this.tanggalMulai,
     required this.tanggalBerakhir,
     required this.status,
@@ -21,8 +21,8 @@ class PelangganAktif {
   factory PelangganAktif.fromMap(Map<String, dynamic> map) {
     return PelangganAktif(
       id: map['id'] as int?,
-      nama: map['nama'],
-      paket: map['paket'],
+      idPelanggan: map['id_pelanggan'],
+      idPaket: map['id_paket'],
       tanggalMulai: map['tanggalMulai'],
       tanggalBerakhir: map['tanggalBerakhir'],
       status: StatusPembayaran.values.firstWhere(
@@ -35,8 +35,8 @@ class PelangganAktif {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'nama': nama,
-      'paket': paket,
+      'id_pelanggan': idPelanggan,
+      'id_paket': idPaket,
       'tanggalMulai': tanggalMulai,
       'tanggalBerakhir': tanggalBerakhir,
       'status': status.toString().split('.').last,

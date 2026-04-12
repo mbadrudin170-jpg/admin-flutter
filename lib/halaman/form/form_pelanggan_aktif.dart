@@ -140,8 +140,8 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         );
 
         final newPelangganAktif = PelangganAktif(
-          nama: _selectedPelanggan!.nama,
-          paket: _selectedPaket!.nama,
+          idPelanggan: _selectedPelanggan!.nama,
+          idPaket: _selectedPaket!.nama,
           tanggalMulai: tanggalMulai.toIso8601String(),
           tanggalBerakhir: tanggalBerakhir.toIso8601String(),
           status: StatusPembayaran.lunas,
