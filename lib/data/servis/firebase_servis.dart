@@ -139,13 +139,13 @@ class FirebaseService {
 
   Future<List<PelangganAktif>> _unduhPelangganAktif() async {
     QuerySnapshot snapshot = await _firestore.collection('pelanggan_aktif').get();
-    return snapshot.docs.map((doc) => PelangganAktif.fromMap(doc.data() as Map<String, dynamic>..['id'] = doc.id)).toList();
+    return snapshot.docs.map((doc) => PelangganAktif.fromMap(doc.data() as Map<String, dynamic>)).toList();
   }
 
   Future<void> _unggahPelangganAktif(List<PelangganAktif> items) async {
     final batch = _firestore.batch();
     for (var item in items) {
-      batch.set(_firestore.collection('pelanggan_aktif').doc(item.id), item.toMap());
+      batch.set(_firestore.collection('pelanggan_aktif').doc(item.id.toString()), item.toMap());
     }
     await batch.commit();
   }

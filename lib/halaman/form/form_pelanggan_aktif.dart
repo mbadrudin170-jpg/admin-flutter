@@ -1,4 +1,5 @@
 // Path: lib/halaman/form/form_pelanggan_aktif.dart
+import 'dart:developer' as developer;
 import 'package:admin/data/operasi/paket_operasi.dart';
 import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin/data/operasi/pelanggan_operasi.dart';
@@ -159,13 +160,12 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         catch (e, s) {
           // Menangkap stack trace (s) juga
           // Mencetak detail error ke debug console untuk dianalisis
-          print('Terjadi kesalahan saat menyimpan: $e');
-          print('Stack trace: $s');
+          developer.log('Terjadi kesalahan saat menyimpan', name: 'admin.form.pelanggan_aktif', error: e, stackTrace: s);
 
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Gagal menyimpan. Cek debug console untuk detail.'),
+              content: Text('Gagal menyimpan. Cek log untuk detail.'),
               duration: const Duration(seconds: 4),
             ),
           );
