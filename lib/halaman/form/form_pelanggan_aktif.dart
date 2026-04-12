@@ -117,7 +117,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
 
         // Hitung tanggal berakhir berdasarkan durasi paket
         DateTime tanggalBerakhir;
-        if (_selectedPaket!.tipe == TipeDurasi.Harian) {
+        if (_selectedPaket!.tipe == TipeDurasi.hari) {
           tanggalBerakhir = tanggalMulai.add(Duration(days: _selectedPaket!.durasi));
         } else { // Bulanan
           tanggalBerakhir = DateTime(
@@ -131,9 +131,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         final newPelangganAktif = PelangganAktif(
           id: _selectedPelanggan!.id,
           nama: _selectedPelanggan!.nama,
-          paket: _selectedPaket!,
-          tanggalMulai: '$tanggalMulai',
-          tanggalBerakhir: tanggalBerakhir,
+          paket: _selectedPaket!.nama,
+          tanggalMulai: tanggalMulai.toString(),
+          tanggalBerakhir: tanggalBerakhir.toString(),
           status: StatusPembayaran.lunas,
         );
 
@@ -179,7 +179,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         labelText: 'Pilih Pelanggan',
                         border: OutlineInputBorder(),
                       ),
-                      initialValue: _selectedPelanggan,
+                      value: _selectedPelanggan,
                       items: _pelangganList.map((Pelanggan pelanggan) {
                         return DropdownMenuItem<Pelanggan>(
                           value: pelanggan,
@@ -203,7 +203,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         labelText: 'Pilih Paket',
                         border: OutlineInputBorder(),
                       ),
-                      initialValue: _selectedPaket,
+                      value: _selectedPaket,
                       items: _paketList.map((Paket paket) {
                         return DropdownMenuItem<Paket>(
                           value: paket,
