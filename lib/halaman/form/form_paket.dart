@@ -1,4 +1,5 @@
 // lib/halaman/form/form_paket.dart
+import 'package:admin/data/operasi/paket_operasi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:admin/model/paket_model.dart';
@@ -21,6 +22,8 @@ class _FormPaketPageState extends State<FormPaketPage> {
   final _hargaFocusNode = FocusNode();
   final _durasiFocusNode = FocusNode();
 
+  final PaketOperasi _paketOperasi = PaketOperasi();
+
   @override
   void dispose() {
     _namaController.dispose();
@@ -32,13 +35,27 @@ class _FormPaketPageState extends State<FormPaketPage> {
     super.dispose();
   }
 
-  void _simpanForm() {
+  void _simpanForm() async {
     if (_formKey.currentState!.validate()) {
-      // Logika untuk menyimpan data paket baru
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data paket berhasil disimpan!')),
+      final newPaket = Paket(
+        nama: _namaController.text,
+        harga: int.parse(_hargaController.text),
+        durasi: int.parse(_durasiController.text),
+        tipe: _selectedTipe,
       );
-      Navigator.pop(context);
+      try {
+        await _paketOperasi.createPaket(newPaket);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Data paket berhasil disimpan!')),
+        );
+        Navigator.pop(context, true);
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menyimpan paket: $e')),
+        );
+      }
     }
   }
 

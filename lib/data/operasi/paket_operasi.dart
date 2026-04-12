@@ -1,4 +1,3 @@
-
 // lib/data/operasi/paket_operasi.dart
 import 'package:admin/data/sqlite.dart';
 import 'package:admin/model/paket_model.dart';
@@ -13,6 +12,7 @@ class PaketOperasi {
       'harga': paket.harga,
       'durasi': paket.durasi,
       'tipe': paket.tipe.toString().split('.').last,
+      'diperbarui': DateTime.now().toIso8601String(), // Menambahkan timestamp
     });
   }
 
@@ -22,10 +22,12 @@ class PaketOperasi {
 
     return List.generate(maps.length, (i) {
       return Paket(
+        id: maps[i]['id'].toString(), // Membaca ID dari database
         nama: maps[i]['nama'],
         harga: maps[i]['harga'],
         durasi: maps[i]['durasi'],
-        tipe: TipeDurasi.values.firstWhere((e) => e.toString().split('.').last == maps[i]['tipe']),
+        tipe: TipeDurasi.values.firstWhere(
+            (e) => e.toString().split('.').last == maps[i]['tipe']),
       );
     });
   }
@@ -39,18 +41,19 @@ class PaketOperasi {
         'harga': paket.harga,
         'durasi': paket.durasi,
         'tipe': paket.tipe.toString().split('.').last,
+        'diperbarui': DateTime.now().toIso8601String(), // Menambahkan timestamp
       },
-      where: 'nama = ?',
-      whereArgs: [paket.nama],
+      where: 'id = ?', // Menggunakan ID untuk update
+      whereArgs: [paket.id],
     );
   }
 
-  Future<void> deletePaket(String nama) async {
+  Future<void> deletePaket(String id) async {
     final db = await dbHelper.database;
     await db.delete(
       'paket',
-      where: 'nama = ?',
-      whereArgs: [nama],
+      where: 'id = ?', // Menggunakan ID untuk delete
+      whereArgs: [id],
     );
   }
 

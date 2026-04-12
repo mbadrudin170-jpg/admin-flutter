@@ -63,9 +63,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
       });
       // Guard against context usage across async gaps.
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memuat data: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal memuat data: $e')));
     }
   }
 
@@ -118,8 +118,11 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         // Hitung tanggal berakhir berdasarkan durasi paket
         DateTime tanggalBerakhir;
         if (_selectedPaket!.tipe == TipeDurasi.hari) {
-          tanggalBerakhir = tanggalMulai.add(Duration(days: _selectedPaket!.durasi));
-        } else { // Bulanan
+          tanggalBerakhir = tanggalMulai.add(
+            Duration(days: _selectedPaket!.durasi),
+          );
+        } else {
+          // Bulanan
           tanggalBerakhir = DateTime(
             tanggalMulai.year,
             tanggalMulai.month + _selectedPaket!.durasi,
@@ -148,9 +151,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
           Navigator.pop(context, true); // Kirim hasil 'true' untuk refresh
         } catch (e) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal menyimpan: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Gagal menyimpan: $e')));
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -179,12 +182,13 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         labelText: 'Pilih Pelanggan',
                         border: OutlineInputBorder(),
                       ),
-                      value: _selectedPelanggan,
+                      initialValue: _selectedPelanggan,
                       items: _pelangganList.map((Pelanggan pelanggan) {
                         return DropdownMenuItem<Pelanggan>(
                           value: pelanggan,
-                          child:
-                              Text(pelanggan.nama), // Menampilkan nama pelanggan
+                          child: Text(
+                            pelanggan.nama,
+                          ), // Menampilkan nama pelanggan
                         );
                       }).toList(),
                       onChanged: (Pelanggan? newValue) {
@@ -203,7 +207,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         labelText: 'Pilih Paket',
                         border: OutlineInputBorder(),
                       ),
-                      value: _selectedPaket,
+                      initialValue: _selectedPaket,
                       items: _paketList.map((Paket paket) {
                         return DropdownMenuItem<Paket>(
                           value: paket,
@@ -219,8 +223,10 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                           value == null ? 'Paket tidak boleh kosong' : null,
                     ),
                     const SizedBox(height: 24),
-                    const Text('Pilih Tanggal & Waktu Aktif:',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Pilih Tanggal & Waktu Aktif:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(height: 8),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -242,6 +248,24 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                                 ? 'Pilih Jam'
                                 : '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}',
                           ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Tanggal Mulai:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              _selectedDate == null
+                                  ? 'Pilih Tanggal'
+                                  : Format.formatTanggal(_selectedDate!),
+                            ),
+                          ],
                         ),
                       ],
                     ),
