@@ -1,8 +1,8 @@
-// lib/model/pelanggan_aktif.dart
+// lib/model/pelanggan_aktif_model.dart
 enum StatusPembayaran { lunas, tidakLunas }
 
 class PelangganAktif {
-  final String id; // Diubah dari int ke String
+  final int? id; 
   final String nama;
   final String paket;
   final String tanggalMulai;
@@ -10,7 +10,7 @@ class PelangganAktif {
   final StatusPembayaran status;
 
   PelangganAktif({
-    required this.id,
+    this.id,
     required this.nama,
     required this.paket,
     required this.tanggalMulai,
@@ -18,23 +18,20 @@ class PelangganAktif {
     required this.status,
   });
 
-  // Konversi dari Map (Firestore) ke objek PelangganAktif
   factory PelangganAktif.fromMap(Map<String, dynamic> map) {
     return PelangganAktif(
-      id: map['id'].toString(), // Pastikan id selalu string
+      id: map['id'] as int?,
       nama: map['nama'],
       paket: map['paket'],
       tanggalMulai: map['tanggalMulai'],
       tanggalBerakhir: map['tanggalBerakhir'],
       status: StatusPembayaran.values.firstWhere(
         (e) => e.toString().split('.').last == map['status'],
-        orElse: () =>
-            StatusPembayaran.tidakLunas, // Default jika tidak ditemukan
+        orElse: () => StatusPembayaran.tidakLunas,
       ),
     );
   }
 
-  // Konversi dari objek PelangganAktif ke Map (untuk Firestore)
   Map<String, dynamic> toMap() {
     return {
       'id': id,

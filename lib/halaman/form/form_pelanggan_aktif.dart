@@ -101,6 +101,23 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
     }
   }
 
+  DateTime _hitungTanggalBerakhir(DateTime startDate, Paket paket) {
+    switch (paket.tipe) {
+      case TipeDurasi.jam:
+        return startDate.add(Duration(hours: paket.durasi));
+      case TipeDurasi.hari:
+        return startDate.add(Duration(days: paket.durasi));
+      case TipeDurasi.bulan:
+        return DateTime(
+          startDate.year,
+          startDate.month + paket.durasi,
+          startDate.day,
+          startDate.hour,
+          startDate.minute,
+        );
+    }
+  }
+
   void _saveForm() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedPelanggan != null &&
@@ -115,28 +132,17 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
           _selectedTime!.minute,
         );
 
-        // Hitung tanggal berakhir berdasarkan durasi paket
-        DateTime tanggalBerakhir;
-        if (_selectedPaket!.tipe == TipeDurasi.hari) {
-          tanggalBerakhir = tanggalMulai.add(
-            Duration(days: _selectedPaket!.durasi),
-          );
-        } else {
-          // Bulanan
-          tanggalBerakhir = DateTime(
-            tanggalMulai.year,
-            tanggalMulai.month + _selectedPaket!.durasi,
-            tanggalMulai.day,
-          );
-        }
+        // Hitung tanggal berakhir menggunakan fungsi terpusat
+        final DateTime tanggalBerakhir = _hitungTanggalBerakhir(
+          tanggalMulai,
+          _selectedPaket!,
+        );
 
-        // Buat objek PelangganAktif baru dengan konstruktor yang benar
         final newPelangganAktif = PelangganAktif(
-          id: _selectedPelanggan!.id,
           nama: _selectedPelanggan!.nama,
           paket: _selectedPaket!.nama,
-          tanggalMulai: tanggalMulai.toString(),
-          tanggalBerakhir: tanggalBerakhir.toString(),
+          tanggalMulai: tanggalMulai.toIso8601String(),
+          tanggalBerakhir: tanggalBerakhir.toIso8601String(),
           status: StatusPembayaran.lunas,
         );
 
@@ -149,11 +155,20 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
             const SnackBar(content: Text('Pelanggan berhasil diaktifkan!')),
           );
           Navigator.pop(context, true); // Kirim hasil 'true' untuk refresh
-        } catch (e) {
+        } // lib/halaman/form/form_pelanggan_aktif.dart
+        catch (e, s) {
+          // Menangkap stack trace (s) juga
+          // Mencetak detail error ke debug console untuk dianalisis
+          print('Terjadi kesalahan saat menyimpan: $e');
+          print('Stack trace: $s');
+
           if (!mounted) return;
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Gagal menyimpan: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal menyimpan. Cek debug console untuk detail.'),
+              duration: const Duration(seconds: 4),
+            ),
+          );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -186,9 +201,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                       items: _pelangganList.map((Pelanggan pelanggan) {
                         return DropdownMenuItem<Pelanggan>(
                           value: pelanggan,
-                          child: Text(
-                            pelanggan.nama,
-                          ), // Menampilkan nama pelanggan
+                          child: Text(pelanggan.nama),
                         );
                       }).toList(),
                       onChanged: (Pelanggan? newValue) {
@@ -251,6 +264,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
                     Column(
                       children: [
                         Row(
@@ -261,15 +275,49 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              _selectedDate == null
-                                  ? 'Pilih Tanggal'
-                                  : Format.formatTanggal(_selectedDate!),
+                              (_selectedDate == null || _selectedTime == null)
+                                  ? 'Pilih Tanggal & Jam'
+                                  : '${Format.formatTanggal(_selectedDate!)}, ${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}',
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Tanggal Berakhir:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text((() {
+                              if (_selectedDate != null &&
+                                  _selectedPaket != null) {
+                                DateTime startDate = DateTime(
+                                  _selectedDate!.year,
+                                  _selectedDate!.month,
+                                  _selectedDate!.day,
+                                  _selectedTime?.hour ?? 0,
+                                  _selectedTime?.minute ?? 0,
+                                );
+
+                                // Gunakan fungsi terpusat untuk kalkulasi
+                                final DateTime endDate = _hitungTanggalBerakhir(
+                                  startDate,
+                                  _selectedPaket!,
+                                );
+
+                                final timePart =
+                                    ', ${endDate.hour.toString().padLeft(2, '0')}:${endDate.minute.toString().padLeft(2, '0')}';
+
+                                return '${Format.formatTanggal(endDate)}$timePart';
+                              } else {
+                                return 'Pilih paket & tanggal mulai';
+                              }
+                            }())),
                           ],
                         ),
                       ],
                     ),
-                    const Spacer(), // Mendorong tombol ke bawah
                     ElevatedButton(
                       onPressed: _saveForm,
                       style: ElevatedButton.styleFrom(
