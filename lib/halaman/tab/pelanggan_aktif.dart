@@ -1,4 +1,5 @@
-// lib/halaman/lainnya/pelanggan_aktif.dart
+// lib/halaman/tab/pelanggan_aktif.dart
+import 'package:admin/utils/format.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin/halaman/detail/detail_pelanggan_aktif.dart';
@@ -38,9 +39,50 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
   }
 
+  // Fungsi untuk menampilkan dialog konfirmasi dan menghapus semua data
+  void _opsiHapus() async {
+    final bool? konfirmasi = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: const Text(
+              'Apakah Anda yakin ingin menghapus semua data pelanggan aktif? Tindakan ini tidak dapat dibatalkan.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Hapus'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (konfirmasi == true) {
+      // Panggil fungsi untuk menghapus semua data dari database
+      await _pelangganAktifOperasi.hapusSemuaPelangganAktif();
+      _loadPelangganAktif(); // Muat ulang daftar setelah menghapus
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // PERINGATAN: Ini akan menyebabkan AppBar ganda lagi.
+      appBar: AppBar(
+        title: const Text('Pelanggan Aktif'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_forever),
+            onPressed: _opsiHapus,
+            tooltip: 'Hapus Semua',
+          ),
+        ],
+      ),
       body: FutureBuilder<List<PelangganAktif>>(
         future: _listaPelangganAktifFuture,
         builder: (context, snapshot) {
@@ -78,7 +120,16 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                         pelanggan.idPelanggan,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      subtitle: Text("Status: ${pelanggan.status.name}"),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(pelanggan.status.displayName),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Berakhir: ${Format.formatTanggal(DateTime.parse(pelanggan.tanggalBerakhir))}',
+                          ),
+                        ],
+                      ),
                       trailing: const Icon(Icons.chevron_right),
                     ),
                   ),

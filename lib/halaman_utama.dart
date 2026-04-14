@@ -1,7 +1,7 @@
 // Path: lib/halaman_utama.dart
 
 import 'package:flutter/material.dart';
-import 'package:admin/halaman/lainnya/pelanggan_aktif.dart';
+import 'package:admin/halaman/tab/pelanggan_aktif.dart';
 import 'package:admin/halaman/tab/dompet.dart';
 import 'package:admin/halaman/tab/lainnya.dart';
 import 'package:admin/halaman/tab/transaksi.dart';
@@ -23,13 +23,6 @@ class _HalamanUtamaState extends State<HalamanUtama> {
     LainnyaPage(),
   ];
 
-  static const List<String> _appBarTitles = [
-    'Dompet',
-    'Pelanggan Aktif',
-    'Transaksi',
-    'Lainnya',
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -39,7 +32,6 @@ class _HalamanUtamaState extends State<HalamanUtama> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_appBarTitles[_selectedIndex])),
       body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

@@ -8,7 +8,9 @@ class PelangganAktifOperasi {
 
   Future<void> createPelangganAktif(PelangganAktif pelanggan) async {
     final db = await dbHelper.database;
-    await db.insert('pelanggan_aktif', pelanggan.toMap());
+    final data = pelanggan.toMap();
+    data['diperbarui'] = DateTime.now().toIso8601String();
+    await db.insert('pelanggan_aktif', data);
   }
 
   Future<List<PelangganAktif>> getPelangganAktif() async {
@@ -22,9 +24,11 @@ class PelangganAktifOperasi {
 
   Future<void> updatePelangganAktif(PelangganAktif pelanggan) async {
     final db = await dbHelper.database;
+    final data = pelanggan.toMap();
+    data['diperbarui'] = DateTime.now().toIso8601String();
     await db.update(
       'pelanggan_aktif',
-      pelanggan.toMap(),
+      data,
       where: 'id = ?',
       whereArgs: [pelanggan.id],
     );

@@ -38,6 +38,8 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
+  StatusPembayaran _statusPembayaran = StatusPembayaran.lunas;
+
   @override
   void initState() {
     super.initState();
@@ -140,11 +142,11 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         );
 
         final newPelangganAktif = PelangganAktif(
-          idPelanggan: _selectedPelanggan!.nama,
-          idPaket: _selectedPaket!.nama,
+          idPelanggan: _selectedPelanggan!.id,
+          idPaket: _selectedPaket!.id,
           tanggalMulai: tanggalMulai.toIso8601String(),
           tanggalBerakhir: tanggalBerakhir.toIso8601String(),
-          status: StatusPembayaran.lunas,
+          status: _statusPembayaran,
         );
 
         try {
@@ -160,7 +162,12 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         catch (e, s) {
           // Menangkap stack trace (s) juga
           // Mencetak detail error ke debug console untuk dianalisis
-          developer.log('Terjadi kesalahan saat menyimpan', name: 'admin.form.pelanggan_aktif', error: e, stackTrace: s);
+          developer.log(
+            'Terjadi kesalahan saat menyimpan',
+            name: 'admin.form.pelanggan_aktif',
+            error: e,
+            stackTrace: s,
+          );
 
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
@@ -261,6 +268,62 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                                 ? 'Pilih Jam'
                                 : '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}',
                           ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Column(
+                      children: [
+                        // lib/halaman/form/form_pelanggan_aktif.dart
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      _statusPembayaran ==
+                                          StatusPembayaran.lunas
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.white,
+                                  foregroundColor:
+                                      _statusPembayaran ==
+                                          StatusPembayaran.lunas
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _statusPembayaran = StatusPembayaran.lunas;
+                                  });
+                                },
+                                child: const Text('Lunas'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      _statusPembayaran ==
+                                          StatusPembayaran.belumLunas
+                                      ? Theme.of(context).primaryColor
+                                      : Colors.white,
+                                  foregroundColor:
+                                      _statusPembayaran ==
+                                          StatusPembayaran.belumLunas
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _statusPembayaran =
+                                        StatusPembayaran.belumLunas;
+                                  });
+                                },
+                                child: const Text('Belum Lunas'),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

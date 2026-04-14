@@ -1,5 +1,16 @@
 // lib/model/pelanggan_aktif_model.dart
-enum StatusPembayaran { lunas, tidakLunas }
+enum StatusPembayaran { lunas, belumLunas }
+
+extension StatusPembayaranExtension on StatusPembayaran {
+  String get displayName {
+    switch (this) {
+      case StatusPembayaran.lunas:
+        return 'Lunas';
+      case StatusPembayaran.belumLunas:
+        return 'Belum Lunas';
+    }
+  }
+}
 
 class PelangganAktif {
   final int? id;
@@ -8,6 +19,7 @@ class PelangganAktif {
   final String tanggalMulai;
   final String tanggalBerakhir;
   final StatusPembayaran status;
+  final DateTime? diperbarui;
 
   PelangganAktif({
     this.id,
@@ -16,19 +28,32 @@ class PelangganAktif {
     required this.tanggalMulai,
     required this.tanggalBerakhir,
     required this.status,
+    this.diperbarui,
   });
 
   factory PelangganAktif.fromMap(Map<String, dynamic> map) {
+    StatusPembayaran statusPembayaran;
+    final statusString = map['status'] as String?;
+
+    // Logika parsing yang aman
+    if (statusString == 'lunas') {
+      statusPembayaran = StatusPembayaran.lunas;
+    } else {
+      // Jika nilainya 'tidakLunas', null, atau data rusak lainnya,
+      // kita akan set default ke tidakLunas.
+      statusPembayaran = StatusPembayaran.belumLunas;
+    }
     return PelangganAktif(
       id: map['id'] as int?,
       idPelanggan: map['id_pelanggan'],
       idPaket: map['id_paket'],
       tanggalMulai: map['tanggalMulai'],
       tanggalBerakhir: map['tanggalBerakhir'],
-      status: StatusPembayaran.values.firstWhere(
-        (e) => e.toString().split('.').last == map['status'],
-        orElse: () => StatusPembayaran.tidakLunas,
-      ),
+      status: statusPembayaran,
+
+      diperbarui: map['diperbarui'] != null
+          ? DateTime.parse(map['diperbarui'])
+          : null,
     );
   }
 
@@ -39,7 +64,8 @@ class PelangganAktif {
       'id_paket': idPaket,
       'tanggalMulai': tanggalMulai,
       'tanggalBerakhir': tanggalBerakhir,
-      'status': status.toString().split('.').last,
+      'status': status.name,
+      'diperbarui': diperbarui?.toIso8601String(),
     };
   }
 }
