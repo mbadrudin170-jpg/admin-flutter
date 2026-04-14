@@ -1,4 +1,3 @@
-
 // lib/data/servis/firebase_servis.dart
 import 'dart:async';
 import 'dart:developer' as developer;
@@ -39,29 +38,52 @@ class FirebaseService {
     required Future<void> Function() hapusLokal,
     required Future<void> Function(T) createLokal,
   }) async {
-    developer.log('Memulai sinkronisasi untuk: $namaKoleksi...', name: 'admin.firebase');
+    developer.log(
+      'Memulai sinkronisasi untuk: $namaKoleksi...',
+      name: 'admin.firebase',
+    );
     try {
       List<T> dataFirebase = await unduhDariFirebase();
 
       if (dataFirebase.isEmpty) {
-        developer.log('Tidak ada data di Firebase untuk $namaKoleksi. Mengunggah dari SQLite...', name: 'admin.firebase');
+        developer.log(
+          'Tidak ada data di Firebase untuk $namaKoleksi. Mengunggah dari SQLite...',
+          name: 'admin.firebase',
+        );
         List<T> dataLokal = await getDariLokal();
         if (dataLokal.isNotEmpty) {
           await unggahKeFirebase(dataLokal);
-          developer.log('Berhasil mengunggah $namaKoleksi ke Firebase.', name: 'admin.firebase');
+          developer.log(
+            'Berhasil mengunggah $namaKoleksi ke Firebase.',
+            name: 'admin.firebase',
+          );
         } else {
-          developer.log('Tidak ada data $namaKoleksi di lokal untuk diunggah.', name: 'admin.firebase');
+          developer.log(
+            'Tidak ada data $namaKoleksi di lokal untuk diunggah.',
+            name: 'admin.firebase',
+          );
         }
       } else {
-        developer.log('Data $namaKoleksi ditemukan di Firebase. Memperbarui SQLite...', name: 'admin.firebase');
+        developer.log(
+          'Data $namaKoleksi ditemukan di Firebase. Memperbarui SQLite...',
+          name: 'admin.firebase',
+        );
         await hapusLokal();
         for (var item in dataFirebase) {
           await createLokal(item);
         }
-        developer.log('SQLite untuk $namaKoleksi diperbarui dari Firebase.', name: 'admin.firebase');
+        developer.log(
+          'SQLite untuk $namaKoleksi diperbarui dari Firebase.',
+          name: 'admin.firebase',
+        );
       }
     } catch (e, s) {
-      developer.log('Error saat sinkronisasi $namaKoleksi', name: 'admin.firebase', error: e, stackTrace: s);
+      developer.log(
+        'Error saat sinkronisasi $namaKoleksi',
+        name: 'admin.firebase',
+        error: e,
+        stackTrace: s,
+      );
     }
   }
 
@@ -71,7 +93,13 @@ class FirebaseService {
 
   Future<List<Kategori>> _unduhKategori() async {
     QuerySnapshot snapshot = await _firestore.collection('kategori').get();
-    return snapshot.docs.map((doc) => Kategori.fromMap(doc.data() as Map<String, dynamic>..['id'] = doc.id)).toList();
+    return snapshot.docs
+        .map(
+          (doc) => Kategori.fromMap(
+            doc.data() as Map<String, dynamic>..['id'] = doc.id,
+          ),
+        )
+        .toList();
   }
 
   Future<void> _unggahKategori(List<Kategori> items) async {
@@ -88,7 +116,13 @@ class FirebaseService {
 
   Future<List<Dompet>> _unduhDompet() async {
     QuerySnapshot snapshot = await _firestore.collection('dompet').get();
-    return snapshot.docs.map((doc) => Dompet.fromMap(doc.data() as Map<String, dynamic>..['id'] = doc.id)).toList();
+    return snapshot.docs
+        .map(
+          (doc) => Dompet.fromMap(
+            doc.data() as Map<String, dynamic>..['id'] = doc.id,
+          ),
+        )
+        .toList();
   }
 
   Future<void> _unggahDompet(List<Dompet> items) async {
@@ -105,7 +139,13 @@ class FirebaseService {
 
   Future<List<Paket>> _unduhPaket() async {
     QuerySnapshot snapshot = await _firestore.collection('paket').get();
-    return snapshot.docs.map((doc) => Paket.fromMap(doc.data() as Map<String, dynamic>..['id'] = doc.id)).toList();
+    return snapshot.docs
+        .map(
+          (doc) => Paket.fromMap(
+            doc.data() as Map<String, dynamic>..['id'] = doc.id,
+          ),
+        )
+        .toList();
   }
 
   Future<void> _unggahPaket(List<Paket> items) async {
@@ -122,7 +162,13 @@ class FirebaseService {
 
   Future<List<Pelanggan>> _unduhPelanggan() async {
     QuerySnapshot snapshot = await _firestore.collection('pelanggan').get();
-    return snapshot.docs.map((doc) => Pelanggan.fromMap(doc.data() as Map<String, dynamic>..['id'] = doc.id)).toList();
+    return snapshot.docs
+        .map(
+          (doc) => Pelanggan.fromMap(
+            doc.data() as Map<String, dynamic>..['id'] = doc.id,
+          ),
+        )
+        .toList();
   }
 
   Future<void> _unggahPelanggan(List<Pelanggan> items) async {
@@ -138,14 +184,23 @@ class FirebaseService {
   // =========================================================================
 
   Future<List<PelangganAktif>> _unduhPelangganAktif() async {
-    QuerySnapshot snapshot = await _firestore.collection('pelanggan_aktif').get();
-    return snapshot.docs.map((doc) => PelangganAktif.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    QuerySnapshot snapshot = await _firestore
+        .collection('pelanggan_aktif')
+        .get();
+    return snapshot.docs
+        .map(
+          (doc) => PelangganAktif.fromMap(doc.data() as Map<String, dynamic>),
+        )
+        .toList();
   }
 
   Future<void> _unggahPelangganAktif(List<PelangganAktif> items) async {
     final batch = _firestore.batch();
     for (var item in items) {
-      batch.set(_firestore.collection('pelanggan_aktif').doc(item.id.toString()), item.toMap());
+      batch.set(
+        _firestore.collection('pelanggan_aktif').doc(item.id.toString()),
+        item.toMap(),
+      );
     }
     await batch.commit();
   }
@@ -156,7 +211,13 @@ class FirebaseService {
 
   Future<List<Transaksi>> _unduhTransaksi() async {
     QuerySnapshot snapshot = await _firestore.collection('transaksi').get();
-    return snapshot.docs.map((doc) => Transaksi.fromMap(doc.data() as Map<String, dynamic>..['id'] = doc.id)).toList();
+    return snapshot.docs
+        .map(
+          (doc) => Transaksi.fromMap(
+            doc.data() as Map<String, dynamic>..['id'] = doc.id,
+          ),
+        )
+        .toList();
   }
 
   Future<void> _unggahTransaksi(List<Transaksi> items) async {
@@ -173,7 +234,7 @@ class FirebaseService {
 
   Future<void> sinkronkanSemuaData() async {
     developer.log('MEMULAI SINKRONISASI DATA GLOBAL', name: 'admin.firebase');
-    
+
     await _sinkronkan<Kategori>(
       namaKoleksi: 'Kategori',
       unduhDariFirebase: _unduhKategori,
@@ -209,12 +270,12 @@ class FirebaseService {
       hapusLokal: _pelangganOperasi.hapusSemuaPelanggan,
       createLokal: _pelangganOperasi.createPelanggan,
     );
-    
+
     await _sinkronkan<PelangganAktif>(
       namaKoleksi: 'PelangganAktif',
       unduhDariFirebase: _unduhPelangganAktif,
       unggahKeFirebase: _unggahPelangganAktif,
-      getDariLokal: _pelangganAktifOperasi.getPelangganAktif,
+      getDariLokal: _pelangganAktifOperasi.ambilSemuaPelangganAktif,
       hapusLokal: _pelangganAktifOperasi.hapusSemuaPelangganAktif,
       createLokal: _pelangganAktifOperasi.createPelangganAktif,
     );

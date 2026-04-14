@@ -6,6 +6,8 @@ import 'package:admin/halaman/detail/detail_pelanggan_aktif.dart';
 import 'package:admin/halaman/form/form_pelanggan_aktif.dart';
 import 'package:admin/model/pelanggan_aktif_model.dart';
 
+enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
+
 class PelangganAktifPage extends StatefulWidget {
   const PelangganAktifPage({super.key});
 
@@ -25,7 +27,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
   void _loadPelangganAktif() {
     setState(() {
-      _listaPelangganAktifFuture = _pelangganAktifOperasi.getPelangganAktif();
+      _listaPelangganAktifFuture = _pelangganAktifOperasi
+          .ambilSemuaPelangganAktif();
     });
   }
 
@@ -34,38 +37,94 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       context,
       MaterialPageRoute(builder: (context) => const FormPelangganAktif()),
     );
+    if (!mounted) return;
     if (result == true) {
       _loadPelangganAktif();
     }
   }
 
-  // Fungsi untuk menampilkan dialog konfirmasi dan menghapus semua data
+  // Fungsi untuk menampilkan dialog dengan beberapa opsi hapus
   void _opsiHapus() async {
-    final bool? konfirmasi = await showDialog(
+    // Menampilkan SimpleDialog untuk memilih opsi
+    final OpsiHapusPilihan? pilihan = await showDialog<OpsiHapusPilihan>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Konfirmasi Hapus'),
-          content: const Text(
-              'Apakah Anda yakin ingin menghapus semua data pelanggan aktif? Tindakan ini tidak dapat dibatalkan.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Batal'),
+        return SimpleDialog(
+          title: const Text('Pilih Opsi Hapus'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiHapusPilihan.hapusKadaluarsa);
+              },
+              child: const Text('Hapus pelanggan kadaluarsa'),
             ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Hapus'),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiHapusPilihan.hapusSemua);
+              },
+              child: Text(
+                'Hapus Semua Pelanggan',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiHapusPilihan.batal);
+              },
+              child: const Text('Batal'),
             ),
           ],
         );
       },
     );
 
-    if (konfirmasi == true) {
-      // Panggil fungsi untuk menghapus semua data dari database
-      await _pelangganAktifOperasi.hapusSemuaPelangganAktif();
-      _loadPelangganAktif(); // Muat ulang daftar setelah menghapus
+    if (!mounted) return;
+
+    // Menangani pilihan dari pengguna
+    switch (pilihan) {
+      case OpsiHapusPilihan.hapusSemua:
+        // Meminta konfirmasi ulang sebelum menghapus semua
+        final bool? konfirmasi = await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Konfirmasi Hapus Semua'),
+              content: const Text(
+                'Apakah Anda yakin ingin menghapus semua data pelanggan aktif? Tindakan ini tidak dapat dibatalkan.',
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Batal'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Hapus'),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (konfirmasi == true) {
+          await _pelangganAktifOperasi.hapusSemuaPelangganAktif();
+          _loadPelangganAktif(); // Muat ulang daftar setelah menghapus
+        }
+        break;
+      case OpsiHapusPilihan.hapusKadaluarsa:
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Fitur hapus pelanggan kadaluarsa belum diimplementasikan.',
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        break;
+      case OpsiHapusPilihan.batal:
+      default:
+        // Pengguna memilih batal atau menutup dialog, tidak ada tindakan yang diambil.
+        break;
     }
   }
 
