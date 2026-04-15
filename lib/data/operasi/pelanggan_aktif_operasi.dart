@@ -8,9 +8,11 @@ class PelangganAktifOperasi {
 
   Future<int> createPelangganAktif(PelangganAktif pelangganAktif) async {
     final db = await dbHelper.database;
+    final now = DateTime.now();
+    final data = pelangganAktif.toMap()..['diperbarui'] = now.toIso8601String();
     return await db.insert(
       'pelanggan_aktif',
-      pelangganAktif.toMap(),
+      data,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
@@ -25,7 +27,7 @@ class PelangganAktifOperasi {
   }
 
   // Perbaikan: Menambahkan metode yang hilang
-  Future<PelangganAktif?> ambilSatuPelangganAktif(int id) async {
+  Future<PelangganAktif?> ambilSatuPelangganAktif(String id) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'pelanggan_aktif',
@@ -41,9 +43,11 @@ class PelangganAktifOperasi {
 
   Future<void> updatePelangganAktif(PelangganAktif pelangganAktif) async {
     final db = await dbHelper.database;
+    final now = DateTime.now();
+    final data = pelangganAktif.toMap()..['diperbarui'] = now.toIso8601String();
     await db.update(
       'pelanggan_aktif',
-      pelangganAktif.toMap(),
+      data,
       where: 'id = ?',
       whereArgs: [pelangganAktif.id],
     );

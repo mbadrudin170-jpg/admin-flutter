@@ -99,11 +99,10 @@ class FirebaseService {
     developer.log('Pengunggahan batch selesai.', name: 'FirebaseService');
   }
 
-  Future<void> _unduhPerubahan(DateTime lastSync, Map<String, dynamic> operasiMap) async {
+ Future<void> _unduhPerubahan(DateTime lastSync, Map<String, dynamic> operasiMap) async {
     developer.log('Mengunduh perubahan sejak $lastSync', name: 'FirebaseService');
 
     for (var collectionName in operasiMap.keys) {
-        // Perbaikan: Gunakan 'diperbarui'
         final querySnapshot = await _firestore
             .collection(collectionName)
             .where('diperbarui', isGreaterThan: lastSync.toIso8601String())
@@ -113,20 +112,49 @@ class FirebaseService {
             developer.log('  - Menemukan ${querySnapshot.docs.length} perubahan di koleksi $collectionName dari Firebase', name: 'FirebaseService');
             final op = operasiMap[collectionName];
             final items = querySnapshot.docs.map((doc) {
-                if (op is KategoriOperasi) return Kategori.fromMap(doc.data());
-                if (op is DompetOperasi) return Dompet.fromMap(doc.data());
-                if (op is TransaksiOperasi) return Transaksi.fromMap(doc.data());
-                if (op is PelangganOperasi) return Pelanggan.fromMap(doc.data());
-                if (op is PaketOperasi) return Paket.fromMap(doc.data());
-                if (op is PelangganAktifOperasi) return PelangganAktif.fromMap(doc.data());
+                final data = doc.data();
+                // Pastikan ID disetel dari ID dokumen Firebase
+                data['id'] ??= int.tryParse(doc.id) ?? doc.id; 
+                if (op is KategoriOperasi) {
+                  return Kategori.fromMap(data);
+                }
+                if (op is DompetOperasi) {
+                  return Dompet.fromMap(data);
+                }
+                if (op is TransaksiOperasi) {
+                  return Transaksi.fromMap(data);
+                }
+                if (op is PelangganOperasi) {
+                  return Pelanggan.fromMap(data);
+                }
+                if (op is PaketOperasi) {
+                  return Paket.fromMap(data);
+                }
+                if (op is PelangganAktifOperasi) {
+                  return PelangganAktif.fromMap(data);
+                }
                 return null;
             }).where((item) => item != null).toList();
 
-            await op.sisipkanAtauPerbaruiBatch(items);
+            // --- PERBAIKAN: Cast list ke tipe yang benar ---
+            if (op is KategoriOperasi) {
+              await op.sisipkanAtauPerbaruiBatch(items.cast<Kategori>());
+            } else if (op is DompetOperasi) {
+              await op.sisipkanAtauPerbaruiBatch(items.cast<Dompet>());
+            } else if (op is TransaksiOperasi) {
+              await op.sisipkanAtauPerbaruiBatch(items.cast<Transaksi>());
+            } else if (op is PelangganOperasi) {
+              await op.sisipkanAtauPerbaruiBatch(items.cast<Pelanggan>());
+            } else if (op is PaketOperasi) {
+              await op.sisipkanAtauPerbaruiBatch(items.cast<Paket>());
+            } else if (op is PelangganAktifOperasi) {
+              await op.sisipkanAtauPerbaruiBatch(items.cast<PelangganAktif>());
+            }
         }
     }
     developer.log('Pengunduhan perubahan selesai.', name: 'FirebaseService');
-  }
+}
+
 
   Future<void> hapusPelangganAktif(String id) async {
     try {

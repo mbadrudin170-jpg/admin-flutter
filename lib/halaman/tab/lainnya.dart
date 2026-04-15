@@ -10,6 +10,7 @@ class LainnyaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text('Lainnya')),
       // AppBar tidak diperlukan di sini karena sudah ada di main.dart
       body: ListView(
         padding: const EdgeInsets.all(8.0),

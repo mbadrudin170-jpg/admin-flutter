@@ -29,6 +29,57 @@ class _PaketPageState extends State<PaketPage> {
     });
   }
 
+  void _hapusSemuaPaket() {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        // Menggunakan context yang berbeda untuk dialog
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: const Text(
+            'Apakah Anda yakin ingin menghapus semua paket? Tindakan ini tidak dapat dibatalkan.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Batal'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Tutup dialog
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Hapus'),
+              onPressed: () async {
+                // Ambil ScaffoldMessenger SEBELUM async gap
+                final messenger = ScaffoldMessenger.of(context);
+                Navigator.of(dialogContext).pop(); // Tutup dialog dulu
+
+                try {
+                  await _paketOperasi.hapusSemuaPaket();
+                  _refreshPaketList(); // Refresh list setelah hapus
+
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Semua paket berhasil dihapus.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } catch (e) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text('Gagal menghapus paket: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,6 +87,13 @@ class _PaketPageState extends State<PaketPage> {
         title: const Text('Daftar Paket'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            onPressed: _hapusSemuaPaket, // Panggil fungsi hapus di sini
+            icon: const Icon(Icons.delete_sweep),
+            tooltip: 'Hapus Semua',
+          ),
+        ],
       ),
       body: FutureBuilder<List<Paket>>(
         future: _paketFuture,

@@ -9,7 +9,9 @@ class PaketOperasi {
 
   Future<int> createPaket(Paket paket) async {
     final db = await dbHelper.database;
-    return await db.insert('paket', paket.toMap());
+    final now = DateTime.now();
+    final data = paket.toMap()..['diperbarui'] = now.toIso8601String();
+    return await db.insert('paket', data);
   }
 
   Future<List<Paket>> getPaket() async {
@@ -30,21 +32,22 @@ class PaketOperasi {
 
     if (maps.isNotEmpty) {
       return Paket.fromMap(maps.first);
-    } 
+    }
     return null;
   }
 
   // Perbaikan: Menambahkan kembali metode updatePaket yang hilang
   Future<void> updatePaket(Paket paket) async {
     final db = await dbHelper.database;
-    await db.update(
-      'paket',
-      paket.toMap(),
-      where: 'id = ?',
-      whereArgs: [paket.id],
-    );
+    final now = DateTime.now();
+    final data = paket.toMap()..['diperbarui'] = now.toIso8601String();
+    await db.update('paket', data, where: 'id = ?', whereArgs: [paket.id]);
   }
 
+  Future<void> hapusSemuaPaket() async {
+    final db = await dbHelper.database;
+    await db.delete('paket');
+  }
   // == METODE BARU UNTUK SINKRONISASI INKREMENTAL ==
 
   Future<List<Paket>> getPerubahan(DateTime since) async {

@@ -2,7 +2,8 @@
 import 'package:admin/data/operasi/paket_operasi.dart';
 import 'package:admin/model/paket_model.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart'; // Impor DatabaseException
+import 'package:sqflite/sqflite.dart';
+import 'dart:developer' as developer;
 
 class FormPaket extends StatefulWidget {
   final Paket? paket;
@@ -59,7 +60,7 @@ class _FormPaketState extends State<FormPaket> {
           ),
         );
         Navigator.pop(context, true);
-      } on DatabaseException catch (e) {
+      } on DatabaseException catch (e, s) {
         // Tangkap error database secara spesifik
         if (!mounted) return;
         String errorMessage =
@@ -68,12 +69,26 @@ class _FormPaketState extends State<FormPaket> {
         if (e.isUniqueConstraintError()) {
           errorMessage = 'Nama paket sudah ada. Harap gunakan nama lain.';
         }
+        developer.log(
+          'Gagal menyimpan paket: $errorMessage',
+          name: 'form_paket.save',
+          error: e,
+          stackTrace: s,
+          level: 1000,
+        );
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(errorMessage)));
-      } catch (e) {
+      } catch (e, s) {
         // Tangkap error lainnya
         if (!mounted) return;
+        developer.log(
+          'Gagal menyimpan paket: Terjadi kesalahan tidak diketahui.',
+          name: 'form_paket.save',
+          error: e,
+          stackTrace: s,
+          level: 1000,
+        );
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));

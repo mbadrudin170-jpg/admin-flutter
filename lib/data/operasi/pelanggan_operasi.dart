@@ -8,8 +8,14 @@ class PelangganOperasi {
 
   Future<void> createPelanggan(Pelanggan pelanggan) async {
     final db = await dbHelper.database;
-    await db.insert('pelanggan', pelanggan.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    final now = DateTime.now();
+    final data = pelanggan.toMap()..['diperbarui'] = now.toIso8601String();
+
+    await db.insert(
+      'pelanggan',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<Pelanggan>> getPelanggan() async {
@@ -31,7 +37,7 @@ class PelangganOperasi {
 
     if (maps.isNotEmpty) {
       return Pelanggan.fromMap(maps.first);
-    } 
+    }
     return null;
   }
 
@@ -47,11 +53,7 @@ class PelangganOperasi {
 
   Future<void> deletePelanggan(String id) async {
     final db = await dbHelper.database;
-    await db.delete(
-      'pelanggan',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('pelanggan', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<List<Pelanggan>> getPerubahan(DateTime since) async {

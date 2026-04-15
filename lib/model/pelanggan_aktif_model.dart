@@ -1,4 +1,7 @@
 // lib/model/pelanggan_aktif_model.dart
+import 'package:uuid/uuid.dart';
+
+// Enum untuk status pembayaran
 enum StatusPembayaran {
   lunas,
   belumLunas;
@@ -14,45 +17,44 @@ enum StatusPembayaran {
 }
 
 class PelangganAktif {
-  final int? id;
-  final String idPelanggan; 
-  final int idPaket;
+  final String? id;
+  final String idPelanggan;
+  final String idPaket;
   final String tanggalMulai;
   final String tanggalBerakhir;
   final StatusPembayaran status;
   final DateTime? diperbarui;
+  final String statusSinkronisasi;
 
   PelangganAktif({
-    this.id,
+    String? id,
     required this.idPelanggan,
     required this.idPaket,
     required this.tanggalMulai,
     required this.tanggalBerakhir,
     required this.status,
     this.diperbarui,
-  });
+    this.statusSinkronisasi = 'SINKRON', // Default value
+  }) : id = id ?? const Uuid().v4();
 
+  // Konversi dari Map ke objek
   factory PelangganAktif.fromMap(Map<String, dynamic> map) {
-    final statusString = map['status'] as String?;
-    StatusPembayaran statusPembayaran;
-    if (statusString == 'lunas') {
-      statusPembayaran = StatusPembayaran.lunas;
-    } else {
-      statusPembayaran = StatusPembayaran.belumLunas;
-    }
     return PelangganAktif(
-      id: map['id'] as int?,
-      idPelanggan: map['id_pelanggan'].toString(),
-      idPaket: int.tryParse(map['id_paket'].toString()) ?? 0,
-      tanggalMulai: map['tanggalMulai'] ?? '',
-      tanggalBerakhir: map['tanggalBerakhir'] ?? '',
-      status: statusPembayaran,
-      diperbarui: map['diperbarui'] != null
-          ? DateTime.parse(map['diperbarui'])
-          : null,
+      id: map['id'],
+      idPelanggan: map['id_pelanggan'],
+      idPaket: map['id_paket'],
+      tanggalMulai: map['tanggalMulai'],
+      tanggalBerakhir: map['tanggalBerakhir'],
+      status: StatusPembayaran.values.firstWhere(
+        (e) => e.name == map['status'],
+        orElse: () => StatusPembayaran.lunas,
+      ),
+      diperbarui: map['diperbarui'] != null ? DateTime.parse(map['diperbarui']) : null,
+      statusSinkronisasi: map['status_sinkronisasi'] ?? 'SINKRON',
     );
   }
 
+  // Konversi dari objek ke Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -62,6 +64,7 @@ class PelangganAktif {
       'tanggalBerakhir': tanggalBerakhir,
       'status': status.name,
       'diperbarui': diperbarui?.toIso8601String(),
+      'status_sinkronisasi': statusSinkronisasi,
     };
   }
 }

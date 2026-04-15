@@ -9,8 +9,11 @@ class TransaksiOperasi {
 
   Future<void> createTransaksi(Transaksi transaksi) async {
     final db = await dbHelper.database;
-    await db.insert('transaksi', transaksi.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(
+      'transaksi',
+      transaksi.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<Transaksi>> getTransaksi() async {
@@ -33,11 +36,7 @@ class TransaksiOperasi {
 
   Future<void> deleteTransaksi(String id) async {
     final db = await dbHelper.database;
-    await db.delete(
-      'transaksi',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('transaksi', where: 'id = ?', whereArgs: [id]);
   }
 
   // == METODE BARU UNTUK SINKRONISASI INKREMENTAL ==

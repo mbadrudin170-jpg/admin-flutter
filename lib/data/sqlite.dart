@@ -6,7 +6,6 @@ import 'package:path_provider/path_provider.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._internal();
-
   static Database? _database;
 
   DatabaseHelper._internal();
@@ -22,7 +21,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      version: 3, // <-- Langkah 1: Versi database dinaikkan
+      version: 5, // Naikkan versi karena struktur berubah kembali ke TEXT
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -32,19 +31,22 @@ class DatabaseHelper {
     await _createTables(db);
   }
 
-  // Langkah 3: Implementasi _onUpgrade yang aman
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 3) {
-      // Tambahkan kolom baru tanpa menghapus data yang ada
-      await db.execute('''
-        ALTER TABLE pelanggan_aktif 
-        ADD COLUMN status_sinkronisasi TEXT NOT NULL DEFAULT 'SINKRON'
-      ''');
-      // Tambahkan ALTER TABLE untuk tabel lain di sini jika diperlukan di masa depan
+    if (oldVersion < 5) {
+      // Hapus tabel lama untuk menerapkan perubahan TEXT PRIMARY KEY
+      await db.execute("DROP TABLE IF EXISTS kategori");
+      await db.execute("DROP TABLE IF EXISTS sub_kategori");
+      await db.execute("DROP TABLE IF EXISTS paket");
+      await db.execute("DROP TABLE IF EXISTS pelanggan");
+      await db.execute("DROP TABLE IF EXISTS pelanggan_aktif");
+      await db.execute("DROP TABLE IF EXISTS transaksi");
+      await db.execute("DROP TABLE IF EXISTS dompet");
+      await _createTables(db);
     }
   }
 
   Future<void> _createTables(Database db) async {
+    // 1. Kategori
     await db.execute('''
       CREATE TABLE kategori(
         id TEXT PRIMARY KEY,
@@ -54,6 +56,7 @@ class DatabaseHelper {
       )
     ''');
 
+    // 2. Sub Kategori
     await db.execute('''
       CREATE TABLE sub_kategori(
         id TEXT PRIMARY KEY,
@@ -64,9 +67,10 @@ class DatabaseHelper {
       )
     ''');
 
+    // 3. Paket
     await db.execute('''
       CREATE TABLE paket(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         nama TEXT NOT NULL,
         harga INTEGER NOT NULL,
         durasi INTEGER NOT NULL,
@@ -75,6 +79,7 @@ class DatabaseHelper {
       )
     ''');
 
+    // 4. Pelanggan
     await db.execute('''
       CREATE TABLE pelanggan(
         id TEXT PRIMARY KEY,
@@ -87,22 +92,23 @@ class DatabaseHelper {
       )
     ''');
 
-    // Langkah 2: Tambahkan kolom baru di definisi tabel utama
+    // 5. Pelanggan Aktif
     await db.execute('''
       CREATE TABLE pelanggan_aktif(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT PRIMARY KEY,
         id_pelanggan TEXT NOT NULL,
         id_paket TEXT NOT NULL,
         tanggalMulai TEXT NOT NULL,
         tanggalBerakhir TEXT NOT NULL,
         status TEXT NOT NULL,
         diperbarui TEXT NOT NULL,
-        status_sinkronisasi TEXT NOT NULL DEFAULT 'SINKRON', --<-- Kolom baru ditambahkan
+        status_sinkronisasi TEXT NOT NULL DEFAULT 'SINKRON',
         FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE ON UPDATE CASCADE
       )
     ''');
 
+    // 6. Transaksi
     await db.execute('''
       CREATE TABLE transaksi(
         id TEXT PRIMARY KEY,
@@ -119,6 +125,7 @@ class DatabaseHelper {
       )
     ''');
 
+    // 7. Dompet
     await db.execute('''
       CREATE TABLE dompet(
         id TEXT PRIMARY KEY,

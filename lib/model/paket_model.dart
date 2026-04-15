@@ -1,5 +1,7 @@
 // lib/model/paket_model.dart
 
+import 'package:uuid/uuid.dart';
+
 // Enum untuk tipe durasi paket
 enum TipeDurasi {
   jam,
@@ -20,19 +22,21 @@ enum TipeDurasi {
 }
 
 class Paket {
-  final int? id; // ID dari database (nullable untuk paket baru)
+  final String? id; // ID dari database (nullable untuk paket baru)
   final String nama;
   final int harga;
   final int durasi;
   final TipeDurasi tipe;
+  final DateTime? diperbarui;
 
   Paket({
-    this.id,
+    String? id,
     required this.nama,
     required this.harga,
     required this.durasi,
     required this.tipe,
-  });
+    this.diperbarui,
+  }) : id = id ?? const Uuid().v4();
 
   // Konversi dari Map (dari database) ke objek Paket
   factory Paket.fromMap(Map<String, dynamic> map) {
@@ -45,6 +49,9 @@ class Paket {
         (e) => e.name == map['tipe'], // Mencocokkan berdasarkan nama enum
         orElse: () => TipeDurasi.hari, // Default jika ada data korup
       ),
+      diperbarui: map['diperbarui'] != null
+          ? DateTime.parse(map['diperbarui'])
+          : null,
     );
   }
 
@@ -56,6 +63,7 @@ class Paket {
       'harga': harga,
       'durasi': durasi,
       'tipe': tipe.name, // Menyimpan nama enum sebagai string
+      'diperbarui': diperbarui?.toIso8601String(),
     };
   }
 }
