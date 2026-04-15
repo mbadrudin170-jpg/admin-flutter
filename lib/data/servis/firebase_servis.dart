@@ -45,30 +45,20 @@ class FirebaseService {
     final pelangganAktifOperasi = PelangganAktifOperasi();
 
     try {
-      final List<Future> futures = [
+      // Disederhanakan: Biarkan kesalahan menyebar ke blok catch utama.
+      await Future.wait([
         _syncKategori(kategoriOperasi),
         _syncTransaksi(transaksiOperasi),
         _syncDompet(dompetOperasi),
         _syncPelanggan(pelangganOperasi),
         _syncPaket(paketOperasi),
         _syncPelangganAktif(pelangganAktifOperasi),
-      ];
+      ]);
 
-      await Future.wait(
-        futures.map(
-          (f) => f.catchError((e, s) {
-            developer.log(
-              'Error dalam salah satu future sinkronisasi',
-              error: e,
-              stackTrace: s,
-              name: 'FirebaseService',
-            );
-            return null;
-          }),
-        ),
-      );
+      // Log ini sekarang hanya akan berjalan jika SEMUA future di atas berhasil.
       developer.log('Sinkronisasi semua data selesai', name: 'FirebaseService');
     } catch (e, s) {
+      // Jika salah satu future di Future.wait gagal, itu akan ditangkap di sini.
       developer.log(
         'Kesalahan besar saat sinkronisasi',
         error: e,
