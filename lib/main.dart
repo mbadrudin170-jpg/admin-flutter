@@ -20,7 +20,8 @@ void main() async {
   await initializeDateFormatting('id_ID', null);
 
   // Inisialisasi database
-  final dbHelper = DatabaseHelper();
+  // Perbaikan: Gunakan instance singleton
+  final dbHelper = DatabaseHelper.instance;
   await dbHelper.database;
 
   // Inisialisasi layanan Firebase

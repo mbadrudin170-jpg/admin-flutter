@@ -41,7 +41,7 @@ class PelangganAktif {
       statusPembayaran = StatusPembayaran.belumLunas;
     }
     return PelangganAktif(
-      id: map['id'] != null ? int.tryParse(map['id'].toString()) : null,
+      id: map['id'] as int?,
       idPelanggan: map['id_pelanggan'].toString(),
       idPaket: int.tryParse(map['id_paket'].toString()) ?? 0,
       tanggalMulai: map['tanggalMulai'] ?? '',

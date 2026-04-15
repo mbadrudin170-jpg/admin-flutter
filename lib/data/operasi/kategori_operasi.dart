@@ -1,126 +1,78 @@
-
 // lib/data/operasi/kategori_operasi.dart
 import 'package:admin/data/sqlite.dart';
 import 'package:admin/model/kategori_model.dart';
+import 'package:sqflite/sqflite.dart';
 
 class KategoriOperasi {
-  final DatabaseHelper dbHelper = DatabaseHelper();
-
-  Future<void> createKategori(Kategori kategori) async {
-    final db = await dbHelper.database;
-    final timestamp = DateTime.now().toIso8601String();
-    await db.insert('kategori', {
-      'id': kategori.id,
-      'nama': kategori.nama,
-      'tipe': kategori.tipe.toString().split('.').last,
-      'diperbarui': timestamp, // <-- Mengisi timestamp saat ini
-    });
-    for (var sub in kategori.subKategori) {
-      await createSubKategori(sub, kategori.id!); 
-    }
-  }
-
-  Future<void> createSubKategori(SubKategori subKategori, String idKategori) async {
-    final db = await dbHelper.database;
-    final timestamp = DateTime.now().toIso8601String();
-    await db.insert('sub_kategori', {
-      'id': subKategori.id,
-      'nama': subKategori.nama,
-      'id_kategori': idKategori,
-      'diperbarui': timestamp, // <-- Mengisi timestamp saat ini
-    });
+  Future<void> create(Kategori kategori) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.insert(
+      'kategori',
+      kategori.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<Kategori>> getKategori() async {
-    final db = await dbHelper.database;
+    final db = await DatabaseHelper.instance.database;
     final List<Map<String, dynamic>> maps = await db.query('kategori');
-
-    List<Kategori> kategoriList = [];
-    for (var map in maps) {
-      final subKategori = await getSubKategori(map['id']);
-      kategoriList.add(Kategori(
-        id: map['id'],
-        nama: map['nama'],
-        tipe: TipeKategori.values.firstWhere((e) => e.toString().split('.').last == map['tipe']),
-        subKategori: subKategori,
-        diperbarui: DateTime.parse(map['diperbarui']), // <-- Membaca timestamp
-      ));
-    }
-    return kategoriList;
-  }
-
-  Future<List<SubKategori>> getSubKategori(String idKategori) async {
-    final db = await dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'sub_kategori',
-      where: 'id_kategori = ?',
-      whereArgs: [idKategori],
-    );
-
     return List.generate(maps.length, (i) {
-      return SubKategori(
-        id: maps[i]['id'],
-        nama: maps[i]['nama'],
-        diperbarui: DateTime.parse(maps[i]['diperbarui']), // <-- Membaca timestamp
-      );
+      return Kategori.fromMap(maps[i]);
     });
   }
 
-  Future<void> updateKategori(Kategori kategori) async {
-    final db = await dbHelper.database;
-    final timestamp = DateTime.now().toIso8601String();
+  Future<void> update(Kategori kategori) async {
+    final db = await DatabaseHelper.instance.database;
     await db.update(
       'kategori',
-      {
-        'nama': kategori.nama,
-        'tipe': kategori.tipe.toString().split('.').last,
-        'diperbarui': timestamp, // <-- Memperbarui timestamp saat ini
-      },
-      where: 'id = ?',
-      whereArgs: [kategori.id],
+      kategori.toMap(),
+      where: 'nama = ?',
+      whereArgs: [kategori.nama],
     );
   }
 
-  Future<void> updateSubKategori(SubKategori subKategori) async {
-    final db = await dbHelper.database;
-    final timestamp = DateTime.now().toIso8601String();
-    await db.update(
-      'sub_kategori',
-      {
-        'nama': subKategori.nama,
-        'diperbarui': timestamp, // <-- Memperbarui timestamp saat ini
-      },
-      where: 'id = ?',
-      whereArgs: [subKategori.id],
-    );
+  Future<void> delete(String nama) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.delete('kategori', where: 'nama = ?', whereArgs: [nama]);
   }
 
-  Future<void> deleteKategori(String id) async {
-    final db = await dbHelper.database;
-    await db.delete(
+  Future<void> bersihkanDanSisipkanSemua(List<Kategori> items) async {
+    final db = await DatabaseHelper.instance.database;
+    await db.transaction((txn) async {
+      await txn.delete('kategori'); // Hapus semua data lama
+      for (var item in items) {
+        await txn.insert('kategori', item.toMap()); // Sisipkan data baru
+      }
+    });
+  }
+
+  // == METODE BARU UNTUK SINKRONISASI INKREMENTAL ==
+
+  /// Mengambil record yang berubah (dibuat atau diperbarui) setelah waktu [since].
+  Future<List<Kategori>> getPerubahan(DateTime since) async {
+    final db = await DatabaseHelper.instance.database;
+    // Pastikan Anda memiliki kolom 'diperbaruiPada' di tabel Anda
+    final List<Map<String, dynamic>> maps = await db.query(
       'kategori',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'diperbarui > ?',
+      whereArgs: [since.toIso8601String()],
     );
-    await db.delete(
-      'sub_kategori',
-      where: 'id_kategori = ?',
-      whereArgs: [id],
-    );
+    return List.generate(maps.length, (i) => Kategori.fromMap(maps[i]));
   }
 
-  Future<void> hapusSemuaKategori() async {
-    final db = await dbHelper.database;
-    await db.delete('sub_kategori');
-    await db.delete('kategori');
-  }
-
-  Future<void> deleteSubKategori(String id) async {
-    final db = await dbHelper.database;
-    await db.delete(
-      'sub_kategori',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+  /// Menyisipkan atau memperbarui batch data dari Firebase.
+  /// Menggunakan `ConflictAlgorithm.replace` untuk melakukan "UPSERT".
+  Future<void> sisipkanAtauPerbaruiBatch(List<Kategori> items) async {
+    final db = await DatabaseHelper.instance.database;
+    final batch = db.batch();
+    for (var item in items) {
+      // Pastikan model Anda memiliki ID yang unik untuk proses ini
+      batch.insert(
+        'kategori',
+        item.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 }

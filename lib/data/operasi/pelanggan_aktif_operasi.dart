@@ -1,34 +1,22 @@
 // lib/data/operasi/pelanggan_aktif_operasi.dart
 import 'package:admin/data/sqlite.dart';
 import 'package:admin/model/pelanggan_aktif_model.dart';
+import 'package:sqflite/sqflite.dart';
 
 class PelangganAktifOperasi {
-  final DatabaseHelper dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper.instance;
 
-  Future<void> createPelangganAktif(PelangganAktif pelanggan) async {
+  Future<int> createPelangganAktif(PelangganAktif pelangganAktif) async {
     final db = await dbHelper.database;
-    final data = pelanggan.toMap();
-    data['diperbarui'] = DateTime.now().toIso8601String();
-    data['status_sinkronisasi'] = 'BARU';
-    await db.insert('pelanggan_aktif', data);
-  }
-
-  Future<List<PelangganAktif>> ambilSemuaPelangganAktif() async {
-    final db = await dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query(
+    return await db.insert(
       'pelanggan_aktif',
-      where: 'status_sinkronisasi != ?',
-      whereArgs: ['HAPUS'],
-      orderBy: 'tanggalBerakhir DESC',
+      pelangganAktif.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
-
-    return List.generate(maps.length, (i) {
-      return PelangganAktif.fromMap(maps[i]);
-    });
   }
 
-  // BARU: Mengambil semua data, termasuk yang akan dihapus, untuk proses sinkronisasi.
-  Future<List<PelangganAktif>> ambilSemuaUntukSinkronisasi() async {
+  // Perbaikan: Mengganti nama metode
+  Future<List<PelangganAktif>> ambilSemuaPelangganAktif() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query('pelanggan_aktif');
     return List.generate(maps.length, (i) {
@@ -36,7 +24,8 @@ class PelangganAktifOperasi {
     });
   }
 
-  Future<PelangganAktif?> ambilSatuPelangganAktif(String id) async {
+  // Perbaikan: Menambahkan metode yang hilang
+  Future<PelangganAktif?> ambilSatuPelangganAktif(int id) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'pelanggan_aktif',
@@ -50,70 +39,59 @@ class PelangganAktifOperasi {
     return null;
   }
 
-  Future<void> updatePelangganAktif(PelangganAktif pelanggan) async {
+  Future<void> updatePelangganAktif(PelangganAktif pelangganAktif) async {
     final db = await dbHelper.database;
-    final data = pelanggan.toMap();
-    data['diperbarui'] = DateTime.now().toIso8601String();
-    data['status_sinkronisasi'] = 'EDIT';
     await db.update(
       'pelanggan_aktif',
-      data,
+      pelangganAktif.toMap(),
       where: 'id = ?',
-      whereArgs: [pelanggan.id],
+      whereArgs: [pelangganAktif.id],
     );
   }
 
-  Future<void> deletePelangganAktif(String id) async {
+  Future<void> deletePelangganAktif(int id) async {
     final db = await dbHelper.database;
-    await db.update(
-      'pelanggan_aktif',
-      {
-        'status_sinkronisasi': 'HAPUS',
-        'diperbarui': DateTime.now().toIso8601String(),
-      },
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('pelanggan_aktif', where: 'id = ?', whereArgs: [id]);
   }
 
-  // BARU: Menandai item sebagai sinkron setelah berhasil diunggah.
-  Future<void> tandaiSebagaiSinkron(List<int> ids) async {
-    if (ids.isEmpty) return;
-    final db = await dbHelper.database;
-    await db.update(
-      'pelanggan_aktif',
-      {
-        'status_sinkronisasi': 'SINKRON',
-      },
-      where: 'id IN (${ids.map((_) => '?').join(',')})',
-      whereArgs: ids,
-    );
-  }
-
-  // BARU: Menghapus item dari SQLite secara permanen setelah dihapus dari Firebase.
-  Future<void> hapusLokalPermanen(List<int> ids) async {
-    if (ids.isEmpty) return;
-    final db = await dbHelper.database;
-    await db.delete(
-      'pelanggan_aktif',
-      where: 'id IN (${ids.map((_) => '?').join(',')})',
-      whereArgs: ids,
-    );
-  }
-
+  // Perbaikan: Menambahkan metode yang hilang
   Future<void> hapusSemuaPelangganAktif() async {
     final db = await dbHelper.database;
     await db.delete('pelanggan_aktif');
   }
 
+  // Perbaikan: Menambahkan metode yang hilang
   Future<int> hapusPelangganKadaluarsa() async {
+    // Ganti void jadi int
     final db = await dbHelper.database;
-    final now = DateTime.now().toIso8601String();
-    final count = await db.delete(
+    // db.delete mengembalikan jumlah baris yang terhapus
+    return await db.delete(
       'pelanggan_aktif',
-      where: 'tanggalBerakhir < ? AND status = ?',
-      whereArgs: [now, 'lunas'],
+      where: 'tanggalBerakhir < ?',
+      whereArgs: [DateTime.now().toIso8601String()],
     );
-    return count;
+  }
+
+  Future<List<PelangganAktif>> getPerubahan(DateTime since) async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'pelanggan_aktif',
+      where: 'diperbarui > ?',
+      whereArgs: [since.toIso8601String()],
+    );
+    return List.generate(maps.length, (i) => PelangganAktif.fromMap(maps[i]));
+  }
+
+  Future<void> sisipkanAtauPerbaruiBatch(List<PelangganAktif> items) async {
+    final db = await dbHelper.database;
+    final batch = db.batch();
+    for (var item in items) {
+      batch.insert(
+        'pelanggan_aktif',
+        item.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 }

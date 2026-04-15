@@ -14,19 +14,20 @@ import 'package:admin/model/paket_model.dart';
 import 'package:admin/model/pelanggan_model.dart';
 import 'package:admin/model/pelanggan_aktif_model.dart';
 import 'package:admin/model/transaksi_model.dart';
+import 'package:admin/utils/sync_manager.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final SyncManager _syncManager = SyncManager();
   Timer? _timer;
 
   void startSync() {
     _timer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      developer.log(
-        'Memulai sinkronisasi periodic...',
-        name: 'FirebaseService',
-      );
+      developer.log('Memulai sinkronisasi periodik...', name: 'FirebaseService');
       sinkronkanSemuaData();
     });
+    // Jalankan sinkronisasi segera saat aplikasi dimulai
+    sinkronkanSemuaData();
   }
 
   void dispose() {
@@ -34,9 +35,10 @@ class FirebaseService {
   }
 
   Future<void> sinkronkanSemuaData() async {
-    developer.log('Sinkronisasi semua data dimulai', name: 'FirebaseService');
+    developer.log('Memulai sinkronisasi data inkremental...', name: 'FirebaseService');
+    final lastSync = await _syncManager.getLastSyncTimestamp();
+    final now = DateTime.now();
 
-    // Pindahkan inisialisasi ke sini untuk memutus circular dependency
     final dompetOperasi = DompetOperasi();
     final kategoriOperasi = KategoriOperasi();
     final transaksiOperasi = TransaksiOperasi();
@@ -45,27 +47,85 @@ class FirebaseService {
     final pelangganAktifOperasi = PelangganAktifOperasi();
 
     try {
-      // Disederhanakan: Biarkan kesalahan menyebar ke blok catch utama.
-      await Future.wait([
-        _syncKategori(kategoriOperasi),
-        _syncTransaksi(transaksiOperasi),
-        _syncDompet(dompetOperasi),
-        _syncPelanggan(pelangganOperasi),
-        _syncPaket(paketOperasi),
-        _syncPelangganAktif(pelangganAktifOperasi),
-      ]);
+      // 1. Unggah perubahan lokal ke Firebase
+      await _unggahPerubahan(lastSync, {
+        'kategori': (await kategoriOperasi.getPerubahan(lastSync)),
+        'dompet': (await dompetOperasi.getPerubahan(lastSync)),
+        'transaksi': (await transaksiOperasi.getPerubahan(lastSync)),
+        'pelanggan': (await pelangganOperasi.getPerubahan(lastSync)),
+        'paket': (await paketOperasi.getPerubahan(lastSync)),
+        'pelanggan_aktif': (await pelangganAktifOperasi.getPerubahan(lastSync)),
+      });
 
-      // Log ini sekarang hanya akan berjalan jika SEMUA future di atas berhasil.
-      developer.log('Sinkronisasi semua data selesai', name: 'FirebaseService');
+      // 2. Unduh perubahan dari Firebase ke lokal
+      await _unduhPerubahan(lastSync, {
+        'kategori': kategoriOperasi,
+        'dompet': dompetOperasi,
+        'transaksi': transaksiOperasi,
+        'pelanggan': pelangganOperasi,
+        'paket': paketOperasi,
+        'pelanggan_aktif': pelangganAktifOperasi,
+      });
+
+      // 3. Simpan waktu sinkronisasi yang berhasil
+      await _syncManager.setLastSyncTimestamp(now);
+      developer.log('Sinkronisasi inkremental berhasil diselesaikan.', name: 'FirebaseService');
+
     } catch (e, s) {
-      // Jika salah satu future di Future.wait gagal, itu akan ditangkap di sini.
       developer.log(
-        'Kesalahan besar saat sinkronisasi',
+        'Kesalahan besar saat sinkronisasi inkremental',
         error: e,
         stackTrace: s,
         name: 'FirebaseService',
       );
     }
+  }
+
+  Future<void> _unggahPerubahan(DateTime lastSync, Map<String, List<dynamic>> dataPerubahan) async {
+    developer.log('Mengunggah perubahan sejak $lastSync', name: 'FirebaseService');
+    final batch = _firestore.batch();
+
+    dataPerubahan.forEach((collectionName, items) {
+      if (items.isNotEmpty) {
+        developer.log('  - Menemukan ${items.length} perubahan di koleksi $collectionName', name: 'FirebaseService');
+        for (var item in items) {
+          final docRef = _firestore.collection(collectionName).doc(item.id.toString());
+          batch.set(docRef, item.toMap());
+        }
+      }
+    });
+
+    await batch.commit();
+    developer.log('Pengunggahan batch selesai.', name: 'FirebaseService');
+  }
+
+  Future<void> _unduhPerubahan(DateTime lastSync, Map<String, dynamic> operasiMap) async {
+    developer.log('Mengunduh perubahan sejak $lastSync', name: 'FirebaseService');
+
+    for (var collectionName in operasiMap.keys) {
+        // Perbaikan: Gunakan 'diperbarui'
+        final querySnapshot = await _firestore
+            .collection(collectionName)
+            .where('diperbarui', isGreaterThan: lastSync.toIso8601String())
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+            developer.log('  - Menemukan ${querySnapshot.docs.length} perubahan di koleksi $collectionName dari Firebase', name: 'FirebaseService');
+            final op = operasiMap[collectionName];
+            final items = querySnapshot.docs.map((doc) {
+                if (op is KategoriOperasi) return Kategori.fromMap(doc.data());
+                if (op is DompetOperasi) return Dompet.fromMap(doc.data());
+                if (op is TransaksiOperasi) return Transaksi.fromMap(doc.data());
+                if (op is PelangganOperasi) return Pelanggan.fromMap(doc.data());
+                if (op is PaketOperasi) return Paket.fromMap(doc.data());
+                if (op is PelangganAktifOperasi) return PelangganAktif.fromMap(doc.data());
+                return null;
+            }).where((item) => item != null).toList();
+
+            await op.sisipkanAtauPerbaruiBatch(items);
+        }
+    }
+    developer.log('Pengunduhan perubahan selesai.', name: 'FirebaseService');
   }
 
   Future<void> hapusPelangganAktif(String id) async {
@@ -84,109 +144,5 @@ class FirebaseService {
       );
       rethrow;
     }
-  }
-
-  // ... (sisa metode sinkronisasi diubah untuk menerima operasi sebagai parameter)
-
-  Future<String> _syncKategori(KategoriOperasi op) async {
-    final items = await op.getKategori();
-    await _unggahKategori(items);
-    return '${items.length} item Kategori disinkronkan.';
-  }
-
-  Future<String> _syncDompet(DompetOperasi op) async {
-    final items = await op.getDompet();
-    await _unggahDompet(items);
-    return '${items.length} item Dompet disinkronkan.';
-  }
-
-  Future<String> _syncTransaksi(TransaksiOperasi op) async {
-    final items = await op.getTransaksi();
-    await _unggahTransaksi(items);
-    return '${items.length} item Transaksi disinkronkan.';
-  }
-
-  Future<String> _syncPelanggan(PelangganOperasi op) async {
-    final items = await op.getPelanggan();
-    await _unggahPelanggan(items);
-    return '${items.length} item Pelanggan disinkronkan.';
-  }
-
-  Future<String> _syncPaket(PaketOperasi op) async {
-    final items = await op.getPaket();
-    await _unggahPaket(items);
-    return '${items.length} item Paket disinkronkan.';
-  }
-
-  Future<String> _syncPelangganAktif(PelangganAktifOperasi op) async {
-    final items = await op.ambilSemuaPelangganAktif();
-    await _unggahPelangganAktif(items);
-    return '${items.length} item Pelanggan Aktif disinkronkan.';
-  }
-
-  // ... (metode unggah tetap sama)
-
-  Future<void> _unggahKategori(List<Kategori> items) async {
-    final batch = _firestore.batch();
-    for (var item in items) {
-      batch.set(_firestore.collection('kategori').doc(item.nama), item.toMap());
-    }
-    await batch.commit();
-  }
-
-  Future<void> _unggahDompet(List<Dompet> items) async {
-    final batch = _firestore.batch();
-    for (var item in items) {
-      batch.set(
-        _firestore.collection('dompet').doc(item.namaDompet),
-        item.toMap(),
-      );
-    }
-    await batch.commit();
-  }
-
-  Future<void> _unggahTransaksi(List<Transaksi> items) async {
-    final batch = _firestore.batch();
-    for (var item in items) {
-      batch.set(
-        _firestore.collection('transaksi').doc(item.id.toString()),
-        item.toMap(),
-      );
-    }
-    await batch.commit();
-  }
-
-  Future<void> _unggahPelanggan(List<Pelanggan> items) async {
-    final batch = _firestore.batch();
-    for (var item in items) {
-      batch.set(_firestore.collection('pelanggan').doc(item.id), item.toMap());
-    }
-    await batch.commit();
-  }
-
-  Future<void> _unggahPaket(List<Paket> items) async {
-    final batch = _firestore.batch();
-    for (var item in items) {
-      if (item.id != null) {
-        batch.set(
-          _firestore.collection('paket').doc(item.id.toString()),
-          item.toMap(),
-        );
-      }
-    }
-    await batch.commit();
-  }
-
-  Future<void> _unggahPelangganAktif(List<PelangganAktif> items) async {
-    final batch = _firestore.batch();
-    for (var item in items) {
-      if (item.id != null) {
-        batch.set(
-          _firestore.collection('pelanggan_aktif').doc(item.id.toString()),
-          item.toMap(),
-        );
-      }
-    }
-    await batch.commit();
   }
 }

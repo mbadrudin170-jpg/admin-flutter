@@ -1,9 +1,11 @@
 // lib/data/operasi/paket_operasi.dart
 import 'package:admin/data/sqlite.dart';
 import 'package:admin/model/paket_model.dart';
+import 'package:sqflite/sqflite.dart';
 
 class PaketOperasi {
-  final dbHelper = DatabaseHelper();
+  // Perbaikan: Gunakan instance singleton
+  final dbHelper = DatabaseHelper.instance;
 
   Future<int> createPaket(Paket paket) async {
     final db = await dbHelper.database;
@@ -32,9 +34,10 @@ class PaketOperasi {
     return null;
   }
 
-  Future<int> updatePaket(Paket paket) async {
+  // Perbaikan: Menambahkan kembali metode updatePaket yang hilang
+  Future<void> updatePaket(Paket paket) async {
     final db = await dbHelper.database;
-    return await db.update(
+    await db.update(
       'paket',
       paket.toMap(),
       where: 'id = ?',
@@ -42,17 +45,28 @@ class PaketOperasi {
     );
   }
 
-  Future<int> deletePaket(int id) async {
+  // == METODE BARU UNTUK SINKRONISASI INKREMENTAL ==
+
+  Future<List<Paket>> getPerubahan(DateTime since) async {
     final db = await dbHelper.database;
-    return await db.delete(
+    final List<Map<String, dynamic>> maps = await db.query(
       'paket',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'diperbarui > ?',
+      whereArgs: [since.toIso8601String()],
     );
+    return List.generate(maps.length, (i) => Paket.fromMap(maps[i]));
   }
 
-  Future<void> hapusSemuaPaket() async {
+  Future<void> sisipkanAtauPerbaruiBatch(List<Paket> items) async {
     final db = await dbHelper.database;
-    await db.delete('paket');
+    final batch = db.batch();
+    for (var item in items) {
+      batch.insert(
+        'paket',
+        item.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 }

@@ -1,18 +1,16 @@
 // lib/data/operasi/dompet_operasi.dart
 import 'package:admin/data/sqlite.dart';
 import 'package:admin/model/dompet_model.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DompetOperasi {
-  final DatabaseHelper dbHelper = DatabaseHelper();
+  // Perbaikan: Gunakan instance singleton yang benar
+  final dbHelper = DatabaseHelper.instance;
 
   Future<void> createDompet(Dompet dompet) async {
     final db = await dbHelper.database;
-    await db.insert('dompet', {
-      'id': dompet.id,
-      'namaDompet': dompet.namaDompet,
-      'saldo': dompet.saldo,
-      'diperbarui': dompet.diperbarui,
-    });
+    await db.insert('dompet', dompet.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Dompet>> getDompet() async {
@@ -20,12 +18,7 @@ class DompetOperasi {
     final List<Map<String, dynamic>> maps = await db.query('dompet');
 
     return List.generate(maps.length, (i) {
-      return Dompet(
-        id: maps[i]['id'],
-        namaDompet: maps[i]['namaDompet'],
-        saldo: maps[i]['saldo'],
-        diperbarui: maps[i]['diperbarui'],
-      );
+      return Dompet.fromMap(maps[i]);
     });
   }
 
@@ -33,11 +26,7 @@ class DompetOperasi {
     final db = await dbHelper.database;
     await db.update(
       'dompet',
-      {
-        'namaDompet': dompet.namaDompet,
-        'saldo': dompet.saldo,
-        'diperbarui': dompet.diperbarui,
-      },
+      dompet.toMap(),
       where: 'id = ?',
       whereArgs: [dompet.id],
     );
@@ -51,9 +40,32 @@ class DompetOperasi {
       whereArgs: [id],
     );
   }
+  
+  // == METODE BARU UNTUK SINKRONISASI INKREMENTAL ==
 
-  Future<void> hapusSemuaDompet() async {
+  /// Mengambil record yang berubah (dibuat atau diperbarui) setelah waktu [since].
+  Future<List<Dompet>> getPerubahan(DateTime since) async {
     final db = await dbHelper.database;
-    await db.delete('dompet');
+    // Perbaikan: Gunakan kolom 'diperbarui' yang sudah ada
+    final List<Map<String, dynamic>> maps = await db.query(
+      'dompet',
+      where: 'diperbarui > ?',
+      whereArgs: [since.toIso8601String()],
+    );
+    return List.generate(maps.length, (i) => Dompet.fromMap(maps[i]));
+  }
+
+  /// Menyisipkan atau memperbarui batch data dari Firebase.
+  Future<void> sisipkanAtauPerbaruiBatch(List<Dompet> items) async {
+    final db = await dbHelper.database;
+    final batch = db.batch();
+    for (var item in items) {
+      batch.insert(
+        'dompet',
+        item.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
   }
 }
