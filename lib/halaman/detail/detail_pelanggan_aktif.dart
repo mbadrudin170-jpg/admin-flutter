@@ -16,20 +16,24 @@ class DetailPelangganAktif extends StatefulWidget {
 }
 
 class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
+  // Inisialisasi langsung untuk menghindari LateError
   late PelangganAktif _pelangganAktif;
   Pelanggan? _pelanggan;
 
   @override
   void initState() {
     super.initState();
+    // Inisialisasi variabel state dari widget
     _pelangganAktif = widget.pelanggan;
     _loadPelangganData();
   }
 
   Future<void> _loadPelangganData() async {
+    // Pastikan widget masih ada di pohon sebelum setState
+    if (!mounted) return;
     final PelangganOperasi operasi = PelangganOperasi();
     final pelanggan = await operasi.ambilSatuPelanggan(_pelangganAktif.idPelanggan);
-    if (pelanggan != null) {
+    if (mounted && pelanggan != null) {
       setState(() {
         _pelanggan = pelanggan;
       });
@@ -49,7 +53,7 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
       final updatedPelanggan = await operasi.ambilSatuPelangganAktif(
         _pelangganAktif.id!.toString(),
       );
-      if (updatedPelanggan != null) {
+      if (mounted && updatedPelanggan != null) {
         setState(() {
           _pelangganAktif = updatedPelanggan;
         });
@@ -92,6 +96,7 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
+                    // Tampilkan nomor HP atau indikator loading
                     _pelanggan == null
                         ? const Center(child: CircularProgressIndicator())
                         : Text(
