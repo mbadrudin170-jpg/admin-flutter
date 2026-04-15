@@ -1,4 +1,4 @@
-// Path: lib/halaman/form/form_pelanggan_aktif.dart
+// lib/halaman/form/form_pelanggan_aktif.dart
 import 'dart:developer' as developer;
 import 'package:admin/data/operasi/paket_operasi.dart';
 import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
@@ -10,7 +10,8 @@ import 'package:admin/utils/format.dart';
 import 'package:flutter/material.dart';
 
 class FormPelangganAktif extends StatefulWidget {
-  const FormPelangganAktif({super.key});
+  final PelangganAktif? pelangganAktif;
+  const FormPelangganAktif({super.key, this.pelangganAktif});
 
   @override
   State<FormPelangganAktif> createState() => _FormPelangganAktifState();
@@ -40,17 +41,16 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
 
   StatusPembayaran _statusPembayaran = StatusPembayaran.lunas;
 
+  bool get _isEditMode => widget.pelangganAktif != null;
+
   @override
   void initState() {
     super.initState();
-    _selectedDate = DateTime.now();
-    _selectedTime = TimeOfDay.now();
-    _loadAllData(); // Memuat semua data yang diperlukan
+    _loadAllData();
   }
 
   Future<void> _loadAllData() async {
     try {
-      // Menjalankan kedua future secara paralel untuk efisiensi
       final results = await Future.wait([
         _pelangganOperasi.getPelanggan(),
         _paketOperasi.getPaket(),
@@ -58,13 +58,37 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
       setState(() {
         _pelangganList = results[0] as List<Pelanggan>;
         _paketList = results[1] as List<Paket>;
+
+        if (_isEditMode) {
+          final pa = widget.pelangganAktif!;
+          try {
+            _selectedPelanggan = _pelangganList.firstWhere(
+              (p) => p.id == pa.idPelanggan,
+            );
+          } catch (e) {
+            _selectedPelanggan = null;
+          }
+          try {
+            _selectedPaket = _paketList.firstWhere((p) => p.id == pa.idPaket);
+          } catch (e) {
+            _selectedPaket = null;
+          }
+
+          final tglMulai = DateTime.parse(pa.tanggalMulai);
+          _selectedDate = tglMulai;
+          _selectedTime = TimeOfDay.fromDateTime(tglMulai);
+          _statusPembayaran = pa.status;
+        } else {
+          _selectedDate = DateTime.now();
+          _selectedTime = TimeOfDay.now();
+        }
+
         _isLoading = false;
       });
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
-      // Guard against context usage across async gaps.
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
@@ -135,13 +159,13 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
           _selectedTime!.minute,
         );
 
-        // Hitung tanggal berakhir menggunakan fungsi terpusat
         final DateTime tanggalBerakhir = _hitungTanggalBerakhir(
           tanggalMulai,
           _selectedPaket!,
         );
 
-        final newPelangganAktif = PelangganAktif(
+        final pelangganAktifData = PelangganAktif(
+          id: _isEditMode ? widget.pelangganAktif!.id : null,
           idPelanggan: _selectedPelanggan!.id,
           idPaket: _selectedPaket!.id,
           tanggalMulai: tanggalMulai.toIso8601String(),
@@ -150,18 +174,27 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         );
 
         try {
-          await _pelangganAktifOperasi.createPelangganAktif(newPelangganAktif);
+          if (_isEditMode) {
+            await _pelangganAktifOperasi.updatePelangganAktif(
+              pelangganAktifData,
+            );
+          } else {
+            await _pelangganAktifOperasi.createPelangganAktif(
+              pelangganAktifData,
+            );
+          }
 
           if (!mounted) return;
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Pelanggan berhasil diaktifkan!')),
+            SnackBar(
+              content: Text(
+                'Pelanggan berhasil ${_isEditMode ? 'diperbarui' : 'diaktifkan'}!',
+              ),
+            ),
           );
-          Navigator.pop(context, true); // Kirim hasil 'true' untuk refresh
-        } // lib/halaman/form/form_pelanggan_aktif.dart
-        catch (e, s) {
-          // Menangkap stack trace (s) juga
-          // Mencetak detail error ke debug console untuk dianalisis
+          Navigator.pop(context, true);
+        } catch (e, s) {
           developer.log(
             'Terjadi kesalahan saat menyimpan',
             name: 'admin.form.pelanggan_aktif',
@@ -188,7 +221,11 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Form Pelanggan Aktif')),
+      appBar: AppBar(
+        title: Text(
+          _isEditMode ? 'Edit Pelanggan Aktif' : 'Form Pelanggan Aktif',
+        ),
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(
@@ -198,7 +235,6 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Dropdown untuk memilih pelanggan
                     DropdownButtonFormField<Pelanggan>(
                       decoration: const InputDecoration(
                         labelText: 'Pilih Pelanggan',
@@ -220,8 +256,6 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                           value == null ? 'Pelanggan tidak boleh kosong' : null,
                     ),
                     const SizedBox(height: 16),
-
-                    // Dropdown untuk memilih paket
                     DropdownButtonFormField<Paket>(
                       decoration: const InputDecoration(
                         labelText: 'Pilih Paket',
@@ -272,58 +306,50 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Column(
-                      children: [
-                        // lib/halaman/form/form_pelanggan_aktif.dart
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      _statusPembayaran ==
-                                          StatusPembayaran.lunas
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.white,
-                                  foregroundColor:
-                                      _statusPembayaran ==
-                                          StatusPembayaran.lunas
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _statusPembayaran = StatusPembayaran.lunas;
-                                  });
-                                },
-                                child: const Text('Lunas'),
-                              ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  _statusPembayaran == StatusPembayaran.lunas
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.white,
+                              foregroundColor:
+                                  _statusPembayaran == StatusPembayaran.lunas
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      _statusPembayaran ==
-                                          StatusPembayaran.belumLunas
-                                      ? Theme.of(context).primaryColor
-                                      : Colors.white,
-                                  foregroundColor:
-                                      _statusPembayaran ==
-                                          StatusPembayaran.belumLunas
-                                      ? Colors.white
-                                      : Colors.black,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _statusPembayaran =
-                                        StatusPembayaran.belumLunas;
-                                  });
-                                },
-                                child: const Text('Belum Lunas'),
-                              ),
+                            onPressed: () {
+                              setState(() {
+                                _statusPembayaran = StatusPembayaran.lunas;
+                              });
+                            },
+                            child: const Text('Lunas'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  _statusPembayaran ==
+                                      StatusPembayaran.belumLunas
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.white,
+                              foregroundColor:
+                                  _statusPembayaran ==
+                                      StatusPembayaran.belumLunas
+                                  ? Colors.white
+                                  : Colors.black,
                             ),
-                          ],
+                            onPressed: () {
+                              setState(() {
+                                _statusPembayaran = StatusPembayaran.belumLunas;
+                              });
+                            },
+                            child: const Text('Belum Lunas'),
+                          ),
                         ),
                       ],
                     ),
@@ -362,16 +388,12 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                                   _selectedTime?.hour ?? 0,
                                   _selectedTime?.minute ?? 0,
                                 );
-
-                                // Gunakan fungsi terpusat untuk kalkulasi
                                 final DateTime endDate = _hitungTanggalBerakhir(
                                   startDate,
                                   _selectedPaket!,
                                 );
-
                                 final timePart =
                                     ', ${endDate.hour.toString().padLeft(2, '0')}:${endDate.minute.toString().padLeft(2, '0')}';
-
                                 return '${Format.formatTanggal(endDate)}$timePart';
                               } else {
                                 return 'Pilih paket & tanggal mulai';
@@ -381,6 +403,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         ),
                       ],
                     ),
+                    const Spacer(),
                     ElevatedButton(
                       onPressed: _saveForm,
                       style: ElevatedButton.styleFrom(

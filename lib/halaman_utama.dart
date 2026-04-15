@@ -17,8 +17,8 @@ class _HalamanUtamaState extends State<HalamanUtama> {
   int _selectedIndex = 0;
 
   static const List<Widget> _widgetOptions = <Widget>[
-    DompetPage(),
     PelangganAktifPage(),
+    DompetPage(),
     TransaksiPage(),
     LainnyaPage(),
   ];
@@ -36,12 +36,12 @@ class _HalamanUtamaState extends State<HalamanUtama> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Dompet',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.person_pin_circle),
             label: 'Aktif',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.account_balance_wallet),
+            label: 'Dompet',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.receipt_long),

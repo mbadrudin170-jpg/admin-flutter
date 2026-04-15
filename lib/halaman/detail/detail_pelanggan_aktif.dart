@@ -1,29 +1,82 @@
+// lib/halaman/detail/detail_pelanggan_aktif.dart
+import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
+import 'package:admin/data/operasi/pelanggan_operasi.dart';
+import 'package:admin/halaman/form/form_pelanggan_aktif.dart';
+import 'package:admin/model/pelanggan_model.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/model/pelanggan_aktif_model.dart';
 
-class DetailPelangganAktif extends StatelessWidget {
+class DetailPelangganAktif extends StatefulWidget {
   final PelangganAktif pelanggan;
 
   const DetailPelangganAktif({super.key, required this.pelanggan});
 
   @override
+  State<DetailPelangganAktif> createState() => _DetailPelangganAktifState();
+}
+
+class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
+  late PelangganAktif _pelangganAktif;
+  Pelanggan? _pelanggan;
+
+  @override
+  void initState() {
+    super.initState();
+    _pelangganAktif = widget.pelanggan;
+    _loadPelangganData();
+  }
+
+  Future<void> _loadPelangganData() async {
+    final PelangganOperasi operasi = PelangganOperasi();
+    final pelanggan = await operasi.ambilSatuPelanggan(_pelangganAktif.idPelanggan);
+    if (pelanggan != null) {
+      setState(() {
+        _pelanggan = pelanggan;
+      });
+    }
+  }
+
+  void _navigateToEdit() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FormPelangganAktif(pelangganAktif: _pelangganAktif),
+      ),
+    );
+
+    if (result == true) {
+      final PelangganAktifOperasi operasi = PelangganAktifOperasi();
+      final updatedPelanggan = await operasi.ambilSatuPelangganAktif(
+        _pelangganAktif.id!.toString(),
+      );
+      if (updatedPelanggan != null) {
+        setState(() {
+          _pelangganAktif = updatedPelanggan;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(pelanggan.idPelanggan),
+        title: Text(_pelangganAktif.idPelanggan),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context, true); // selalu kirim true untuk refresh
           },
         ),
+        actions: [
+          IconButton(icon: const Icon(Icons.edit), onPressed: _navigateToEdit),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -35,12 +88,34 @@ class DetailPelangganAktif extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Nama: ${pelanggan.idPelanggan}',
+                      'Nama: ${_pelangganAktif.idPelanggan}',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
+                    _pelanggan == null
+                        ? const Center(child: CircularProgressIndicator())
+                        : Text(
+                            'No HP: ${_pelanggan!.telepon}',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                    const SizedBox(height: 8),
                     Text(
-                      'Status: ${pelanggan.status}',
+                      'Status: ${_pelangganAktif.status.displayName}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Paket: ${_pelangganAktif.idPaket}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Mulai: ${_pelangganAktif.tanggalMulai}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Berakhir: ${_pelangganAktif.tanggalBerakhir}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],

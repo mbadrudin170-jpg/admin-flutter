@@ -21,6 +21,20 @@ class PelangganOperasi {
     });
   }
 
+  Future<Pelanggan?> ambilSatuPelanggan(String id) async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'pelanggan',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Pelanggan.fromMap(maps.first);
+    }
+    return null;
+  }
+
   Future<void> updatePelanggan(Pelanggan pelanggan) async {
     final db = await dbHelper.database;
     // Saat memperbarui, kita perlu membuat map baru yang berisi

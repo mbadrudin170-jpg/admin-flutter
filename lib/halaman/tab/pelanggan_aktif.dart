@@ -112,14 +112,18 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         }
         break;
       case OpsiHapusPilihan.hapusKadaluarsa:
+        final int jumlahDihapus = await _pelangganAktifOperasi
+            .hapusPelangganKadaluarsa();
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
-              'Fitur hapus pelanggan kadaluarsa belum diimplementasikan.',
+              '$jumlahDihapus pelanggan kadaluarsa berhasil dihapus.',
             ),
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           ),
         );
+        _loadPelangganAktif();
         break;
       case OpsiHapusPilihan.batal:
       default:

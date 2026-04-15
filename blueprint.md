@@ -50,7 +50,7 @@ Dokumentasi ini mencakup semua gaya, desain, dan fitur yang diimplementasikan da
 
 ## 3. Rencana Saat Ini
 
-1.  **Menambahkan Tombol Kembali**: Menambahkan tombol kembali pada `AppBar` di semua file yang relevan di dalam folder `lib/halaman` untuk meningkatkan navigasi.
+1.  **Tampilkan Nomor HP Pelanggan**: Mengambil dan menampilkan nomor HP pelanggan di halaman `DetailPelangganAktif` dengan mengambil data dari tabel `pelanggan`.
 
 ## 4. Tugas Selesai
 
@@ -59,3 +59,4 @@ Berdasarkan permintaan sebelumnya, fitur-fitur berikut telah berhasil diimplemen
 1.  **Navigasi Halaman "Lainnya"**: File `lib/lainnya.dart` telah dibuat dan diisi dengan tombol navigasi berikon.
 2.  **Konfigurasi Firebase**: Proyek telah diinisialisasi untuk Firebase, dan file konfigurasi telah dibuat.
 3.  **Sinkronisasi Data (Firebase & SQLite)**: Fungsi untuk mengunduh data dari Firebase ke SQLite dan mengunggah dari SQLite ke Firebase telah dibuat dalam file layanan terpusat (`firebase_servis.dart`). Sinkronisasi ini terjadi secara otomatis saat aplikasi dimulai.
+4.  **Perbaikan Refresh Data**: Fungsi `_navigateToEdit` pada halaman detail pelanggan aktif telah diperbaiki untuk memuat ulang data yang benar setelah proses edit selesai.

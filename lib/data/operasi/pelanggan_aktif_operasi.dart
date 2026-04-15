@@ -24,6 +24,20 @@ class PelangganAktifOperasi {
     });
   }
 
+  Future<PelangganAktif?> ambilSatuPelangganAktif(String id) async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'pelanggan_aktif',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return PelangganAktif.fromMap(maps.first);
+    }
+    return null;
+  }
+
   Future<void> updatePelangganAktif(PelangganAktif pelanggan) async {
     final db = await dbHelper.database;
     final data = pelanggan.toMap();
@@ -50,15 +64,15 @@ class PelangganAktifOperasi {
     await db.delete('pelanggan_aktif');
   }
 
-  /// Menghapus pelanggan yang tanggal berakhirnya sudah lewat.
+  /// Menghapus pelanggan yang tanggal berakhirnya sudah lewat dan statusnya lunas.
   /// Mengembalikan jumlah pelanggan yang dihapus.
   Future<int> hapusPelangganKadaluarsa() async {
     final db = await dbHelper.database;
     final now = DateTime.now().toIso8601String();
     final count = await db.delete(
       'pelanggan_aktif',
-      where: 'tanggalBerakhir < ?',
-      whereArgs: [now],
+      where: 'tanggalBerakhir < ? AND status = ?',
+      whereArgs: [now, 'lunas'],
     );
     return count;
   }
