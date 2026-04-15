@@ -1,7 +1,8 @@
 // lib/model/pelanggan_aktif_model.dart
-enum StatusPembayaran { lunas, belumLunas }
+enum StatusPembayaran {
+  lunas,
+  belumLunas;
 
-extension StatusPembayaranExtension on StatusPembayaran {
   String get displayName {
     switch (this) {
       case StatusPembayaran.lunas:
@@ -14,8 +15,8 @@ extension StatusPembayaranExtension on StatusPembayaran {
 
 class PelangganAktif {
   final int? id;
-  final String idPaket;
-  final String idPelanggan;
+  final String idPelanggan; 
+  final int idPaket;       // Tipe data sudah benar (int)
   final String tanggalMulai;
   final String tanggalBerakhir;
   final StatusPembayaran status;
@@ -32,25 +33,20 @@ class PelangganAktif {
   });
 
   factory PelangganAktif.fromMap(Map<String, dynamic> map) {
-    StatusPembayaran statusPembayaran;
     final statusString = map['status'] as String?;
-
-    // Logika parsing yang aman
+    StatusPembayaran statusPembayaran;
     if (statusString == 'lunas') {
       statusPembayaran = StatusPembayaran.lunas;
     } else {
-      // Jika nilainya 'tidakLunas', null, atau data rusak lainnya,
-      // kita akan set default ke tidakLunas.
       statusPembayaran = StatusPembayaran.belumLunas;
     }
     return PelangganAktif(
       id: map['id'] as int?,
-      idPelanggan: map['id_pelanggan'],
-      idPaket: map['id_paket'],
+      idPelanggan: map['id_pelanggan'].toString(),
+      idPaket: map['id_paket'] as int,
       tanggalMulai: map['tanggalMulai'],
       tanggalBerakhir: map['tanggalBerakhir'],
       status: statusPembayaran,
-
       diperbarui: map['diperbarui'] != null
           ? DateTime.parse(map['diperbarui'])
           : null,

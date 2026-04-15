@@ -17,158 +17,164 @@ import 'package:admin/model/transaksi_model.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // Operasi Lokal
-  final KategoriOperasi _kategoriOperasi = KategoriOperasi();
   final DompetOperasi _dompetOperasi = DompetOperasi();
-  final PaketOperasi _paketOperasi = PaketOperasi();
-  final PelangganOperasi _pelangganOperasi = PelangganOperasi();
-  final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
+  final KategoriOperasi _kategoriOperasi = KategoriOperasi();
   final TransaksiOperasi _transaksiOperasi = TransaksiOperasi();
+  final PelangganOperasi _pelangganOperasi = PelangganOperasi();
+  final PaketOperasi _paketOperasi = PaketOperasi();
+  final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
+  Timer? _timer;
 
-  // =========================================================================
-  // Generic Sync Logic
-  // =========================================================================
+  void startSync() {
+    _timer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      developer.log(
+        'Memulai sinkronisasi periodic...',
+        name: 'FirebaseService',
+      );
+      sinkronkanSemuaData();
+    });
+  }
 
-  Future<void> _sinkronkan<T>({
-    required String namaKoleksi,
-    required Future<List<T>> Function() unduhDariFirebase,
-    required Future<void> Function(List<T>) unggahKeFirebase,
-    required Future<List<T>> Function() getDariLokal,
-    required Future<void> Function() hapusLokal,
-    required Future<void> Function(T) createLokal,
-  }) async {
-    developer.log(
-      'Memulai sinkronisasi untuk: $namaKoleksi...',
-      name: 'admin.firebase',
-    );
+  void dispose() {
+    _timer?.cancel();
+  }
+
+  Future<void> sinkronkanSemuaData() async {
+    developer.log('Sinkronisasi semua data dimulai', name: 'FirebaseService');
+
     try {
-      List<T> dataFirebase = await unduhDariFirebase();
+      final List<Future> futures = [
+        _syncKategori(),
+        _syncTransaksi(),
+        _syncDompet(),
+        _syncPelanggan(),
+        _syncPaket(),
+        _syncPelangganAktif(),
+      ];
 
-      if (dataFirebase.isEmpty) {
-        developer.log(
-          'Tidak ada data di Firebase untuk $namaKoleksi. Mengunggah dari SQLite...',
-          name: 'admin.firebase',
-        );
-        List<T> dataLokal = await getDariLokal();
-        if (dataLokal.isNotEmpty) {
-          await unggahKeFirebase(dataLokal);
-          developer.log(
-            'Berhasil mengunggah $namaKoleksi ke Firebase.',
-            name: 'admin.firebase',
-          );
-        } else {
-          developer.log(
-            'Tidak ada data $namaKoleksi di lokal untuk diunggah.',
-            name: 'admin.firebase',
-          );
-        }
-      } else {
-        developer.log(
-          'Data $namaKoleksi ditemukan di Firebase. Memperbarui SQLite...',
-          name: 'admin.firebase',
-        );
-        await hapusLokal();
-        for (var item in dataFirebase) {
-          await createLokal(item);
-        }
-        developer.log(
-          'SQLite untuk $namaKoleksi diperbarui dari Firebase.',
-          name: 'admin.firebase',
-        );
-      }
+      final results = await Future.wait(
+        futures.map(
+          (f) => f.catchError((e, s) {
+            developer.log(
+              'Error dalam salah satu future sinkronisasi',
+              error: e,
+              stackTrace: s,
+              name: 'FirebaseService',
+            );
+            return null; // Return null on error to not break Future.wait
+          }),
+        ),
+      );
+
+      // Log hasil untuk setiap sinkronisasi
+      developer.log(
+        'Sinkronisasi Kategori selesai: ${results[0]}',
+        name: 'FirebaseService',
+      );
+      developer.log(
+        'Sinkronisasi Transaksi selesai: ${results[1]}',
+        name: 'FirebaseService',
+      );
+      developer.log(
+        'Sinkronisasi Dompet selesai: ${results[2]}',
+        name: 'FirebaseService',
+      );
+      developer.log(
+        'Sinkronisasi Pelanggan selesai: ${results[3]}',
+        name: 'FirebaseService',
+      );
+      developer.log(
+        'Sinkronisasi Paket selesai: ${results[4]}',
+        name: 'FirebaseService',
+      );
+      developer.log(
+        'Sinkronisasi Pelanggan Aktif selesai: ${results[5]}',
+        name: 'FirebaseService',
+      );
+
+      developer.log('Sinkronisasi semua data selesai', name: 'FirebaseService');
     } catch (e, s) {
       developer.log(
-        'Error saat sinkronisasi $namaKoleksi',
-        name: 'admin.firebase',
+        'Kesalahan besar saat sinkronisasi',
         error: e,
         stackTrace: s,
+        name: 'FirebaseService',
       );
     }
   }
 
   // =========================================================================
-  // Kategori
+  // Sinkronisasi Spesifik
   // =========================================================================
 
-  Future<List<Kategori>> _unduhKategori() async {
-    QuerySnapshot snapshot = await _firestore.collection('kategori').get();
-    return snapshot.docs
-        .map(
-          (doc) => Kategori.fromMap(
-            doc.data() as Map<String, dynamic>..['id'] = doc.id,
-          ),
-        )
-        .toList();
+  Future<String> _syncKategori() async {
+    final items = await _kategoriOperasi.getKategori();
+    await _unggahKategori(items);
+    return '${items.length} item Kategori disinkronkan.';
   }
+
+  Future<String> _syncDompet() async {
+    final items = await _dompetOperasi.getDompet();
+    await _unggahDompet(items);
+    return '${items.length} item Dompet disinkronkan.';
+  }
+
+  Future<String> _syncTransaksi() async {
+    final items = await _transaksiOperasi.getTransaksi();
+    await _unggahTransaksi(items);
+    return '${items.length} item Transaksi disinkronkan.';
+  }
+
+  Future<String> _syncPelanggan() async {
+    final items = await _pelangganOperasi.getPelanggan();
+    await _unggahPelanggan(items);
+    return '${items.length} item Pelanggan disinkronkan.';
+  }
+
+  Future<String> _syncPaket() async {
+    final items = await _paketOperasi.getPaket();
+    await _unggahPaket(items);
+    return '${items.length} item Paket disinkronkan.';
+  }
+
+  Future<String> _syncPelangganAktif() async {
+    final items = await _pelangganAktifOperasi.ambilSemuaPelangganAktif();
+    await _unggahPelangganAktif(items);
+    return '${items.length} item Pelanggan Aktif disinkronkan.';
+  }
+
+  // =========================================================================
+  // Logika Unggah (Upload)
+  // =========================================================================
 
   Future<void> _unggahKategori(List<Kategori> items) async {
     final batch = _firestore.batch();
     for (var item in items) {
-      batch.set(_firestore.collection('kategori').doc(item.id), item.toMap());
+      batch.set(_firestore.collection('kategori').doc(item.nama), item.toMap());
     }
     await batch.commit();
-  }
-
-  // =========================================================================
-  // Dompet
-  // =========================================================================
-
-  Future<List<Dompet>> _unduhDompet() async {
-    QuerySnapshot snapshot = await _firestore.collection('dompet').get();
-    return snapshot.docs
-        .map(
-          (doc) => Dompet.fromMap(
-            doc.data() as Map<String, dynamic>..['id'] = doc.id,
-          ),
-        )
-        .toList();
   }
 
   Future<void> _unggahDompet(List<Dompet> items) async {
     final batch = _firestore.batch();
     for (var item in items) {
-      batch.set(_firestore.collection('dompet').doc(item.id), item.toMap());
+      batch.set(
+        _firestore.collection('dompet').doc(item.namaDompet),
+        item.toMap(),
+      );
     }
     await batch.commit();
   }
 
-  // =========================================================================
-  // Paket
-  // =========================================================================
-
-  Future<List<Paket>> _unduhPaket() async {
-    QuerySnapshot snapshot = await _firestore.collection('paket').get();
-    return snapshot.docs
-        .map(
-          (doc) => Paket.fromMap(
-            doc.data() as Map<String, dynamic>..['id'] = doc.id,
-          ),
-        )
-        .toList();
-  }
-
-  Future<void> _unggahPaket(List<Paket> items) async {
+  Future<void> _unggahTransaksi(List<Transaksi> items) async {
     final batch = _firestore.batch();
     for (var item in items) {
-      batch.set(_firestore.collection('paket').doc(item.id), item.toMap());
+      batch.set(
+        _firestore.collection('transaksi').doc(item.id.toString()),
+        item.toMap(),
+      );
     }
     await batch.commit();
-  }
-
-  // =========================================================================
-  // Pelanggan
-  // =========================================================================
-
-  Future<List<Pelanggan>> _unduhPelanggan() async {
-    QuerySnapshot snapshot = await _firestore.collection('pelanggan').get();
-    return snapshot.docs
-        .map(
-          (doc) => Pelanggan.fromMap(
-            doc.data() as Map<String, dynamic>..['id'] = doc.id,
-          ),
-        )
-        .toList();
   }
 
   Future<void> _unggahPelanggan(List<Pelanggan> items) async {
@@ -179,116 +185,32 @@ class FirebaseService {
     await batch.commit();
   }
 
-  // =========================================================================
-  // Pelanggan Aktif
-  // =========================================================================
-
-  Future<List<PelangganAktif>> _unduhPelangganAktif() async {
-    QuerySnapshot snapshot = await _firestore
-        .collection('pelanggan_aktif')
-        .get();
-    return snapshot.docs
-        .map(
-          (doc) => PelangganAktif.fromMap(doc.data() as Map<String, dynamic>),
-        )
-        .toList();
+  Future<void> _unggahPaket(List<Paket> items) async {
+    final batch = _firestore.batch();
+    for (var item in items) {
+      if (item.id != null) {
+        // Pastikan ID tidak null
+        // PERBAIKAN: Konversi id (int?) ke String
+        batch.set(
+          _firestore.collection('paket').doc(item.id.toString()),
+          item.toMap(),
+        );
+      }
+    }
+    await batch.commit();
   }
 
   Future<void> _unggahPelangganAktif(List<PelangganAktif> items) async {
     final batch = _firestore.batch();
     for (var item in items) {
-      batch.set(
-        _firestore.collection('pelanggan_aktif').doc(item.id.toString()),
-        item.toMap(),
-      );
+      if (item.id != null) {
+        // Pastikan ID tidak null
+        batch.set(
+          _firestore.collection('pelanggan_aktif').doc(item.id.toString()),
+          item.toMap(),
+        );
+      }
     }
     await batch.commit();
-  }
-
-  // =========================================================================
-  // Transaksi
-  // =========================================================================
-
-  Future<List<Transaksi>> _unduhTransaksi() async {
-    QuerySnapshot snapshot = await _firestore.collection('transaksi').get();
-    return snapshot.docs
-        .map(
-          (doc) => Transaksi.fromMap(
-            doc.data() as Map<String, dynamic>..['id'] = doc.id,
-          ),
-        )
-        .toList();
-  }
-
-  Future<void> _unggahTransaksi(List<Transaksi> items) async {
-    final batch = _firestore.batch();
-    for (var item in items) {
-      batch.set(_firestore.collection('transaksi').doc(item.id), item.toMap());
-    }
-    await batch.commit();
-  }
-
-  // =========================================================================
-  // Main Public Sync Method
-  // =========================================================================
-
-  Future<void> sinkronkanSemuaData() async {
-    developer.log('MEMULAI SINKRONISASI DATA GLOBAL', name: 'admin.firebase');
-
-    await _sinkronkan<Kategori>(
-      namaKoleksi: 'Kategori',
-      unduhDariFirebase: _unduhKategori,
-      unggahKeFirebase: _unggahKategori,
-      getDariLokal: _kategoriOperasi.getKategori,
-      hapusLokal: _kategoriOperasi.hapusSemuaKategori,
-      createLokal: _kategoriOperasi.createKategori,
-    );
-
-    await _sinkronkan<Dompet>(
-      namaKoleksi: 'Dompet',
-      unduhDariFirebase: _unduhDompet,
-      unggahKeFirebase: _unggahDompet,
-      getDariLokal: _dompetOperasi.getDompet,
-      hapusLokal: _dompetOperasi.hapusSemuaDompet,
-      createLokal: _dompetOperasi.createDompet,
-    );
-
-    await _sinkronkan<Paket>(
-      namaKoleksi: 'Paket',
-      unduhDariFirebase: _unduhPaket,
-      unggahKeFirebase: _unggahPaket,
-      getDariLokal: _paketOperasi.getPaket,
-      hapusLokal: _paketOperasi.hapusSemuaPaket,
-      createLokal: _paketOperasi.createPaket,
-    );
-
-    await _sinkronkan<Pelanggan>(
-      namaKoleksi: 'Pelanggan',
-      unduhDariFirebase: _unduhPelanggan,
-      unggahKeFirebase: _unggahPelanggan,
-      getDariLokal: _pelangganOperasi.getPelanggan,
-      hapusLokal: _pelangganOperasi.hapusSemuaPelanggan,
-      createLokal: _pelangganOperasi.createPelanggan,
-    );
-
-    await _sinkronkan<PelangganAktif>(
-      namaKoleksi: 'PelangganAktif',
-      unduhDariFirebase: _unduhPelangganAktif,
-      unggahKeFirebase: _unggahPelangganAktif,
-      getDariLokal: _pelangganAktifOperasi.ambilSemuaPelangganAktif,
-      hapusLokal: _pelangganAktifOperasi.hapusSemuaPelangganAktif,
-      createLokal: _pelangganAktifOperasi.createPelangganAktif,
-    );
-
-    await _sinkronkan<Transaksi>(
-      namaKoleksi: 'Transaksi',
-      unduhDariFirebase: _unduhTransaksi,
-      unggahKeFirebase: _unggahTransaksi,
-      getDariLokal: _transaksiOperasi.getTransaksi,
-      hapusLokal: _transaksiOperasi.hapusSemuaTransaksi,
-      createLokal: _transaksiOperasi.createTransaksi,
-    );
-
-    developer.log('SINKRONISASI DATA GLOBAL SELESAI', name: 'admin.firebase');
   }
 }

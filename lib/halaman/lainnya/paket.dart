@@ -1,3 +1,5 @@
+// Path: lib/halaman/lainnya/paket.dart
+
 import 'package:admin/data/operasi/paket_operasi.dart';
 import 'package:admin/model/paket_model.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +87,7 @@ class _PaketPageState extends State<PaketPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const FormPaketPage()),
+            MaterialPageRoute(builder: (context) => const FormPaket()),
           ).then((_) => _refreshPaketList());
         },
         backgroundColor: Colors.blueAccent,

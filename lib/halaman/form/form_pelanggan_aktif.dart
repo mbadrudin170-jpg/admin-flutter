@@ -167,7 +167,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         final pelangganAktifData = PelangganAktif(
           id: _isEditMode ? widget.pelangganAktif!.id : null,
           idPelanggan: _selectedPelanggan!.id,
-          idPaket: _selectedPaket!.id,
+          idPaket: _selectedPaket!.id!,
           tanggalMulai: tanggalMulai.toIso8601String(),
           tanggalBerakhir: tanggalBerakhir.toIso8601String(),
           status: _statusPembayaran,

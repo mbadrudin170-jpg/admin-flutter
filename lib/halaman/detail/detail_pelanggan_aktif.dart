@@ -1,7 +1,10 @@
 // lib/halaman/detail/detail_pelanggan_aktif.dart
+import 'dart:developer' as developer;
+import 'package:admin/data/operasi/paket_operasi.dart';
 import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin/data/operasi/pelanggan_operasi.dart';
 import 'package:admin/halaman/form/form_pelanggan_aktif.dart';
+import 'package:admin/model/paket_model.dart';
 import 'package:admin/model/pelanggan_model.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/model/pelanggan_aktif_model.dart';
@@ -16,27 +19,61 @@ class DetailPelangganAktif extends StatefulWidget {
 }
 
 class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
-  // Inisialisasi langsung untuk menghindari LateError
   late PelangganAktif _pelangganAktif;
+  // State untuk data yang dimuat
   Pelanggan? _pelanggan;
+  Paket? _paket;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // Inisialisasi variabel state dari widget
     _pelangganAktif = widget.pelanggan;
-    _loadPelangganData();
+    _loadDetails();
   }
 
-  Future<void> _loadPelangganData() async {
-    // Pastikan widget masih ada di pohon sebelum setState
+  Future<void> _loadDetails() async {
     if (!mounted) return;
-    final PelangganOperasi operasi = PelangganOperasi();
-    final pelanggan = await operasi.ambilSatuPelanggan(_pelangganAktif.idPelanggan);
-    if (mounted && pelanggan != null) {
-      setState(() {
-        _pelanggan = pelanggan;
-      });
+    setState(() {
+      _isLoading = true;
+    });
+
+    final pelangganOperasi = PelangganOperasi();
+    final paketOperasi = PaketOperasi();
+
+    try {
+      // PERBAIKAN: Mengonversi idPaket ke int sebelum memanggil
+      final idPaketInt = int.tryParse(_pelangganAktif.idPaket.toString());
+
+      // Muat data pelanggan dan paket secara bersamaan
+      final results = await Future.wait([
+        // PERBAIKAN: Memanggil method yang benar
+        pelangganOperasi.ambilSatuPelangganById(_pelangganAktif.idPelanggan),
+        if (idPaketInt != null)
+          paketOperasi.ambilSatuPaket(idPaketInt)
+        else
+          Future.value(null),
+      ]);
+
+      if (mounted) {
+        setState(() {
+          _pelanggan = results[0] as Pelanggan?;
+          _paket = results[1] as Paket?;
+          _isLoading = false;
+        });
+      }
+    } catch (e, s) {
+      developer.log(
+        'Gagal memuat detail',
+        name: 'DetailPelangganAktif',
+        error: e,
+        stackTrace: s,
+      );
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -44,19 +81,22 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FormPelangganAktif(pelangganAktif: _pelangganAktif),
+        builder: (context) =>
+            FormPelangganAktif(pelangganAktif: _pelangganAktif),
       ),
     );
 
     if (result == true) {
-      final PelangganAktifOperasi operasi = PelangganAktifOperasi();
-      final updatedPelanggan = await operasi.ambilSatuPelangganAktif(
+      final operasi = PelangganAktifOperasi();
+      final updatedPelangganAktif = await operasi.ambilSatuPelangganAktif(
         _pelangganAktif.id!.toString(),
       );
-      if (mounted && updatedPelanggan != null) {
+      if (mounted && updatedPelangganAktif != null) {
         setState(() {
-          _pelangganAktif = updatedPelanggan;
+          _pelangganAktif = updatedPelangganAktif;
         });
+        // Muat ulang semua detail setelah edit
+        _loadDetails();
       }
     }
   }
@@ -65,11 +105,11 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_pelangganAktif.idPelanggan),
+        title: Text(_pelanggan?.nama ?? _pelangganAktif.idPelanggan),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context, true); // selalu kirim true untuk refresh
+            Navigator.pop(context, true);
           },
         ),
         actions: [
@@ -92,27 +132,18 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Nama: ${_pelangganAktif.idPelanggan}',
+                      'Nama: ${_pelanggan?.nama ?? _pelangganAktif.idPelanggan}',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
-                    // Tampilkan nomor HP atau indikator loading
-                    _pelanggan == null
-                        ? const Center(child: CircularProgressIndicator())
-                        : Text(
-                            'No HP: ${_pelanggan!.telepon}',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
+                    _buildTeleponDisplay(),
                     const SizedBox(height: 8),
                     Text(
                       'Status: ${_pelangganAktif.status.displayName}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'Paket: ${_pelangganAktif.idPaket}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+                    _buildPaketDisplay(),
                     const SizedBox(height: 8),
                     Text(
                       'Mulai: ${_pelangganAktif.tanggalMulai}',
@@ -131,5 +162,46 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
         ),
       ),
     );
+  }
+
+  Widget _buildTeleponDisplay() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_pelanggan != null) {
+      return Text(
+        'No HP: ${_pelanggan!.telepon}',
+        style: Theme.of(context).textTheme.titleMedium,
+      );
+    } else {
+      return Text(
+        'No HP tidak ditemukan',
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(color: Colors.red),
+      );
+    }
+  }
+
+  Widget _buildPaketDisplay() {
+    if (_isLoading) {
+      return Text(
+        'Memuat nama paket...',
+        style: Theme.of(context).textTheme.titleMedium,
+      );
+    }
+    if (_paket != null) {
+      return Text(
+        'Paket: ${_paket!.nama}',
+        style: Theme.of(context).textTheme.titleMedium,
+      );
+    } else {
+      return Text(
+        'Paket: (ID: ${_pelangganAktif.idPaket}) tidak ditemukan',
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(color: Colors.red),
+      );
+    }
   }
 }

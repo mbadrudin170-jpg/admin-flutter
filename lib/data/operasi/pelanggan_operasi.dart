@@ -7,8 +7,6 @@ class PelangganOperasi {
 
   Future<void> createPelanggan(Pelanggan pelanggan) async {
     final db = await dbHelper.database;
-    // Objek pelanggan dari form sekarang sudah lengkap, 
-    // termasuk 'diperbarui'. Langsung masukkan ke database.
     await db.insert('pelanggan', pelanggan.toMap());
   }
 
@@ -21,7 +19,7 @@ class PelangganOperasi {
     });
   }
 
-  Future<Pelanggan?> ambilSatuPelanggan(String id) async {
+  Future<Pelanggan?> ambilSatuPelangganById(String id) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'pelanggan',
@@ -37,8 +35,6 @@ class PelangganOperasi {
 
   Future<void> updatePelanggan(Pelanggan pelanggan) async {
     final db = await dbHelper.database;
-    // Saat memperbarui, kita perlu membuat map baru yang berisi
-    // timestamp 'diperbarui' yang baru.
     final dataToUpdate = pelanggan.toMap();
     dataToUpdate['diperbarui'] = DateTime.now().toIso8601String();
 

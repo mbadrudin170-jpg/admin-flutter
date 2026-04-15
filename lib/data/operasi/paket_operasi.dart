@@ -3,56 +3,50 @@ import 'package:admin/data/sqlite.dart';
 import 'package:admin/model/paket_model.dart';
 
 class PaketOperasi {
-  final DatabaseHelper dbHelper = DatabaseHelper();
+  final dbHelper = DatabaseHelper();
 
-  Future<void> createPaket(Paket paket) async {
+  Future<int> createPaket(Paket paket) async {
     final db = await dbHelper.database;
-    await db.insert('paket', {
-      'nama': paket.nama,
-      'harga': paket.harga,
-      'durasi': paket.durasi,
-      'tipe': paket.tipe.toString().split('.').last,
-      'diperbarui': DateTime.now().toIso8601String(), // Menambahkan timestamp
-    });
+    return await db.insert('paket', paket.toMap());
   }
 
   Future<List<Paket>> getPaket() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query('paket');
-
     return List.generate(maps.length, (i) {
-      return Paket(
-        id: maps[i]['id'].toString(), // Membaca ID dari database
-        nama: maps[i]['nama'],
-        harga: maps[i]['harga'],
-        durasi: maps[i]['durasi'],
-        tipe: TipeDurasi.values.firstWhere(
-            (e) => e.toString().split('.').last == maps[i]['tipe']),
-      );
+      return Paket.fromMap(maps[i]);
     });
   }
 
-  Future<void> updatePaket(Paket paket) async {
+  Future<Paket?> ambilSatuPaket(int id) async {
     final db = await dbHelper.database;
-    await db.update(
+    final List<Map<String, dynamic>> maps = await db.query(
       'paket',
-      {
-        'nama': paket.nama,
-        'harga': paket.harga,
-        'durasi': paket.durasi,
-        'tipe': paket.tipe.toString().split('.').last,
-        'diperbarui': DateTime.now().toIso8601String(), // Menambahkan timestamp
-      },
-      where: 'id = ?', // Menggunakan ID untuk update
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Paket.fromMap(maps.first);
+    } 
+    return null;
+  }
+
+  Future<int> updatePaket(Paket paket) async {
+    final db = await dbHelper.database;
+    return await db.update(
+      'paket',
+      paket.toMap(),
+      where: 'id = ?',
       whereArgs: [paket.id],
     );
   }
 
-  Future<void> deletePaket(String id) async {
+  Future<int> deletePaket(int id) async {
     final db = await dbHelper.database;
-    await db.delete(
+    return await db.delete(
       'paket',
-      where: 'id = ?', // Menggunakan ID untuk delete
+      where: 'id = ?',
       whereArgs: [id],
     );
   }
