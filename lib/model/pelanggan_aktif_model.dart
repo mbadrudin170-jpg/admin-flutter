@@ -16,7 +16,7 @@ enum StatusPembayaran {
 class PelangganAktif {
   final int? id;
   final String idPelanggan; 
-  final int idPaket;       // Tipe data sudah benar (int)
+  final int idPaket;
   final String tanggalMulai;
   final String tanggalBerakhir;
   final StatusPembayaran status;
@@ -41,11 +41,11 @@ class PelangganAktif {
       statusPembayaran = StatusPembayaran.belumLunas;
     }
     return PelangganAktif(
-      id: map['id'] as int?,
+      id: map['id'] != null ? int.tryParse(map['id'].toString()) : null,
       idPelanggan: map['id_pelanggan'].toString(),
-      idPaket: map['id_paket'] as int,
-      tanggalMulai: map['tanggalMulai'],
-      tanggalBerakhir: map['tanggalBerakhir'],
+      idPaket: int.tryParse(map['id_paket'].toString()) ?? 0,
+      tanggalMulai: map['tanggalMulai'] ?? '',
+      tanggalBerakhir: map['tanggalBerakhir'] ?? '',
       status: statusPembayaran,
       diperbarui: map['diperbarui'] != null
           ? DateTime.parse(map['diperbarui'])

@@ -23,32 +23,28 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      version: 2, // <-- Versi database dinaikkan
+      version: 3, // <-- Langkah 1: Versi database dinaikkan
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade, // <-- Menambahkan handler untuk upgrade
+      onUpgrade: _onUpgrade,
     );
   }
 
-  // Dijalankan saat database dibuat untuk pertama kalinya
   Future<void> _onCreate(Database db, int version) async {
     await _createTables(db);
   }
 
-  // Dijalankan saat versi database berubah
+  // Langkah 3: Implementasi _onUpgrade yang aman
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Untuk kesederhanaan, kita hapus tabel lama dan buat yang baru.
-    // Peringatan: Ini akan menghapus semua data yang ada!
-    await db.execute('DROP TABLE IF EXISTS sub_kategori');
-    await db.execute('DROP TABLE IF EXISTS kategori');
-    await db.execute('DROP TABLE IF EXISTS paket');
-    await db.execute('DROP TABLE IF EXISTS pelanggan');
-    await db.execute('DROP TABLE IF EXISTS pelanggan_aktif');
-    await db.execute('DROP TABLE IF EXISTS transaksi');
-    await db.execute('DROP TABLE IF EXISTS dompet');
-    await _createTables(db);
+    if (oldVersion < 3) {
+      // Tambahkan kolom baru tanpa menghapus data yang ada
+      await db.execute('''
+        ALTER TABLE pelanggan_aktif 
+        ADD COLUMN status_sinkronisasi TEXT NOT NULL DEFAULT 'SINKRON'
+      ''');
+      // Tambahkan ALTER TABLE untuk tabel lain di sini jika diperlukan di masa depan
+    }
   }
 
-  // Fungsi terpusat untuk membuat semua tabel
   Future<void> _createTables(Database db) async {
     await db.execute('''
       CREATE TABLE kategori(
@@ -92,6 +88,7 @@ class DatabaseHelper {
       )
     ''');
 
+    // Langkah 2: Tambahkan kolom baru di definisi tabel utama
     await db.execute('''
       CREATE TABLE pelanggan_aktif(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -101,6 +98,7 @@ class DatabaseHelper {
         tanggalBerakhir TEXT NOT NULL,
         status TEXT NOT NULL,
         diperbarui TEXT NOT NULL,
+        status_sinkronisasi TEXT NOT NULL DEFAULT 'SINKRON', --<-- Kolom baru ditambahkan
         FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE ON UPDATE CASCADE
       )

@@ -17,12 +17,6 @@ import 'package:admin/model/transaksi_model.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final DompetOperasi _dompetOperasi = DompetOperasi();
-  final KategoriOperasi _kategoriOperasi = KategoriOperasi();
-  final TransaksiOperasi _transaksiOperasi = TransaksiOperasi();
-  final PelangganOperasi _pelangganOperasi = PelangganOperasi();
-  final PaketOperasi _paketOperasi = PaketOperasi();
-  final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
   Timer? _timer;
 
   void startSync() {
@@ -42,17 +36,25 @@ class FirebaseService {
   Future<void> sinkronkanSemuaData() async {
     developer.log('Sinkronisasi semua data dimulai', name: 'FirebaseService');
 
+    // Pindahkan inisialisasi ke sini untuk memutus circular dependency
+    final dompetOperasi = DompetOperasi();
+    final kategoriOperasi = KategoriOperasi();
+    final transaksiOperasi = TransaksiOperasi();
+    final pelangganOperasi = PelangganOperasi();
+    final paketOperasi = PaketOperasi();
+    final pelangganAktifOperasi = PelangganAktifOperasi();
+
     try {
       final List<Future> futures = [
-        _syncKategori(),
-        _syncTransaksi(),
-        _syncDompet(),
-        _syncPelanggan(),
-        _syncPaket(),
-        _syncPelangganAktif(),
+        _syncKategori(kategoriOperasi),
+        _syncTransaksi(transaksiOperasi),
+        _syncDompet(dompetOperasi),
+        _syncPelanggan(pelangganOperasi),
+        _syncPaket(paketOperasi),
+        _syncPelangganAktif(pelangganAktifOperasi),
       ];
 
-      final results = await Future.wait(
+      await Future.wait(
         futures.map(
           (f) => f.catchError((e, s) {
             developer.log(
@@ -61,37 +63,10 @@ class FirebaseService {
               stackTrace: s,
               name: 'FirebaseService',
             );
-            return null; // Return null on error to not break Future.wait
+            return null;
           }),
         ),
       );
-
-      // Log hasil untuk setiap sinkronisasi
-      developer.log(
-        'Sinkronisasi Kategori selesai: ${results[0]}',
-        name: 'FirebaseService',
-      );
-      developer.log(
-        'Sinkronisasi Transaksi selesai: ${results[1]}',
-        name: 'FirebaseService',
-      );
-      developer.log(
-        'Sinkronisasi Dompet selesai: ${results[2]}',
-        name: 'FirebaseService',
-      );
-      developer.log(
-        'Sinkronisasi Pelanggan selesai: ${results[3]}',
-        name: 'FirebaseService',
-      );
-      developer.log(
-        'Sinkronisasi Paket selesai: ${results[4]}',
-        name: 'FirebaseService',
-      );
-      developer.log(
-        'Sinkronisasi Pelanggan Aktif selesai: ${results[5]}',
-        name: 'FirebaseService',
-      );
-
       developer.log('Sinkronisasi semua data selesai', name: 'FirebaseService');
     } catch (e, s) {
       developer.log(
@@ -103,49 +78,63 @@ class FirebaseService {
     }
   }
 
-  // =========================================================================
-  // Sinkronisasi Spesifik
-  // =========================================================================
+  Future<void> hapusPelangganAktif(String id) async {
+    try {
+      await _firestore.collection('pelanggan_aktif').doc(id).delete();
+      developer.log(
+        'Pelanggan aktif dengan ID: $id berhasil dihapus dari Firebase.',
+        name: 'FirebaseService',
+      );
+    } catch (e, s) {
+      developer.log(
+        'Gagal menghapus pelanggan aktif dari Firebase.',
+        error: e,
+        stackTrace: s,
+        name: 'FirebaseService',
+      );
+      rethrow;
+    }
+  }
 
-  Future<String> _syncKategori() async {
-    final items = await _kategoriOperasi.getKategori();
+  // ... (sisa metode sinkronisasi diubah untuk menerima operasi sebagai parameter)
+
+  Future<String> _syncKategori(KategoriOperasi op) async {
+    final items = await op.getKategori();
     await _unggahKategori(items);
     return '${items.length} item Kategori disinkronkan.';
   }
 
-  Future<String> _syncDompet() async {
-    final items = await _dompetOperasi.getDompet();
+  Future<String> _syncDompet(DompetOperasi op) async {
+    final items = await op.getDompet();
     await _unggahDompet(items);
     return '${items.length} item Dompet disinkronkan.';
   }
 
-  Future<String> _syncTransaksi() async {
-    final items = await _transaksiOperasi.getTransaksi();
+  Future<String> _syncTransaksi(TransaksiOperasi op) async {
+    final items = await op.getTransaksi();
     await _unggahTransaksi(items);
     return '${items.length} item Transaksi disinkronkan.';
   }
 
-  Future<String> _syncPelanggan() async {
-    final items = await _pelangganOperasi.getPelanggan();
+  Future<String> _syncPelanggan(PelangganOperasi op) async {
+    final items = await op.getPelanggan();
     await _unggahPelanggan(items);
     return '${items.length} item Pelanggan disinkronkan.';
   }
 
-  Future<String> _syncPaket() async {
-    final items = await _paketOperasi.getPaket();
+  Future<String> _syncPaket(PaketOperasi op) async {
+    final items = await op.getPaket();
     await _unggahPaket(items);
     return '${items.length} item Paket disinkronkan.';
   }
 
-  Future<String> _syncPelangganAktif() async {
-    final items = await _pelangganAktifOperasi.ambilSemuaPelangganAktif();
+  Future<String> _syncPelangganAktif(PelangganAktifOperasi op) async {
+    final items = await op.ambilSemuaPelangganAktif();
     await _unggahPelangganAktif(items);
     return '${items.length} item Pelanggan Aktif disinkronkan.';
   }
 
-  // =========================================================================
-  // Logika Unggah (Upload)
-  // =========================================================================
+  // ... (metode unggah tetap sama)
 
   Future<void> _unggahKategori(List<Kategori> items) async {
     final batch = _firestore.batch();
@@ -189,8 +178,6 @@ class FirebaseService {
     final batch = _firestore.batch();
     for (var item in items) {
       if (item.id != null) {
-        // Pastikan ID tidak null
-        // PERBAIKAN: Konversi id (int?) ke String
         batch.set(
           _firestore.collection('paket').doc(item.id.toString()),
           item.toMap(),
@@ -204,7 +191,6 @@ class FirebaseService {
     final batch = _firestore.batch();
     for (var item in items) {
       if (item.id != null) {
-        // Pastikan ID tidak null
         batch.set(
           _firestore.collection('pelanggan_aktif').doc(item.id.toString()),
           item.toMap(),
