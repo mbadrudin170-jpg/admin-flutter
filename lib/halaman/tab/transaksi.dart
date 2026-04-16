@@ -1,4 +1,4 @@
-// lib/transaksi.dart
+// lib/halaman/tab/transaksi.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:admin/data/operasi/transaksi_operasi.dart';
@@ -44,6 +44,9 @@ class _TransaksiPageState extends State<TransaksiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Transaksi'),
+      ),
       body: FutureBuilder<List<Transaksi>>(
         future: _listaTransaksiFuture,
         builder: (context, snapshot) {
