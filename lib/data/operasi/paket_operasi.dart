@@ -1,4 +1,5 @@
 // lib/data/operasi/paket_operasi.dart
+import 'dart:developer' as developer;
 import 'package:admin/data/sqlite.dart';
 import 'package:admin/model/paket_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -7,11 +8,31 @@ class PaketOperasi {
   // Perbaikan: Gunakan instance singleton
   final dbHelper = DatabaseHelper.instance;
 
+  // lib/data/operasi/paket_operasi.dart
   Future<int> createPaket(Paket paket) async {
-    final db = await dbHelper.database;
-    final now = DateTime.now();
-    final data = paket.toMap()..['diperbarui'] = now.toIso8601String();
-    return await db.insert('paket', data);
+    try {
+      developer.log("Mencoba mendapatkan database...");
+      final db = await dbHelper.database;
+      developer.log("Database didapatkan. Menyiapkan data...");
+
+      final now = DateTime.now();
+      final data = paket.toMap()..['diperbarui'] = now.toIso8601String();
+
+      // Cetak data untuk memastikan isinya benar
+      developer.log("Data yang akan di-insert: $data");
+
+      developer.log("Melakukan insert ke tabel 'paket'...");
+      final result = await db.insert('paket', data);
+      developer.log("Insert berhasil dengan ID: $result");
+
+      return result;
+    } catch (e, stacktrace) {
+      // Ini akan mencetak error apa pun yang terjadi di dalam blok try
+      developer.log("TERJADI ERROR di createPaket", error: e, stackTrace: stacktrace);
+
+      // Kembalikan nilai yang menandakan kegagalan, misalnya -1
+      return -1;
+    }
   }
 
   Future<List<Paket>> getPaket() async {
