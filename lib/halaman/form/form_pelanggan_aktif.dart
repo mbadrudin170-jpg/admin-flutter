@@ -74,7 +74,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
             _selectedPaket = null;
           }
 
-          final tglMulai = DateTime.parse(pa.tanggalMulai);
+          final tglMulai = pa.tanggalMulai;
           _selectedDate = tglMulai;
           _selectedTime = TimeOfDay.fromDateTime(tglMulai);
           _statusPembayaran = pa.status;
@@ -168,8 +168,8 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
           id: _isEditMode ? widget.pelangganAktif!.id : null,
           idPelanggan: _selectedPelanggan!.id,
           idPaket: _selectedPaket!.id!,
-          tanggalMulai: tanggalMulai.toIso8601String(),
-          tanggalBerakhir: tanggalBerakhir.toIso8601String(),
+          tanggalMulai: tanggalMulai,
+          tanggalBerakhir: tanggalBerakhir,
           status: _statusPembayaran,
         );
 

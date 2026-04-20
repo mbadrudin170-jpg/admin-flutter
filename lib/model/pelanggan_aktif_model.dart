@@ -1,4 +1,6 @@
 // lib/model/pelanggan_aktif_model.dart
+// File ini mendefinisikan model data untuk PelangganAktif, termasuk atribut dan metode untuk konversi data.
+
 import 'package:uuid/uuid.dart';
 
 // Enum untuk status pembayaran
@@ -20,8 +22,8 @@ class PelangganAktif {
   final String? id;
   final String idPelanggan;
   final String idPaket;
-  final String tanggalMulai;
-  final String tanggalBerakhir;
+  final DateTime tanggalMulai;
+  final DateTime tanggalBerakhir;
   final StatusPembayaran status;
   final DateTime? diperbarui;
   final String statusSinkronisasi;
@@ -43,8 +45,8 @@ class PelangganAktif {
       id: map['id'],
       idPelanggan: map['id_pelanggan'],
       idPaket: map['id_paket'],
-      tanggalMulai: map['tanggalMulai'],
-      tanggalBerakhir: map['tanggalBerakhir'],
+      tanggalMulai: DateTime.parse(map['tanggalMulai']),
+      tanggalBerakhir: DateTime.parse(map['tanggalBerakhir']),
       status: StatusPembayaran.values.firstWhere(
         (e) => e.name == map['status'],
         orElse: () => StatusPembayaran.lunas,
@@ -60,8 +62,8 @@ class PelangganAktif {
       'id': id,
       'id_pelanggan': idPelanggan,
       'id_paket': idPaket,
-      'tanggalMulai': tanggalMulai,
-      'tanggalBerakhir': tanggalBerakhir,
+      'tanggalMulai': tanggalMulai.toIso8601String(),
+      'tanggalBerakhir': tanggalBerakhir.toIso8601String(),
       'status': status.name,
       'diperbarui': diperbarui?.toIso8601String(),
       'status_sinkronisasi': statusSinkronisasi,

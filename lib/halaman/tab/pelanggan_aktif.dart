@@ -168,9 +168,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                 final pelanggan = snapshot.data![index];
                 
                 // Logika status paket
-                final tanggalBerakhir = DateTime.parse(pelanggan.tanggalBerakhir);
                 final sekarang = DateTime.now();
-                final isAktif = tanggalBerakhir.isAfter(sekarang);
+                final isAktif = pelanggan.tanggalBerakhir.isAfter(sekarang);
                 final statusPaketText = isAktif ? 'Aktif' : 'Tidak Aktif';
                 final statusPaketColor = isAktif ? Colors.green : Colors.red;
 
@@ -225,7 +224,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Berakhir: ${Format.formatTanggal(tanggalBerakhir)}',
+                            'Berakhir: ${Format.formatTanggalDanJam(pelanggan.tanggalBerakhir)}',
                           ),
                         ],
                       ),
