@@ -1,20 +1,24 @@
 // lib/data/servis/firebase_servis.dart
+// File ini bertanggung jawab untuk sinkronisasi data antara database lokal (SQLite)
+// dan Firestore. Ini termasuk mengunggah perubahan lokal ke Firebase dan
+// mengunduh perubahan dari Firebase ke database lokal.
+
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:admin/data/operasi/dompet_operasi.dart';
-import 'package:admin/data/operasi/kategori_operasi.dart';
-import 'package:admin/data/operasi/paket_operasi.dart';
-import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
-import 'package:admin/data/operasi/pelanggan_operasi.dart';
-import 'package:admin/data/operasi/transaksi_operasi.dart';
-import 'package:admin/model/dompet_model.dart';
-import 'package:admin/model/kategori_model.dart';
-import 'package:admin/model/paket_model.dart';
-import 'package:admin/model/pelanggan_model.dart';
-import 'package:admin/model/pelanggan_aktif_model.dart';
-import 'package:admin/model/transaksi_model.dart';
-import 'package:admin/utils/sync_manager.dart';
+import 'package:admin_wifi/data/operasi/dompet_operasi.dart';
+import 'package:admin_wifi/data/operasi/kategori_operasi.dart';
+import 'package:admin_wifi/data/operasi/paket_operasi.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
+import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
+import 'package:admin_wifi/model/dompet_model.dart';
+import 'package:admin_wifi/model/kategori_model.dart';
+import 'package:admin_wifi/model/paket_model.dart';
+import 'package:admin_wifi/model/pelanggan_model.dart';
+import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
+import 'package:admin_wifi/model/transaksi_model.dart';
+import 'package:admin_wifi/utils/sync_manager.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

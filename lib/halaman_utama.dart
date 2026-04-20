@@ -1,10 +1,13 @@
-// Path: lib/halaman_utama.dart
+// lib/halaman_utama.dart
+// File ini adalah kerangka utama aplikasi yang berisi BottomNavigationBar
+// untuk navigasi antar halaman utama seperti Pelanggan Aktif, Dompet,
+// Transaksi, dan Lainnya.
 
 import 'package:flutter/material.dart';
-import 'package:admin/halaman/tab/pelanggan_aktif.dart';
-import 'package:admin/halaman/tab/dompet.dart';
-import 'package:admin/halaman/tab/lainnya.dart';
-import 'package:admin/halaman/tab/transaksi.dart';
+import 'package:admin_wifi/halaman/tab/pelanggan_aktif.dart';
+import 'package:admin_wifi/halaman/tab/dompet.dart';
+import 'package:admin_wifi/halaman/tab/lainnya.dart';
+import 'package:admin_wifi/halaman/tab/transaksi.dart';
 
 class HalamanUtama extends StatefulWidget {
   const HalamanUtama({super.key});

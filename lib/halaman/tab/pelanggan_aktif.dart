@@ -8,13 +8,13 @@
 // - Menyediakan opsi untuk menghapus semua pelanggan atau hanya yang sudah kedaluwarsa.
 // - Navigasi ke halaman detail saat item daftar diklik.
 
-import 'package:admin/utils/format.dart';
+import 'package:admin_wifi/utils/format.dart';
 import 'package:flutter/material.dart';
-import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
-import 'package:admin/halaman/detail/detail_pelanggan_aktif.dart';
-import 'package:admin/halaman/form/form_pelanggan_aktif.dart';
-import 'package:admin/model/pelanggan_aktif_model.dart';
-import 'package:admin/widget/nama_pelanggan.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
+import 'package:admin_wifi/halaman/detail/detail_pelanggan_aktif.dart';
+import 'package:admin_wifi/halaman/form/form_pelanggan_aktif.dart';
+import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
+import 'package:admin_wifi/widget/nama_pelanggan.dart';
 
 enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
 

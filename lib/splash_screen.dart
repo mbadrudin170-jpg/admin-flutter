@@ -1,6 +1,10 @@
 // lib/splash_screen.dart
+// File ini berfungsi untuk menampilkan layar pembuka (splash screen)
+// saat aplikasi pertama kali dijalankan. Setelah jeda singkat, aplikasi
+// akan menavigasi ke halaman utama.
+
 import 'dart:async';
-import 'package:admin/halaman_utama.dart';
+import 'package:admin_wifi/halaman_utama.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {

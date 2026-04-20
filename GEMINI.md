@@ -80,7 +80,7 @@ flutter pub add google_fonts
 *Contoh `TextTheme` dengan `google_fonts`:*
 
 ```dart
-import \'\'\'package:google_fonts/google_fonts.dart\'\'\';
+import \'package:google_fonts/google_fonts.dart\';
 
 final TextTheme myTextTheme = TextTheme(
   displayLarge: GoogleFonts.oswald(fontSize: 57, fontWeight: FontWeight.bold),
@@ -109,8 +109,8 @@ flutter pub add provider
 
 ```dart
 import 'package:flutter/material.dart';
-import \'\'\'package:google_fonts/google_fonts.dart\'\'\';
-import \'\'\'package:provider/provider.dart\'\'\'; // Impor Provider
+import \'package:google_fonts/google_fonts.dart\';
+import \'package:provider/provider.dart\'; // Impor Provider
 
 void main() {
   runApp(
@@ -367,8 +367,8 @@ flutter pub add go_router
 
 ```dart
 // Di main.dart atau file router.dart khusus
-import \'\'\'package:flutter/material.dart\'\'\';
-import \'\'\'package:go_router/go_router.dart\'\'\';
+import \'package:flutter/material.dart\';
+import \'package:go_router/go_router.dart\';
 
 // Definisikan rute Anda
 final GoRouter _router = GoRouter(
@@ -561,7 +561,7 @@ Untuk debugging dan pemantauan yang efektif, AI akan menggunakan pustaka `dart:d
 * **Pencatatan Dasar**: Untuk pesan sederhana, fungsi `log` digunakan.
 
 ```dart
-import \'\'\'dart:developer\'\'\' as developer;
+import \'dart:developer\' as developer;
 
 developer.log(\'This is a simple log message.\');
 ```
@@ -577,7 +577,7 @@ developer.log(\'This is a simple log message.\');
   *Contoh:*
 
 ```dart
-import \'\'\'dart:developer\'\'\' as developer;
+import \'dart:developer\' as developer;
 
 try {
   throw \'Something went wrong!\';
@@ -612,8 +612,8 @@ flutter pub add firebase_core firebase_ai
 3. **Inisialisasi Firebase**: AI akan memastikan Firebase diinisialisasi di `lib/main.dart`.
 
 ```dart
-import \'\'\'package:firebase_core/firebase_core.dart\'\'\';
-import \'\'\'firebase_options.dart\'\'\';
+import \'package:firebase_core/firebase_core.dart\';
+import \'firebase_options.dart\';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -634,7 +634,7 @@ Untuk fitur pembuatan teks, peringkasan, atau obrolan, AI akan menggunakan model
 * **Implementasi**:
 
 ```dart
-import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
+import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<String> generateText(String promptText) async {
   try {
@@ -659,8 +659,8 @@ Untuk fitur yang memerlukan pemahaman gambar (misalnya, "apa yang ada di gambar 
 * **Implementasi**: AI akan mengharapkan data gambar sebagai `Uint8List`.
 
 ```dart
-import \'\'\'dart:typed_data\'\'\';
-import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
+import \'dart:typed_data\';
+import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<String> analyzeImage(String promptText, Uint8List imageData) async {
   try {
@@ -691,7 +691,7 @@ Untuk menghasilkan gambar berkualitas tinggi dari perintah teks, AI akan menggun
 * **Implementasi**:
 
 ```dart
-import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
+import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<List<ImageData>> generateImage(String prompt) async {
   try {
@@ -722,7 +722,7 @@ Untuk fitur yang memerlukan pencarian semantik, klasifikasi, atau pengelompokan,
 * **Implementasi**:
 
 ```dart
-import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
+import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<List<double>?> generateEmbedding(String text) async {
   try {
@@ -817,17 +817,16 @@ Bagian ini mendefinisikan serangkaian aturan dan protokol yang harus diikuti ole
     *   **Komunikasi:** Semua interaksi dan percakapan dengan pengguna harus dilakukan dalam Bahasa Indonesia.
 
 2.  **Dokumentasi dan Konteks File:**
-    *   **Identifikasi Jalur (Path):** Setiap file yang dimodifikasi atau dibuat harus menyertakan jalur (path) lengkapnya dari direktori root proyek. Informasi ini harus ditempatkan sebagai komentar di baris paling atas file. Contoh: `// lib/halaman/beranda.dart`.
-    *   **Deskripsi Fitur:** Setelah menyelesaikan tugas pada sebuah file, AI wajib menambahkan atau memperbarui blok komentar di bagian atas file (setelah komentar path) yang menjelaskan fungsionalitas utama, fitur, dan tujuan dari kode di dalam file tersebut. Ini berfungsi sebagai dokumentasi *real-time* dan harus diperbarui di `blueprint.md`.
+    *   **Identifikasi Jalur (Path):** Setiap file yang dimodifikasi atau dibuat harus menyertakan jalur (path) lengkapnya dari direktori root proyek sebagai komentar di baris paling atas. Contoh: `// lib/halaman/beranda.dart`.
+    *   **Deskripsi Fitur:** Setelah menyelesaikan tugas pada sebuah file, AI wajib menambahkan atau memperbarui blok komentar di bagian atas file (setelah komentar path) yang menjelaskan fungsionalitas utama, fitur, dan tujuan dari kode di dalam file tersebut.
 
 3.  **Manajemen Alur Kerja Proyek:**
     *   **Referensi Utama (`blueprint.md`):** Sebelum memulai tugas atau modifikasi apa pun, AI harus selalu membaca dan memahami konten dari file `blueprint.md`. File ini adalah sumber kebenaran tunggal (`single source of truth`) yang berisi alur kerja, arsitektur, dan rencana pengembangan proyek.
-    *   **Pembaruan `blueprint.md`:** Setelah menyelesaikan serangkaian tugas atau mengimplementasikan fitur baru, AI wajib memperbarui file `blueprint.md` dengan mendokumentasikan perubahan yang telah dibuat, termasuk fitur dan fungsi baru yang ditambahkan. Contoh: `lib/halaman/utama.dart` - **Fitur**: Tombol tambah pelanggan baru. - **Fungsi**: Mengarahkan pengguna ke halaman `lib/halaman/form/form_pelanggan.dart`.
+    *   **Pembaruan `blueprint.md`:** Setelah menyelesaikan pekerjaan, AI wajib memperbarui file `blueprint.md` sesuai dengan struktur yang ada untuk mendokumentasikan perubahan. Contoh: `lib/home - fitur: tombol tambah, fungsi: untuk menuju file lib/form`.
 
 4.  **Manajemen Build dan Rilis:**
     *   **Peningkatan Versi:** Sebelum menjalankan proses build untuk rilis, AI wajib menaikkan nomor versi aplikasi di dalam file `pubspec.yaml` sesuai dengan standar semantic versioning (major.minor.patch+buildNumber).
-    *   **Proses Build Standar:** Sebelum menjalankan build, AI harus selalu menjalankan `flutter clean` diikuti oleh `flutter pub get`.
-    *   **Target Build Default:** AI akan membangun `build/app/outputs/apk/release/app-arm64-v8a-release.apk` secara default, kecuali jika ada permintaan lain dari pengguna. Perintah yang digunakan adalah `flutter build apk --split-per-abi`.
+    *   **Proses Build:** Sebelum memulai proses build, AI wajib menjalankan perintah: `flutter clean && flutter pub get && flutter build apk --split-per-abi`.
 
 # Firebase MCP
 
