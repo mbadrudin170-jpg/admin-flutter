@@ -108,9 +108,8 @@ flutter pub add provider
 ```
 
 ```dart
-// lib/main.dart
-import \'package:flutter/material.dart\';
-import \'package:google_fonts/google_fonts.dart\'; // Impor GoogleFonts
+import 'package:flutter/material.dart';
+import \'package:google_fonts/google_fonts.dart\';
 import \'package:provider/provider.dart\'; // Impor Provider
 
 void main() {
@@ -153,7 +152,7 @@ class MyApp extends StatelessWidget {
       bodyMedium: GoogleFonts.openSans(fontSize: 14),
     );
 
-    // Tema Terang
+     Tema Terang
     final ThemeData lightTheme = ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
