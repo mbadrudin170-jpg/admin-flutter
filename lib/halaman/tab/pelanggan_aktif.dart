@@ -2,7 +2,8 @@
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 // Fitur utama:
 // - Menampilkan daftar pelanggan aktif dari database.
-// - Menambahkan status "Aktif" (hijau) atau "Tidak Aktif" (merah) berdasarkan tanggal kedaluwarsa.
+// - Menambahkan status paket "Aktif" (hijau) atau "Tidak Aktif" (merah) berdasarkan tanggal kedaluwarsa.
+// - Menambahkan status pembayaran "Lunas" (hijau) atau "Belum Lunas" (merah).
 // - Menyediakan opsi untuk menambah pelanggan aktif baru.
 // - Menyediakan opsi untuk menghapus semua pelanggan atau hanya yang sudah kedaluwarsa.
 // - Navigasi ke halaman detail saat item daftar diklik.
@@ -36,8 +37,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
   void _loadPelangganAktif() {
     setState(() {
-      _listaPelangganAktifFuture = _pelangganAktifOperasi
-          .ambilSemuaPelangganAktif();
+      _listaPelangganAktifFuture =
+          _pelangganAktifOperasi.ambilSemuaPelangganAktif();
     });
   }
 
@@ -117,8 +118,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         }
         break;
       case OpsiHapusPilihan.hapusKadaluarsa:
-        final int jumlahDihapus = await _pelangganAktifOperasi
-            .hapusPelangganKadaluarsa();
+        final int jumlahDihapus =
+            await _pelangganAktifOperasi.hapusPelangganKadaluarsa();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -165,13 +166,20 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final pelanggan = snapshot.data![index];
-                final tanggalBerakhir = DateTime.parse(
-                  pelanggan.tanggalBerakhir,
-                );
+                
+                // Logika status paket
+                final tanggalBerakhir = DateTime.parse(pelanggan.tanggalBerakhir);
                 final sekarang = DateTime.now();
                 final isAktif = tanggalBerakhir.isAfter(sekarang);
-                final statusText = isAktif ? 'Aktif' : 'Tidak Aktif';
-                final statusColor = isAktif ? Colors.green : Colors.red;
+                final statusPaketText = isAktif ? 'Aktif' : 'Tidak Aktif';
+                final statusPaketColor = isAktif ? Colors.green : Colors.red;
+
+                // Logika status pembayaran
+                final statusPembayaranText = pelanggan.status.displayName;
+                final statusPembayaranColor =
+                    pelanggan.status == StatusPembayaran.lunas
+                        ? Colors.green
+                        : Colors.red;
 
                 return Card(
                   margin: const EdgeInsets.symmetric(
@@ -201,9 +209,17 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Status: $statusText',
+                            'Pembayaran: $statusPembayaranText',
                             style: TextStyle(
-                              color: statusColor,
+                              color: statusPembayaranColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Status Paket: $statusPaketText',
+                            style: TextStyle(
+                              color: statusPaketColor,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
