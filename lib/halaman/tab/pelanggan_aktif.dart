@@ -1,4 +1,12 @@
 // lib/halaman/tab/pelanggan_aktif.dart
+// File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
+// Fitur utama:
+// - Menampilkan daftar pelanggan aktif dari database.
+// - Menambahkan status "Aktif" (hijau) atau "Tidak Aktif" (merah) berdasarkan tanggal kedaluwarsa.
+// - Menyediakan opsi untuk menambah pelanggan aktif baru.
+// - Menyediakan opsi untuk menghapus semua pelanggan atau hanya yang sudah kedaluwarsa.
+// - Navigasi ke halaman detail saat item daftar diklik.
+
 import 'package:admin/utils/format.dart';
 import 'package:flutter/material.dart';
 import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
@@ -44,9 +52,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
   }
 
-  // Fungsi untuk menampilkan dialog dengan beberapa opsi hapus
   void _opsiHapus() async {
-    // Menampilkan SimpleDialog untuk memilih opsi
     final OpsiHapusPilihan? pilihan = await showDialog<OpsiHapusPilihan>(
       context: context,
       builder: (BuildContext context) {
@@ -81,10 +87,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
     if (!mounted) return;
 
-    // Menangani pilihan dari pengguna
     switch (pilihan) {
       case OpsiHapusPilihan.hapusSemua:
-        // Meminta konfirmasi ulang sebelum menghapus semua
         final bool? konfirmasi = await showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -109,7 +113,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
         if (konfirmasi == true) {
           await _pelangganAktifOperasi.hapusSemuaPelangganAktif();
-          _loadPelangganAktif(); // Muat ulang daftar setelah menghapus
+          _loadPelangganAktif();
         }
         break;
       case OpsiHapusPilihan.hapusKadaluarsa:
@@ -128,7 +132,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         break;
       case OpsiHapusPilihan.batal:
       default:
-        // Pengguna memilih batal atau menutup dialog, tidak ada tindakan yang diambil.
         break;
     }
   }
@@ -136,14 +139,13 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // PERINGATAN: Ini akan menyebabkan AppBar ganda lagi.
       appBar: AppBar(
         title: const Text('Pelanggan Aktif'),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_forever),
             onPressed: _opsiHapus,
-            tooltip: 'Hapus Semua',
+            tooltip: 'Hapus',
           ),
         ],
       ),
@@ -163,6 +165,14 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final pelanggan = snapshot.data![index];
+                final tanggalBerakhir = DateTime.parse(
+                  pelanggan.tanggalBerakhir,
+                );
+                final sekarang = DateTime.now();
+                final isAktif = tanggalBerakhir.isAfter(sekarang);
+                final statusText = isAktif ? 'Aktif' : 'Tidak Aktif';
+                final statusColor = isAktif ? Colors.green : Colors.red;
+
                 return Card(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -170,14 +180,17 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
                               DetailPelangganAktif(pelanggan: pelanggan),
                         ),
                       );
+                      if (result == true) {
+                        _loadPelangganAktif();
+                      }
                     },
                     child: ListTile(
                       title: NamaPelangganWidget(
@@ -187,10 +200,16 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(pelanggan.status.displayName),
+                          Text(
+                            'Status: $statusText',
+                            style: TextStyle(
+                              color: statusColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           const SizedBox(height: 4),
                           Text(
-                            'Berakhir: ${Format.formatTanggal(DateTime.parse(pelanggan.tanggalBerakhir))}',
+                            'Berakhir: ${Format.formatTanggal(tanggalBerakhir)}',
                           ),
                         ],
                       ),
