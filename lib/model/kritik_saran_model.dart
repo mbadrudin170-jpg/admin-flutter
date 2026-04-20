@@ -8,17 +8,10 @@ class KritikSaran {
   final String isi;
   final DateTime tanggal;
 
-  KritikSaran({
-    this.id,
-    required this.isi,
-    required this.tanggal,
-  });
+  KritikSaran({this.id, required this.isi, required this.tanggal});
 
   // Konversi dari objek ke Map untuk Firestore
   Map<String, dynamic> toMap() {
-    return {
-      'isi': isi,
-      'tanggal': Timestamp.fromDate(tanggal),
-    };
+    return {'isi': isi, 'tanggal': Timestamp.fromDate(tanggal)};
   }
 }
