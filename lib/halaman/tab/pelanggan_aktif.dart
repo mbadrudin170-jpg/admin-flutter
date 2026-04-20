@@ -37,8 +37,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
   void _loadPelangganAktif() {
     setState(() {
-      _listaPelangganAktifFuture =
-          _pelangganAktifOperasi.ambilSemuaPelangganAktif();
+      _listaPelangganAktifFuture = _pelangganAktifOperasi
+          .ambilSemuaPelangganAktif();
     });
   }
 
@@ -118,8 +118,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         }
         break;
       case OpsiHapusPilihan.hapusKadaluarsa:
-        final int jumlahDihapus =
-            await _pelangganAktifOperasi.hapusPelangganKadaluarsa();
+        final int jumlahDihapus = await _pelangganAktifOperasi
+            .hapusPelangganKadaluarsa();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -166,7 +166,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final pelanggan = snapshot.data![index];
-                
+
                 // Logika status paket
                 final sekarang = DateTime.now();
                 final isAktif = pelanggan.tanggalBerakhir.isAfter(sekarang);
@@ -177,8 +177,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                 final statusPembayaranText = pelanggan.status.displayName;
                 final statusPembayaranColor =
                     pelanggan.status == StatusPembayaran.lunas
-                        ? Colors.green
-                        : Colors.red;
+                    ? Colors.green
+                    : Colors.red;
 
                 return Card(
                   margin: const EdgeInsets.symmetric(
