@@ -5,6 +5,7 @@ import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin/halaman/detail/detail_pelanggan_aktif.dart';
 import 'package:admin/halaman/form/form_pelanggan_aktif.dart';
 import 'package:admin/model/pelanggan_aktif_model.dart';
+import 'package:admin/widget/nama_pelanggan.dart';
 
 enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
 
@@ -179,8 +180,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                       );
                     },
                     child: ListTile(
-                      title: Text(
-                        pelanggan.idPelanggan,
+                      title: NamaPelangganWidget(
+                        idPelanggan: pelanggan.idPelanggan,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Column(
