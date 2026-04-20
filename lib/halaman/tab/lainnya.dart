@@ -24,7 +24,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
   Future<void> _initPackageInfo() async {
     final info = await PackageInfo.fromPlatform();
     setState(() {
-      _version = 'v${info.version} build ${info.buildNumber}';
+      _version = 'v${info.version}';
     });
   }
 
