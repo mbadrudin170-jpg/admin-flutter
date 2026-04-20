@@ -80,7 +80,7 @@ flutter pub add google_fonts
 *Contoh `TextTheme` dengan `google_fonts`:*
 
 ```dart
-import \'package:google_fonts/google_fonts.dart\';
+import \'\'\'package:google_fonts/google_fonts.dart\'\'\';
 
 final TextTheme myTextTheme = TextTheme(
   displayLarge: GoogleFonts.oswald(fontSize: 57, fontWeight: FontWeight.bold),
@@ -109,8 +109,8 @@ flutter pub add provider
 
 ```dart
 import 'package:flutter/material.dart';
-import \'package:google_fonts/google_fonts.dart\';
-import \'package:provider/provider.dart\'; // Impor Provider
+import \'\'\'package:google_fonts/google_fonts.dart\'\'\';
+import \'\'\'package:provider/provider.dart\'\'\'; // Impor Provider
 
 void main() {
   runApp(
@@ -367,8 +367,8 @@ flutter pub add go_router
 
 ```dart
 // Di main.dart atau file router.dart khusus
-import \'package:flutter/material.dart\';
-import \'package:go_router/go_router.dart\';
+import \'\'\'package:flutter/material.dart\'\'\';
+import \'\'\'package:go_router/go_router.dart\'\'\';
 
 // Definisikan rute Anda
 final GoRouter _router = GoRouter(
@@ -561,7 +561,7 @@ Untuk debugging dan pemantauan yang efektif, AI akan menggunakan pustaka `dart:d
 * **Pencatatan Dasar**: Untuk pesan sederhana, fungsi `log` digunakan.
 
 ```dart
-import \'dart:developer\' as developer;
+import \'\'\'dart:developer\'\'\' as developer;
 
 developer.log(\'This is a simple log message.\');
 ```
@@ -577,7 +577,7 @@ developer.log(\'This is a simple log message.\');
   *Contoh:*
 
 ```dart
-import \'dart:developer\' as developer;
+import \'\'\'dart:developer\'\'\' as developer;
 
 try {
   throw \'Something went wrong!\';
@@ -612,8 +612,8 @@ flutter pub add firebase_core firebase_ai
 3. **Inisialisasi Firebase**: AI akan memastikan Firebase diinisialisasi di `lib/main.dart`.
 
 ```dart
-import \'package:firebase_core/firebase_core.dart\';
-import \'firebase_options.dart\';
+import \'\'\'package:firebase_core/firebase_core.dart\'\'\';
+import \'\'\'firebase_options.dart\'\'\';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -634,7 +634,7 @@ Untuk fitur pembuatan teks, peringkasan, atau obrolan, AI akan menggunakan model
 * **Implementasi**:
 
 ```dart
-import \'package:firebase_ai/firebase_ai.dart\';
+import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
 
 Future<String> generateText(String promptText) async {
   try {
@@ -659,8 +659,8 @@ Untuk fitur yang memerlukan pemahaman gambar (misalnya, "apa yang ada di gambar 
 * **Implementasi**: AI akan mengharapkan data gambar sebagai `Uint8List`.
 
 ```dart
-import \'dart:typed_data\';
-import \'package:firebase_ai/firebase_ai.dart\';
+import \'\'\'dart:typed_data\'\'\';
+import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
 
 Future<String> analyzeImage(String promptText, Uint8List imageData) async {
   try {
@@ -691,7 +691,7 @@ Untuk menghasilkan gambar berkualitas tinggi dari perintah teks, AI akan menggun
 * **Implementasi**:
 
 ```dart
-import \'package:firebase_ai/firebase_ai.dart\';
+import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
 
 Future<List<ImageData>> generateImage(String prompt) async {
   try {
@@ -722,7 +722,7 @@ Untuk fitur yang memerlukan pencarian semantik, klasifikasi, atau pengelompokan,
 * **Implementasi**:
 
 ```dart
-import \'package:firebase_ai/firebase_ai.dart\';
+import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
 
 Future<List<double>?> generateEmbedding(String text) async {
   try {
@@ -822,6 +822,7 @@ Bagian ini mendefinisikan serangkaian aturan dan protokol yang harus diikuti ole
 
 3.  **Manajemen Alur Kerja Proyek:**
     *   **Referensi Utama (`blueprint.md`):** Sebelum memulai tugas atau modifikasi apa pun, AI harus selalu membaca dan memahami konten dari file `blueprint.md`. File ini adalah sumber kebenaran tunggal (`single source of truth`) yang berisi alur kerja, arsitektur, dan rencana pengembangan proyek.
+    *   **Pembaruan `blueprint.md`:** Setelah menyelesaikan serangkaian tugas atau mengimplementasikan fitur baru, AI wajib memperbarui file `blueprint.md` dengan mendokumentasikan perubahan yang telah dibuat, termasuk fitur dan fungsi baru yang ditambahkan. Contoh: `lib/halaman/utama.dart` - **Fitur**: Tombol tambah pelanggan baru. - **Fungsi**: Mengarahkan pengguna ke halaman `lib/halaman/form/form_pelanggan.dart`.
 
 4.  **Manajemen Build dan Rilis:**
     *   **Peningkatan Versi:** Sebelum menjalankan proses build untuk rilis, AI wajib menaikkan nomor versi aplikasi di dalam file `pubspec.yaml` sesuai dengan standar semantic versioning (major.minor.patch+buildNumber).

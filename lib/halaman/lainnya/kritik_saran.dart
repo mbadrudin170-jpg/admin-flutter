@@ -58,30 +58,32 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
       appBar: AppBar(
         title: const Text('Kritik & Saran'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Kami sangat menghargai masukan Anda untuk membantu kami menjadi lebih baik.',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: _controller,
-              maxLines: 8,
-              decoration: const InputDecoration(
-                hintText: 'Tuliskan kritik atau saran Anda di sini...',
-                border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Kami sangat menghargai masukan Anda untuk membantu kami menjadi lebih baik.',
+                style: TextStyle(fontSize: 16),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _kirim,
-              child: const Text('Kirim'),
-            ),
-          ],
+              const SizedBox(height: 20),
+              TextField(
+                controller: _controller,
+                maxLines: 8,
+                decoration: const InputDecoration(
+                  hintText: 'Tuliskan kritik atau saran Anda di sini...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _kirim,
+                child: const Text('Kirim'),
+              ),
+            ],
+          ),
         ),
       ),
     );
