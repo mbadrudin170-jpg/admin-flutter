@@ -1,5 +1,6 @@
 
 # Blueprint Aplikasi Flutter
+admin_wifi_v1.0.6
 
 ## Gambaran Umum
 

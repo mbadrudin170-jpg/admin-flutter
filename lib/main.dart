@@ -14,24 +14,32 @@ import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/splash_screen.dart';
 
 void main() async {
+  // Pastikan binding Flutter sudah siap sebelum melakukan inisialisasi asinkron.
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inisialisasi Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    // Inisialisasi Firebase.
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Inisialisasi data lokalisasi
-  await initializeDateFormatting('id_ID', null);
+    // Inisialisasi data lokalisasi untuk format tanggal.
+    await initializeDateFormatting('id_ID', null);
 
-  // Inisialisasi database
-  final dbHelper = DatabaseHelper.instance;
-  await dbHelper.database;
+    // Inisialisasi database lokal (SQLite).
+    final dbHelper = DatabaseHelper.instance;
+    await dbHelper.database;
 
-  // Inisialisasi layanan Firebase
-  final firebaseService = FirebaseService();
+    // Menjalankan proses sinkronisasi di latar belakang tanpa menunggu (await)
+    // agar runApp() dapat segera dipanggil dan menghindari timeout dari sistem operasi.
+    FirebaseService().sinkronkanSemuaData().catchError((error) {
+      debugPrint("Gagal melakukan sinkronisasi otomatis: $error");
+    });
 
-  // Sinkronkan semua data
-  await firebaseService.sinkronkanSemuaData();
+  } catch (e) {
+    // Tangkap error jika terjadi kegagalan inisialisasi agar aplikasi tidak langsung crash.
+    debugPrint("Terjadi kesalahan saat inisialisasi: $e");
+  }
 
+  // Segera jalankan aplikasi agar SplashScreen muncul.
   runApp(const MyApp());
 }
 

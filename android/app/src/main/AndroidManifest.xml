@@ -1,6 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Izin untuk mengakses internet -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Izin untuk memeriksa status koneksi jaringan -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
-        android:label="Admin Wifi"
+        android:label="admin_wifi"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

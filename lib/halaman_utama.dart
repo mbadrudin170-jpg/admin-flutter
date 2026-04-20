@@ -37,6 +37,7 @@ class _HalamanUtamaState extends State<HalamanUtama> {
     return Scaffold(
       body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed, // Memastikan perilaku konsisten
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.person_pin_circle),
@@ -53,8 +54,10 @@ class _HalamanUtamaState extends State<HalamanUtama> {
           BottomNavigationBarItem(icon: Icon(Icons.apps), label: 'Lainnya'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: Theme.of(context).colorScheme.primary,
+        unselectedItemColor: Theme.of(
+          context,
+        ).colorScheme.onSurface.withAlpha(179), // Perbaikan dari withOpacity
         onTap: _onItemTapped,
         showUnselectedLabels: true,
       ),
