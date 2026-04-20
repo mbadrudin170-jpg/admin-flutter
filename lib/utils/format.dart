@@ -1,4 +1,5 @@
- // Path: lib/utils/format.dart
+// lib/utils/format.dart
+// File ini berisi kelas-kelas utilitas untuk memformat data seperti tanggal, jam, dan mata uang.
 
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,10 @@ class Format {
 
   static String formatJam(DateTime tanggal) {
     return DateFormat.Hm('id_ID').format(tanggal);
+  }
+
+  static String formatTanggalDanJam(DateTime tanggal) {
+    return DateFormat.yMMMEd('id_ID').add_Hm().format(tanggal);
   }
 
   static String formatAngka(num value) {
@@ -28,7 +33,7 @@ class CurrencyInputFormatter extends TextInputFormatter {
       return newValue.copyWith(text: '');
     }
 
-    String cleanText = newValue.text.replaceAll(RegExp(r'[^0-g]'), '');
+    String cleanText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
     if (cleanText.isEmpty) {
       return const TextEditingValue(
         text: "",
