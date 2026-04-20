@@ -1,7 +1,10 @@
 // lib/halaman/tab/lainnya.dart
+// File ini menampilkan halaman "Lainnya" dengan berbagai menu navigasi.
+
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:admin/halaman/lainnya/kategori.dart';
+import 'package:admin/halaman/lainnya/kritik_saran.dart';
 import 'package:admin/halaman/lainnya/paket.dart';
 import 'package:admin/halaman/lainnya/pelanggan.dart';
 
@@ -31,7 +34,7 @@ class _LainnyaPageState extends State<LainnyaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Lainnya')),
+      appBar: AppBar(title: const Text('Lainnya')),
       body: Column(
         children: [
           Expanded(
@@ -55,6 +58,12 @@ class _LainnyaPageState extends State<LainnyaPage> {
                   icon: Icons.people,
                   title: 'Pelanggan',
                   page: const PelangganPage(),
+                ),
+                _buildMenuItem(
+                  context,
+                  icon: Icons.feedback,
+                  title: 'Kritik & Saran',
+                  page: const KritikSaranPage(),
                 ),
               ],
             ),
