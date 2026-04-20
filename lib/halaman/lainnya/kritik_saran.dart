@@ -1,6 +1,8 @@
 // lib/halaman/lainnya/kritik_saran.dart
 // Halaman ini menyediakan antarmuka bagi pengguna untuk mengirimkan kritik dan saran.
 
+import 'package:admin/data/operasi/kritik_saran_operasi.dart';
+import 'package:admin/model/kritik_saran_model.dart';
 import 'package:flutter/material.dart';
 
 class KritikSaranPage extends StatefulWidget {
@@ -12,6 +14,7 @@ class KritikSaranPage extends StatefulWidget {
 
 class _KritikSaranPageState extends State<KritikSaranPage> {
   final _controller = TextEditingController();
+  final KritikSaranOperasi _kritikSaranOperasi = KritikSaranOperasi();
 
   @override
   void dispose() {
@@ -19,7 +22,7 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
     super.dispose();
   }
 
-  void _kirim() {
+  void _kirim() async {
     if (_controller.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Harap isi kritik atau saran Anda.')),
@@ -27,13 +30,26 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
       return;
     }
 
-    // TODO: Implementasi logika pengiriman (misalnya, ke database atau API)
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content: Text('Terima kasih atas masukan Anda!')),
-    );
+    try {
+      final kritikSaran = KritikSaran(
+        isi: _controller.text.trim(),
+        tanggal: DateTime.now(),
+      );
+      await _kritikSaranOperasi.createKritikSaran(kritikSaran);
 
-    Navigator.pop(context);
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Terima kasih atas masukan Anda!')),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal mengirim: $e')),
+      );
+    }
   }
 
   @override
