@@ -31,7 +31,7 @@ AI diberdayakan untuk memodifikasi basis kode Flutter dan mengelola dependensiny
 * **Pembuatan Kode (build_runner):**
   1. Ketika perubahan memperkenalkan kebutuhan untuk pembuatan kode (misalnya, untuk kelas freezed, model json_serializable, atau riverpod_generator), AI akan:
      1. Memastikan build_runner terdaftar di dev_dependencies di pubspec.yaml.
-     2. Secara otomatis menjalankan `dart run build_runner build \\--delete-conflicting-outputs` untuk menghasilkan file yang diperlukan setelah modifikasi kode yang membutuhkannya.
+     2. Secara otomatis menjalankan `dart run build_runner build --delete-conflicting-outputs`.
 * **Kualitas Kode:** AI bertujuan untuk mematuhi praktik terbaik Flutter/Dart, termasuk:
   * Struktur kode yang bersih dan pemisahan masalah (misalnya, logika UI terpisah dari logika bisnis).
   * Konvensi penamaan yang bermakna dan konsisten.
@@ -79,7 +79,7 @@ flutter pub add google_fonts
 
 *Contoh `TextTheme` dengan `google_fonts`:*
 
-```
+```dart
 import \'package:google_fonts/google_fonts.dart\';
 
 final TextTheme myTextTheme = TextTheme(
@@ -88,8 +88,6 @@ final TextTheme myTextTheme = TextTheme(
   bodyMedium: GoogleFonts.openSans(fontSize: 14),
 );
 ```
-
-####
 
 #### **Tema Komponen**
 
@@ -109,7 +107,7 @@ Untuk menggunakan `provider`, tambahkan ke proyek Anda:
 flutter pub add provider
 ```
 
-```
+```dart
 // lib/main.dart
 import \'package:flutter/material.dart\';
 import \'package:google_fonts/google_fonts.dart\'; // Impor GoogleFonts
@@ -257,15 +255,13 @@ class MyHomePage extends StatelessWidget {
 }
 ```
 
-###
-
 ### **Aset, Gambar, dan Ikon**
 
 Widget-widget ini digunakan untuk mengelola dan menampilkan berbagai jenis aset, termasuk gambar dan ikon.
 
 * **Deklarasi Aset di pubspec.yaml**: Sebelum menggunakan aset, aset tersebut harus dideklarasikan di file pubspec.yaml. AI akan meminta pengguna untuk memastikan ini dikonfigurasi dengan benar atau menambahkannya jika perlu.
 
-```
+```yaml
 # Di pubspec.yaml
 flutter:
   uses-material-design: true
@@ -276,7 +272,7 @@ flutter:
 
 * **Image.asset**: Menampilkan gambar dari bundel aset aplikasi.
 
-```
+```dart
 // Dengan asumsi \'assets/images/placeholder.png\' dideklarasikan di pubspec.yaml
 Image.asset(
   \'assets/images/placeholder.png\',
@@ -288,7 +284,7 @@ Image.asset(
 
 * **Image.network**: Menampilkan gambar dari URL.
 
-```
+```dart
 Image.network(
   \'https://picsum.photos/200/300\',
   width: 200,
@@ -310,7 +306,7 @@ Image.network(
 
 * **Ikon**: Menampilkan ikon Desain Material (dari kelas Ikon).
 
-```
+```dart
 const Icon(
   Icons.favorite,
   color: Colors.red,
@@ -320,7 +316,7 @@ const Icon(
 
 * **ImageIcon**: Menampilkan ikon dari ImageProvider (berguna untuk ikon kustom yang tidak ada di kelas Ikon).
 
-```
+```dart
 // Dengan asumsi \'assets/icons/custom_icon.png\' dideklarasikan di pubspec.yaml
 ImageIcon(
   const AssetImage(\'assets/icons/custom_icon.png\'),
@@ -329,8 +325,6 @@ ImageIcon(
 )
 ```
 
-###
-
 ### **Perutean dan Navigasi**
 
 Flutter menyediakan mekanisme yang kuat untuk bernavigasi di antara berbagai layar (rute) dalam sebuah aplikasi. AI akan memanfaatkan dan merekomendasikan strategi perutean yang sesuai berdasarkan kompleksitas dan persyaratan alur navigasi.
@@ -338,7 +332,7 @@ Flutter menyediakan mekanisme yang kuat untuk bernavigasi di antara berbagai lay
 * **Navigasi Imperatif Dasar (Navigator)**: Untuk tumpukan navigasi sederhana, Navigator bawaan Flutter sangat mudah.
   * **Navigator.push**: Mendorong rute baru ke tumpukan navigator.
 
-```
+```dart
 // Dari Layar A ke Layar B
 Navigator.push(
   context,
@@ -348,14 +342,14 @@ Navigator.push(
 
 * **Navigator.pop**: Melepas rute teratas dari tumpukan navigator.
 
-```
+```dart
 // Dari Layar B kembali ke Layar A
 Navigator.pop(context);
 ```
 
 * **Navigator.pushReplacement**: Mengganti rute saat ini dengan yang baru.
 
-```
+```dart
 // Ganti layar saat ini dengan yang baru (misalnya, setelah login)
 Navigator.pushReplacement(
   context,
@@ -372,7 +366,7 @@ flutter pub add go_router
 
   **Contoh Konfigurasi go_router:**
 
-```
+```dart
 // Di main.dart atau file router.dart khusus
 import \'package:flutter/material.dart\';
 import \'package:go_router/go_router.dart\';
@@ -506,7 +500,7 @@ Pilihan solusi manajemen status bergantung pada skala dan kompleksitas proyek. A
 
     *Contoh:*
 
-```
+```dart
 // 1. Definisikan ValueNotifier untuk menampung status.
 final ValueNotifier<int> _counter = ValueNotifier<int>(0);
 
@@ -567,7 +561,7 @@ Untuk debugging dan pemantauan yang efektif, AI akan menggunakan pustaka `dart:d
 
 * **Pencatatan Dasar**: Untuk pesan sederhana, fungsi `log` digunakan.
 
-```
+```dart
 import \'dart:developer\' as developer;
 
 developer.log(\'This is a simple log message.\');
@@ -583,7 +577,7 @@ developer.log(\'This is a simple log message.\');
 
   *Contoh:*
 
-```
+```dart
 import \'dart:developer\' as developer;
 
 try {
@@ -618,7 +612,7 @@ flutter pub add firebase_core firebase_ai
 
 3. **Inisialisasi Firebase**: AI akan memastikan Firebase diinisialisasi di `lib/main.dart`.
 
-```
+```dart
 import \'package:firebase_core/firebase_core.dart\';
 import \'firebase_options.dart\';
 
@@ -640,7 +634,7 @@ Untuk fitur pembuatan teks, peringkasan, atau obrolan, AI akan menggunakan model
 * **Pemilihan Model**: AI akan default ke `gemini-1.5-flash` untuk keseimbangan kecepatan dan kemampuannya.
 * **Implementasi**:
 
-```
+```dart
 import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<String> generateText(String promptText) async {
@@ -665,7 +659,7 @@ Untuk fitur yang memerlukan pemahaman gambar (misalnya, "apa yang ada di gambar 
 
 * **Implementasi**: AI akan mengharapkan data gambar sebagai `Uint8List`.
 
-```
+```dart
 import \'dart:typed_data\';
 import \'package:firebase_ai/firebase_ai.dart\';
 
@@ -697,7 +691,7 @@ Untuk menghasilkan gambar berkualitas tinggi dari perintah teks, AI akan menggun
 
 * **Implementasi**:
 
-```
+```dart
 import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<List<ImageData>> generateImage(String prompt) async {
@@ -728,7 +722,7 @@ Untuk fitur yang memerlukan pencarian semantik, klasifikasi, atau pengelompokan,
 * **Pemilihan Model**: AI akan menggunakan model penyematan teks seperti `text-embedding-004`.
 * **Implementasi**:
 
-```
+```dart
 import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<List<double>?> generateEmbedding(String text) async {
@@ -777,12 +771,12 @@ Saat diminta, AI akan memfasilitasi pembuatan dan pelaksanaan tes, memastikan ke
 
 **Definisi Tebal:** AI menggunakan ikonografi, gambar, dan komponen UI modern dan interaktif seperti tombol, bidang teks, animasi, efek, gerakan, bilah geser, korsel, navigasi, dll.
 
-1. Font \\- Pilih tipografi yang ekspresif dan relevan. Tekankan dan tekankan ukuran font untuk memudahkan pemahaman, misalnya, teks pahlawan, tajuk bagian, tajuk daftar, kata kunci dalam paragraf, dll.
-2. Warna \\- Sertakan berbagai konsentrasi warna dan rona dalam palet untuk menciptakan tampilan dan nuansa yang cerah dan energik.
-3. Tekstur \\- Terapkan tekstur noise halus ke latar belakang utama untuk menambahkan nuansa premium dan taktil.
-4. Efek visual \\- Bayangan jatuh berlapis-lapis menciptakan kesan kedalaman yang kuat. Kartu memiliki bayangan lembut dan dalam agar terlihat "terangkat".
-5. Ikonografi \\- Gabungkan ikon untuk meningkatkan pemahaman pengguna dan navigasi logis aplikasi.
-6. Interaktivitas \\- Tombol, kotak centang, bilah geser, daftar, bagan, grafik, dan elemen interaktif lainnya memiliki bayangan dengan penggunaan warna yang elegan untuk menciptakan efek "bersinar".
+1. Font - Pilih tipografi yang ekspresif dan relevan. Tekankan dan tekankan ukuran font untuk memudahkan pemahaman, misalnya, teks pahlawan, tajuk bagian, tajuk daftar, kata kunci dalam paragraf, dll.
+2. Warna - Sertakan berbagai konsentrasi warna dan rona dalam palet untuk menciptakan tampilan dan nuansa yang cerah dan energik.
+3. Tekstur - Terapkan tekstur noise halus ke latar belakang utama untuk menambahkan nuansa premium dan taktil.
+4. Efek visual - Bayangan jatuh berlapis-lapis menciptakan kesan kedalaman yang kuat. Kartu memiliki bayangan lembut dan dalam agar terlihat "terangkat".
+5. Ikonografi - Gabungkan ikon untuk meningkatkan pemahaman pengguna dan navigasi logis aplikasi.
+6. Interaktivitas - Tombol, kotak centang, bilah geser, daftar, bagan, grafik, dan elemen interaktif lainnya memiliki bayangan dengan penggunaan warna yang elegan untuk menciptakan efek "bersinar".
 
 ## **Standar Aksesibilitas atau A11Y:** Terapkan fitur aksesibilitas untuk memberdayakan semua pengguna, dengan asumsi berbagai pengguna dengan kemampuan fisik, kemampuan mental, kelompok usia, tingkat pendidikan, dan gaya belajar yang berbeda.
 
@@ -803,7 +797,7 @@ Alur kerja AI bersifat berulang, transparan, dan responsif terhadap masukan peng
   1. **Perubahan Kode:** AI menerapkan modifikasi kode.
   2. **Lint/Format:** AI menjalankan `dart format .` dan mengatasi peringatan lint kecil.
   3. **Pemeriksaan Ketergantungan:** Jika pubspec.yaml diubah, AI menjalankan `flutter pub get`.
-  4. **Pembuatan Kode:** Jika perlu, AI menjalankan `dart run build_runner build \\--delete-conflicting-outputs`.
+  4. **Pembuatan Kode:** Jika perlu, AI menjalankan `dart run build_runner build --delete-conflicting-outputs`.
   5. **Kompilasi & Analisis:** AI memantau terminal untuk `flutter analyze` dan kesalahan kompilasi dari `flutter run` (yang terjadi secara otomatis saat file disimpan dengan server pratinjau).
   6. **Eksekusi Tes:** Jika tes diminta atau diubah, AI menjalankan `flutter test`.
   7. **Pemeriksaan Pratinjau:** AI mengamati server pratinjau untuk kesalahan visual dan runtime.
@@ -829,6 +823,11 @@ Bagian ini mendefinisikan serangkaian aturan dan protokol yang harus diikuti ole
 
 3.  **Manajemen Alur Kerja Proyek:**
     *   **Referensi Utama (`blueprint.md`):** Sebelum memulai tugas atau modifikasi apa pun, AI harus selalu membaca dan memahami konten dari file `blueprint.md`. File ini adalah sumber kebenaran tunggal (`single source of truth`) yang berisi alur kerja, arsitektur, dan rencana pengembangan proyek.
+
+4.  **Manajemen Build dan Rilis:**
+    *   **Peningkatan Versi:** Sebelum menjalankan proses build untuk rilis, AI wajib menaikkan nomor versi aplikasi di dalam file `pubspec.yaml` sesuai dengan standar semantic versioning (major.minor.patch+buildNumber).
+    *   **Proses Build Standar:** Sebelum menjalankan build, AI harus selalu menjalankan `flutter clean` diikuti oleh `flutter pub get`.
+    *   **Target Build Default:** AI akan membangun `build/app/outputs/apk/release/app-arm64-v8a-release.apk` secara default, kecuali jika ada permintaan lain dari pengguna. Perintah yang digunakan adalah `flutter build apk --split-per-abi`.
 
 # Firebase MCP
 
