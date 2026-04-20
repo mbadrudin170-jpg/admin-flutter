@@ -18,7 +18,7 @@ AI beroperasi di dalam lingkungan pengembangan Firebase Studio, yang menyediakan
   * Firebase Studio menyediakan server pratinjau yang berjalan (untuk web dan emulator Android) dengan kemampuan hot reload otomatis (idx.previews.enable \\= true; biasanya dikonfigurasi secara default).
   * AI akan terus memantau output dari server pratinjau (misalnya, log konsol, pesan kesalahan, rendering visual) untuk mendapatkan umpan balik waktu nyata tentang perubahan.
   * Untuk perubahan struktural yang signifikan, pembaruan dependensi, atau masalah yang persisten, AI harus memicu Manual Full Reload atau Hard Restart dari lingkungan pratinjau seperlunya.
-* **Integrasi Firebase:** AI mengenali pola integrasi Firebase standar di Flutter, termasuk penggunaan firebase\_options.dart yang dihasilkan oleh flutterfire configure, dan interaksi dengan berbagai Firebase SDK.
+* **Integrasi Firebase:** AI mengenali pola integrasi Firebase standar di Flutter, termasuk penggunaan firebase_options.dart yang dihasilkan oleh flutterfire configure, dan interaksi dengan berbagai Firebase SDK.
 
 ## **Modifikasi Kode & Manajemen Dependensi**
 
@@ -28,10 +28,10 @@ AI diberdayakan untuk memodifikasi basis kode Flutter dan mengelola dependensiny
 * **Manajemen Paket:** Jika fitur baru memerlukan paket eksternal, AI akan mengidentifikasi paket yang paling sesuai dan stabil dari pub.dev.
   * Untuk menambahkan dependensi biasa, ia akan menjalankan `flutter pub add <nama_paket>`.
   * Untuk menambahkan dependensi pengembangan (misalnya, untuk pengujian atau pembuatan kode), ia akan menjalankan `flutter pub add dev:<nama_paket>`.
-* **Pembuatan Kode (build\_runner):**
-  1. Ketika perubahan memperkenalkan kebutuhan untuk pembuatan kode (misalnya, untuk kelas freezed, model json\_serializable, atau riverpod\_generator), AI akan:
-     1. Memastikan build\_runner terdaftar di dev\_dependencies di pubspec.yaml.
-     2. Secara otomatis menjalankan `dart run build\_runner build \\--delete-conflicting-outputs` untuk menghasilkan file yang diperlukan setelah modifikasi kode yang membutuhkannya.
+* **Pembuatan Kode (build_runner):**
+  1. Ketika perubahan memperkenalkan kebutuhan untuk pembuatan kode (misalnya, untuk kelas freezed, model json_serializable, atau riverpod_generator), AI akan:
+     1. Memastikan build_runner terdaftar di dev_dependencies di pubspec.yaml.
+     2. Secara otomatis menjalankan `dart run build_runner build \\--delete-conflicting-outputs` untuk menghasilkan file yang diperlukan setelah modifikasi kode yang membutuhkannya.
 * **Kualitas Kode:** AI bertujuan untuk mematuhi praktik terbaik Flutter/Dart, termasuk:
   * Struktur kode yang bersih dan pemisahan masalah (misalnya, logika UI terpisah dari logika bisnis).
   * Konvensi penamaan yang bermakna dan konsisten.
@@ -63,7 +63,7 @@ Fungsi penting dari AI adalah untuk terus memantau dan secara otomatis menyelesa
 
 AI akan mengimplementasikan dan mengelola tema yang komprehensif dan konsisten untuk aplikasi, dengan mematuhi prinsip-prinsip Desain Material 3. Ini termasuk mendefinisikan skema warna, tipografi, dan gaya komponen dalam objek `ThemeData` terpusat.
 
-#### **Skema Warna (Material 3\\)**
+#### **Skema Warna (Material 3)**
 
 AI akan memprioritaskan penggunaan `ColorScheme.fromSeed` untuk menghasilkan palet warna yang harmonis dan dapat diakses dari satu warna benih. Ini adalah dasar dari tema Material 3 dan mendukung warna dinamis pada platform seperti Android.
 
@@ -363,14 +363,14 @@ Navigator.pushReplacement(
 );
 ```
 
-* **Navigasi Deklaratif dengan go\_router**: Untuk navigasi yang lebih kompleks, tautan dalam, dan dukungan web, paket go\_router adalah solusi yang kuat dan direkomendasikan. AI akan mengintegrasikan dan mengonfigurasi go\_router ketika navigasi deklaratif atau fitur-fitur canggih seperti tautan dalam diperlukan.
-  Untuk menggunakan go\_router, pertama-tama tambahkan ke proyek Anda dengan menjalankan:
+* **Navigasi Deklaratif dengan go_router**: Untuk navigasi yang lebih kompleks, tautan dalam, dan dukungan web, paket go_router adalah solusi yang kuat dan direkomendasikan. AI akan mengintegrasikan dan mengonfigurasi go_router ketika navigasi deklaratif atau fitur-fitur canggih seperti tautan dalam diperlukan.
+  Untuk menggunakan go_router, pertama-tama tambahkan ke proyek Anda dengan menjalankan:
 
 ```shell
 flutter pub add go_router
 ```
 
-  **Contoh Konfigurasi go\_router:**
+  **Contoh Konfigurasi go_router:**
 
 ```
 // Di main.dart atau file router.dart khusus
@@ -480,8 +480,8 @@ class SettingsScreen extends StatelessWidget {
 }
 ```
 
-* **Tautan Dalam**: go\_router menangani tautan dalam secara otomatis berdasarkan path URL yang ditentukan, memungkinkan layar tertentu dibuka langsung dari sumber eksternal (misalnya, tautan web, notifikasi push).
-* **Pengalihan Otentikasi**: AI dapat mengonfigurasi properti pengalihan go\_router untuk menangani alur otentikasi, memastikan pengguna dialihkan ke layar login saat tidak sah, dan kembali ke tujuan yang dimaksud setelah login berhasil.
+* **Tautan Dalam**: go_router menangani tautan dalam secara otomatis berdasarkan path URL yang ditentukan, memungkinkan layar tertentu dibuka langsung dari sumber eksternal (misalnya, tautan web, notifikasi push).
+* **Pengalihan Otentikasi**: AI dapat mengonfigurasi properti pengalihan go_router untuk menangani alur otentikasi, memastikan pengguna dialihkan ke layar login saat tidak sah, dan kembali ke tujuan yang dimaksud setelah login berhasil.
 
 ## **Arsitektur Aplikasi**
 
@@ -575,7 +575,7 @@ developer.log(\'This is a simple log message.\');
 
 * **Pencatatan Terstruktur**: Untuk log yang lebih detail, fungsi `log` menerima beberapa parameter opsional:
 
-  * `name`: Sebuah `String` untuk mengkategorikan pesan log (misalnya, \'my\_app.network\').
+  * `name`: Sebuah `String` untuk mengkategorikan pesan log (misalnya, \'my_app.network\').
   * `level`: Sebuah `int` untuk tingkat keparahan (misalnya, `800` untuk `INFO`, `900` untuk `WARNING`, `1000` untuk `SEVERE`).
   * `error`: Sebuah `Object` untuk mencatat pengecualian.
   * `stackTrace`: Sebuah objek `StackTrace`.
@@ -755,7 +755,7 @@ AI akan menggunakan penyematan ini sebagai vektor untuk tugas hilir, seperti men
 Saat diminta, AI akan memfasilitasi pembuatan dan pelaksanaan tes, memastikan keandalan kode dan memvalidasi fungsionalitas.
 
 * **Penulisan Tes:**
-  * Atas permintaan pengguna untuk tes (misalnya, "Tulis tes untuk fitur baru ini"), AI akan menghasilkan file tes yang sesuai (misalnya, test/\<nama_file\>\_test.dart).
+  * Atas permintaan pengguna untuk tes (misalnya, "Tulis tes untuk fitur baru ini"), AI akan menghasilkan file tes yang sesuai (misalnya, test/\<nama_file\>_test.dart).
   * Untuk fungsi, metode, atau kelas baru, terutama yang berisi logika bisnis, AI akan memprioritaskan penulisan tes unit komprehensif menggunakan kerangka kerja package:test/test.dart.
   * AI akan secara otomatis mengatur mocking (misalnya, menggunakan mockito) untuk mengisolasi unit yang diuji dari dependensinya.
   * Tes akan dirancang untuk mencakup berbagai nilai input, kasus tepi, dan skenario kesalahan.
@@ -803,18 +803,32 @@ Alur kerja AI bersifat berulang, transparan, dan responsif terhadap masukan peng
   1. **Perubahan Kode:** AI menerapkan modifikasi kode.
   2. **Lint/Format:** AI menjalankan `dart format .` dan mengatasi peringatan lint kecil.
   3. **Pemeriksaan Ketergantungan:** Jika pubspec.yaml diubah, AI menjalankan `flutter pub get`.
-  4. **Pembuatan Kode:** Jika perlu, AI menjalankan `dart run build\_runner build \\--delete-conflicting-outputs`.
+  4. **Pembuatan Kode:** Jika perlu, AI menjalankan `dart run build_runner build \\--delete-conflicting-outputs`.
   5. **Kompilasi & Analisis:** AI memantau terminal untuk `flutter analyze` dan kesalahan kompilasi dari `flutter run` (yang terjadi secara otomatis saat file disimpan dengan server pratinjau).
   6. **Eksekusi Tes:** Jika tes diminta atau diubah, AI menjalankan `flutter test`.
   7. **Pemeriksaan Pratinjau:** AI mengamati server pratinjau untuk kesalahan visual dan runtime.
   8. **Remediasi/Laporan:** Jika kesalahan ditemukan, AI mencoba perbaikan otomatis. Jika tidak berhasil, ia melaporkan detail kepada pengguna.
 * **Spesifikasi Firebase Studio untuk Pemeriksaan Kesalahan:**
   * **Umpan Balik Waktu Nyata:** Lingkungan Code OSS terintegrasi di Firebase Studio memberikan isyarat visual langsung untuk kesalahan sintaks, peringatan, dan pengecualian yang tidak tertangani di editor dan panel "Masalah".
-  * **Output Terminal:** Jendela terminal utama di Firebase Studio akan menampilkan output terperinci dari `flutter run`, `flutter test`, `flutter analyze`, dan `dart run build\_runner`, memberikan log kesalahan yang komprehensif.
+  * **Output Terminal:** Jendela terminal utama di Firebase Studio akan menampilkan output terperinci dari `flutter run`, `flutter test`, `flutter analyze`, dan `dart run build_runner`, memberikan log kesalahan yang komprehensif.
   * **Konsol Pratinjau:** Konsol browser yang ditautkan ke pratinjau web, atau output logcat untuk emulator Android, akan menampilkan kesalahan runtime, pernyataan cetak, dan masalah terkait jaringan. AI akan memanfaatkan output ini.
 
 Pendekatan terstruktur ini memastikan bahwa AI dapat secara efektif membantu dalam mengembangkan dan memelihara aplikasi Flutter yang kuat di Firebase Studio, membuat proses pengembangan lebih otomatis dan efisien.
 
+# **Protokol Interaksi dan Pengembangan**
+
+Bagian ini mendefinisikan serangkaian aturan dan protokol yang harus diikuti oleh AI untuk memastikan konsistensi, kejelasan, dan efisiensi selama proses pengembangan.
+
+1.  **Standarisasi Bahasa:**
+    *   **Bahasa Pemrograman dan Kode:** Di seluruh basis kode, termasuk nama *file*, *variabel*, *fungsi*, *parameter*, dan *class*, wajib menggunakan Bahasa Indonesia yang baik dan benar.
+    *   **Komunikasi:** Semua interaksi dan percakapan dengan pengguna harus dilakukan dalam Bahasa Indonesia.
+
+2.  **Dokumentasi dan Konteks File:**
+    *   **Identifikasi Jalur (Path):** Setiap file yang dimodifikasi atau dibuat harus menyertakan jalur (path) lengkapnya dari direktori root proyek. Informasi ini harus ditempatkan sebagai komentar di baris paling atas file. Contoh: `// lib/halaman/beranda.dart`.
+    *   **Deskripsi Fitur:** Setelah menyelesaikan tugas pada sebuah file, AI wajib menambahkan atau memperbarui blok komentar di bagian atas file (setelah komentar path) yang menjelaskan fungsionalitas utama, fitur, dan tujuan dari kode di dalam file tersebut. Ini berfungsi sebagai dokumentasi *real-time* dan harus diperbarui di `blueprint.md`.
+
+3.  **Manajemen Alur Kerja Proyek:**
+    *   **Referensi Utama (`blueprint.md`):** Sebelum memulai tugas atau modifikasi apa pun, AI harus selalu membaca dan memahami konten dari file `blueprint.md`. File ini adalah sumber kebenaran tunggal (`single source of truth`) yang berisi alur kerja, arsitektur, dan rencana pengembangan proyek.
 
 # Firebase MCP
 
@@ -832,7 +846,3 @@ Saat diminta untuk Firebase, tambahkan konfigurasi server berikut ke .idx/mcp.js
         }
     }
 }
-
-## aturan lainnnya
-1. selalu sertakan jalur path di setiap file agar saya tahu tempat file itu berada dan path ini bungkus dengan komentar //.
-2. selalu jaga konsistensi.
