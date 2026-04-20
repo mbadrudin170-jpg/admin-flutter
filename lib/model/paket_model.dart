@@ -22,7 +22,7 @@ enum TipeDurasi {
 }
 
 class Paket {
-  final String? id; // ID dari database (nullable untuk paket baru)
+  final String id; // PERBAIKAN: ID tidak boleh nullable
   final String nama;
   final int harga;
   final int durasi;

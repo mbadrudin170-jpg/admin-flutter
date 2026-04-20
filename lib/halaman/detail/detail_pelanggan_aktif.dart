@@ -42,15 +42,15 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
     final paketOperasi = PaketOperasi();
 
     try {
-      // PERBAIKAN: Mengonversi idPaket ke int sebelum memanggil
-      final idPaketInt = int.tryParse(_pelangganAktif.idPaket.toString());
+      // PERBAIKAN: Langsung gunakan idPaket (String) tanpa konversi
+      final idPaket = _pelangganAktif.idPaket;
 
       // Muat data pelanggan dan paket secara bersamaan
       final results = await Future.wait([
-        // PERBAIKAN: Memanggil method yang benar
         pelangganOperasi.ambilSatuPelangganById(_pelangganAktif.idPelanggan),
-        if (idPaketInt != null)
-          paketOperasi.ambilSatuPaket(idPaketInt)
+        // PERBAIKAN: Panggil dengan ID String jika tidak kosong
+        if (idPaket.isNotEmpty)
+          paketOperasi.ambilSatuPaket(idPaket)
         else
           Future.value(null),
       ]);

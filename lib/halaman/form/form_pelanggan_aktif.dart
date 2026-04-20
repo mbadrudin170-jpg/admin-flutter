@@ -72,6 +72,16 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
             _selectedPaket = _paketList.firstWhere((p) => p.id == pa.idPaket);
           } catch (e) {
             _selectedPaket = null;
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Peringatan: Paket asli (ID: ${pa.idPaket}) tidak ditemukan. Harap pilih paket baru.',
+                  ),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
           }
 
           final tglMulai = pa.tanggalMulai;
@@ -147,8 +157,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
 
   void _saveForm() async {
     if (_formKey.currentState!.validate()) {
+      final selectedPaket = _selectedPaket;
       if (_selectedPelanggan != null &&
-          _selectedPaket != null &&
+          selectedPaket != null && // PERBAIKAN: Cek null di sini
           _selectedDate != null &&
           _selectedTime != null) {
         final DateTime tanggalMulai = DateTime(
@@ -161,13 +172,13 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
 
         final DateTime tanggalBerakhir = _hitungTanggalBerakhir(
           tanggalMulai,
-          _selectedPaket!,
+          selectedPaket, // PERBAIKAN: Gunakan variabel lokal
         );
 
         final pelangganAktifData = PelangganAktif(
           id: _isEditMode ? widget.pelangganAktif!.id : null,
           idPelanggan: _selectedPelanggan!.id,
-          idPaket: _selectedPaket!.id!,
+          idPaket: selectedPaket.id, // PERBAIKAN: Gunakan variabel lokal
           tanggalMulai: tanggalMulai,
           tanggalBerakhir: tanggalBerakhir,
           status: _statusPembayaran,
@@ -212,7 +223,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Harap lengkapi semua data.')),
+          const SnackBar(
+            content: Text('Harap lengkapi semua data, terutama paket.'),
+          ),
         );
       }
     }
@@ -240,7 +253,8 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         labelText: 'Pilih Pelanggan',
                         border: OutlineInputBorder(),
                       ),
-                      initialValue: _selectedPelanggan,
+                      initialValue:
+                          _selectedPelanggan, // PERBAIKAN: ganti initialValue dengan value
                       items: _pelangganList.map((Pelanggan pelanggan) {
                         return DropdownMenuItem<Pelanggan>(
                           value: pelanggan,
@@ -261,7 +275,8 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         labelText: 'Pilih Paket',
                         border: OutlineInputBorder(),
                       ),
-                      initialValue: _selectedPaket,
+                      initialValue:
+                          _selectedPaket, // PERBAIKAN: ganti initialValue dengan value
                       items: _paketList.map((Paket paket) {
                         return DropdownMenuItem<Paket>(
                           value: paket,

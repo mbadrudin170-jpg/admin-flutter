@@ -22,13 +22,18 @@ class PaketOperasi {
       developer.log("Data yang akan di-insert: $data");
 
       developer.log("Melakukan insert ke tabel 'paket'...");
+      // Perbaikan: Menggunakan ID String dari model
       final result = await db.insert('paket', data);
       developer.log("Insert berhasil dengan ID: $result");
 
       return result;
     } catch (e, stacktrace) {
       // Ini akan mencetak error apa pun yang terjadi di dalam blok try
-      developer.log("TERJADI ERROR di createPaket", error: e, stackTrace: stacktrace);
+      developer.log(
+        "TERJADI ERROR di createPaket",
+        error: e,
+        stackTrace: stacktrace,
+      );
 
       // Kembalikan nilai yang menandakan kegagalan, misalnya -1
       return -1;
@@ -43,7 +48,8 @@ class PaketOperasi {
     });
   }
 
-  Future<Paket?> ambilSatuPaket(int id) async {
+  // PERBAIKAN: Mengubah parameter 'id' menjadi String
+  Future<Paket?> ambilSatuPaket(String id) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'paket',
