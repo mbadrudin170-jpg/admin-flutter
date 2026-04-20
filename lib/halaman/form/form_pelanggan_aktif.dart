@@ -1,12 +1,14 @@
 // lib/halaman/form/form_pelanggan_aktif.dart
+// Halaman ini menyediakan formulir untuk mengaktifkan pelanggan dengan paket tertentu.
+
 import 'dart:developer' as developer;
-import 'package:admin/data/operasi/paket_operasi.dart';
-import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
-import 'package:admin/data/operasi/pelanggan_operasi.dart';
-import 'package:admin/model/paket_model.dart';
-import 'package:admin/model/pelanggan_aktif_model.dart';
-import 'package:admin/model/pelanggan_model.dart';
-import 'package:admin/utils/format.dart';
+import 'package:admin_wifi/data/operasi/paket_operasi.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
+import 'package:admin_wifi/model/paket_model.dart';
+import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
+import 'package:admin_wifi/model/pelanggan_model.dart';
+import 'package:admin_wifi/utils/format.dart';
 import 'package:flutter/material.dart';
 
 class FormPelangganAktif extends StatefulWidget {
@@ -208,7 +210,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
         } catch (e, s) {
           developer.log(
             'Terjadi kesalahan saat menyimpan',
-            name: 'admin.form.pelanggan_aktif',
+            name: 'admin_wifi.form.pelanggan_aktif',
             error: e,
             stackTrace: s,
           );
@@ -253,8 +255,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         labelText: 'Pilih Pelanggan',
                         border: OutlineInputBorder(),
                       ),
-                      initialValue:
-                          _selectedPelanggan, // PERBAIKAN: ganti initialValue dengan value
+                      initialValue: _selectedPelanggan,
                       items: _pelangganList.map((Pelanggan pelanggan) {
                         return DropdownMenuItem<Pelanggan>(
                           value: pelanggan,
@@ -275,8 +276,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                         labelText: 'Pilih Paket',
                         border: OutlineInputBorder(),
                       ),
-                      initialValue:
-                          _selectedPaket, // PERBAIKAN: ganti initialValue dengan value
+                      initialValue: _selectedPaket,
                       items: _paketList.map((Paket paket) {
                         return DropdownMenuItem<Paket>(
                           value: paket,

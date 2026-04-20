@@ -1,6 +1,6 @@
 // lib/halaman/detail/detail_pelanggan.dart
 import 'package:flutter/material.dart';
-import 'package:admin/model/pelanggan_model.dart';
+import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:flutter/services.dart';
 
 class DetailPelangganPage extends StatefulWidget {

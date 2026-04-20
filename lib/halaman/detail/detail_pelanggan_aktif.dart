@@ -1,13 +1,13 @@
 // lib/halaman/detail/detail_pelanggan_aktif.dart
 import 'dart:developer' as developer;
-import 'package:admin/data/operasi/paket_operasi.dart';
-import 'package:admin/data/operasi/pelanggan_aktif_operasi.dart';
-import 'package:admin/data/operasi/pelanggan_operasi.dart';
-import 'package:admin/halaman/form/form_pelanggan_aktif.dart';
-import 'package:admin/model/paket_model.dart';
-import 'package:admin/model/pelanggan_model.dart';
+import 'package:admin_wifi/data/operasi/paket_operasi.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
+import 'package:admin_wifi/halaman/form/form_pelanggan_aktif.dart';
+import 'package:admin_wifi/model/paket_model.dart';
+import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:flutter/material.dart';
-import 'package:admin/model/pelanggan_aktif_model.dart';
+import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
 
 class DetailPelangganAktif extends StatefulWidget {
   final PelangganAktif pelanggan;

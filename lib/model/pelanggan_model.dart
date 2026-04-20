@@ -1,4 +1,7 @@
-// lib/model/pelanggan.dart
+// lib/model/pelanggan_model.dart
+// Model ini merepresentasikan data pelanggan.
+// Ini mencakup informasi seperti nama, telepon, alamat, dan detail login.
+// Digunakan untuk mengelola data pelanggan dari dan ke database.
 
 class Pelanggan {
   final String id;

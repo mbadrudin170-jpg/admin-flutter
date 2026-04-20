@@ -1,6 +1,6 @@
 // lib/data/operasi/kategori_operasi.dart
-import 'package:admin/data/sqlite.dart';
-import 'package:admin/model/kategori_model.dart';
+import 'package:admin_wifi/data/sqlite.dart';
+import 'package:admin_wifi/model/kategori_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class KategoriOperasi {
@@ -16,6 +16,18 @@ class KategoriOperasi {
   Future<List<Kategori>> getKategori() async {
     final db = await DatabaseHelper.instance.database;
     final List<Map<String, dynamic>> maps = await db.query('kategori');
+    return List.generate(maps.length, (i) {
+      return Kategori.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<Kategori>> getKategoriByTipe(TipeKategori tipe) async {
+    final db = await DatabaseHelper.instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'kategori',
+      where: 'tipe = ?',
+      whereArgs: [tipe.name],
+    );
     return List.generate(maps.length, (i) {
       return Kategori.fromMap(maps[i]);
     });

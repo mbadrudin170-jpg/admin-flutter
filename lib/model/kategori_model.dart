@@ -1,5 +1,7 @@
-
-// lib/model/kategori.dart
+// lib/model/kategori_model.dart
+// Model ini mendefinisikan struktur data untuk kategori dan sub-kategori transaksi.
+// Ini termasuk tipe kategori (pemasukan atau pengeluaran) dan daftar sub-kategori.
+// Digunakan untuk mengelola data kategori dari dan ke Firestore.
 
 enum TipeKategori {
   pemasukan,

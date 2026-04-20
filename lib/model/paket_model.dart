@@ -1,4 +1,7 @@
 // lib/model/paket_model.dart
+// Model ini merepresentasikan paket layanan yang ditawarkan.
+// Ini mencakup detail seperti nama, harga, durasi, dan tipe durasi (jam, hari, bulan).
+// Digunakan untuk mengelola data paket dari dan ke database lokal dan Firestore.
 
 import 'package:uuid/uuid.dart';
 

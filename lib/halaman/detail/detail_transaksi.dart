@@ -1,7 +1,10 @@
+// lib/halaman/detail/detail_transaksi.dart
+// Halaman ini menampilkan detail dari satu transaksi.
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:admin/model/transaksi_model.dart';
-import 'package:admin/utils/format.dart';
+import 'package:admin_wifi/model/transaksi_model.dart';
+import 'package:admin_wifi/utils/format.dart';
 
 class DetailTransaksiPage extends StatelessWidget {
   final Transaksi transaksi;

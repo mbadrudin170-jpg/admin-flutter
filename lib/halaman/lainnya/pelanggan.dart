@@ -1,9 +1,11 @@
 // lib/halaman/lainnya/pelanggan.dart
+// Halaman ini menampilkan daftar semua pelanggan yang terdaftar.
+
+import 'package:admin_wifi/halaman/form/form_pelanggan.dart';
+import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:flutter/material.dart';
-import 'package:admin/data/operasi/pelanggan_operasi.dart';
-import 'package:admin/halaman/form/form_pelanggan.dart';
-import 'package:admin/halaman/detail/detail_pelanggan.dart';
-import 'package:admin/model/pelanggan_model.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
+import 'package:admin_wifi/halaman/detail/detail_pelanggan.dart';
 
 class PelangganPage extends StatefulWidget {
   const PelangganPage({super.key});

@@ -1,8 +1,8 @@
 // lib/halaman/lainnya/kritik_saran.dart
 // Halaman ini menyediakan antarmuka bagi pengguna untuk mengirimkan kritik dan saran.
 
-import 'package:admin/data/operasi/kritik_saran_operasi.dart';
-import 'package:admin/model/kritik_saran_model.dart';
+import 'package:admin_wifi/data/operasi/kritik_saran_operasi.dart';
+import 'package:admin_wifi/model/kritik_saran_model.dart';
 import 'package:flutter/material.dart';
 
 class KritikSaranPage extends StatefulWidget {

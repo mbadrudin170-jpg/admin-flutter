@@ -1,8 +1,12 @@
 // lib/halaman/lainnya/kategori.dart
+// File ini menampilkan halaman untuk mengelola kategori pemasukan dan pengeluaran.
+// Pengguna dapat melihat, menambah, dan (nantinya) mengedit atau menghapus kategori.
+// Terdapat tombol untuk beralih antara tipe kategori (Pemasukan/Pengeluaran).
+
 import 'package:flutter/material.dart';
-import 'package:admin/data/operasi/kategori_operasi.dart';
-import 'package:admin/halaman/form/form_kategori.dart';
-import 'package:admin/model/kategori_model.dart';
+import 'package:admin_wifi/data/operasi/kategori_operasi.dart';
+import 'package:admin_wifi/halaman/form/form_kategori.dart';
+import 'package:admin_wifi/model/kategori_model.dart';
 
 class KategoriPage extends StatefulWidget {
   const KategoriPage({super.key});

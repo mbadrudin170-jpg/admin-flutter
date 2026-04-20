@@ -3,10 +3,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:admin/halaman/lainnya/kategori.dart';
-import 'package:admin/halaman/lainnya/kritik_saran.dart';
-import 'package:admin/halaman/lainnya/paket.dart';
-import 'package:admin/halaman/lainnya/pelanggan.dart';
+import 'package:admin_wifi/halaman/lainnya/kategori.dart';
+import 'package:admin_wifi/halaman/lainnya/kritik_saran.dart';
+import 'package:admin_wifi/halaman/lainnya/paket.dart';
+import 'package:admin_wifi/halaman/lainnya/pelanggan.dart';
 
 class LainnyaPage extends StatefulWidget {
   const LainnyaPage({super.key});

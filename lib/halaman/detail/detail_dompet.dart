@@ -1,6 +1,6 @@
 // lib/halaman/detail/detail_dompet.dart
 import 'package:flutter/material.dart';
-import 'package:admin/model/dompet_model.dart';
+import 'package:admin_wifi/model/dompet_model.dart';
 
 class DetailDompet extends StatelessWidget {
   final Dompet dompet;

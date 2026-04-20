@@ -1,6 +1,8 @@
 // lib/halaman/form/form_kategori.dart
+// Halaman ini menyediakan formulir untuk menambah atau mengedit kategori.
+
 import 'package:flutter/material.dart';
-import 'package:admin/model/kategori_model.dart';
+import 'package:admin_wifi/model/kategori_model.dart';
 
 class FormKategoriPage extends StatefulWidget {
   const FormKategoriPage({super.key});

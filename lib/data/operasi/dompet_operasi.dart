@@ -1,6 +1,6 @@
 // lib/data/operasi/dompet_operasi.dart
-import 'package:admin/data/sqlite.dart';
-import 'package:admin/model/dompet_model.dart';
+import 'package:admin_wifi/data/sqlite.dart';
+import 'package:admin_wifi/model/dompet_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DompetOperasi {

@@ -1,7 +1,7 @@
 // lib/data/operasi/paket_operasi.dart
 import 'dart:developer' as developer;
-import 'package:admin/data/sqlite.dart';
-import 'package:admin/model/paket_model.dart';
+import 'package:admin_wifi/data/sqlite.dart';
+import 'package:admin_wifi/model/paket_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PaketOperasi {

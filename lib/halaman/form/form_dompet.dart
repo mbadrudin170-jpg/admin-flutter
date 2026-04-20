@@ -1,6 +1,8 @@
 // lib/halaman/form/form_dompet.dart
-import 'package:admin/data/operasi/dompet_operasi.dart';
-import 'package:admin/model/dompet_model.dart';
+// Halaman ini menyediakan formulir untuk menambah atau mengedit dompet.
+
+import 'package:admin_wifi/data/operasi/dompet_operasi.dart';
+import 'package:admin_wifi/model/dompet_model.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:developer' as developer;

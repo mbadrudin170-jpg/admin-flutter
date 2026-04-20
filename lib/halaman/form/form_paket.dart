@@ -1,6 +1,8 @@
 // lib/halaman/form/form_paket.dart
-import 'package:admin/data/operasi/paket_operasi.dart';
-import 'package:admin/model/paket_model.dart';
+// Halaman ini menyediakan formulir untuk menambah atau mengedit paket internet.
+
+import 'package:admin_wifi/data/operasi/paket_operasi.dart';
+import 'package:admin_wifi/model/paket_model.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:developer' as developer;

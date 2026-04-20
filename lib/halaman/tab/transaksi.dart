@@ -1,10 +1,14 @@
 // lib/halaman/tab/transaksi.dart
+// Halaman ini menampilkan daftar semua transaksi, dikelompokkan berdasarkan tanggal.
+// Ini juga mencakup ringkasan total pemasukan, pengeluaran, dan transfer.
+// Pengguna dapat menambahkan transaksi baru melalui tombol floating action.
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:admin/data/operasi/transaksi_operasi.dart';
-import 'package:admin/halaman/form/form_transaksi.dart';
-import 'package:admin/model/transaksi_model.dart';
-import 'package:admin/utils/format.dart';
+import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
+import 'package:admin_wifi/halaman/form/form_transaksi.dart';
+import 'package:admin_wifi/model/transaksi_model.dart';
+import 'package:admin_wifi/utils/format.dart';
 
 import '../detail/detail_transaksi.dart';
 

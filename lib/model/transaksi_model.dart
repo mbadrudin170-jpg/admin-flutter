@@ -1,10 +1,25 @@
 // lib/model/transaksi_model.dart
-import 'package:admin/model/kategori_model.dart';
+// File ini mendefinisikan model data untuk Transaksi, termasuk tipe, atribut, dan metode konversi.
+
+import 'package:admin_wifi/model/kategori_model.dart';
 
 enum TipeTransaksi {
   pemasukan,
   pengeluaran,
   transfer,
+}
+
+extension TipeTransaksiExtension on TipeTransaksi {
+  TipeKategori toTipeKategori() {
+    switch (this) {
+      case TipeTransaksi.pemasukan:
+        return TipeKategori.pemasukan;
+      case TipeTransaksi.pengeluaran:
+        return TipeKategori.pengeluaran;
+      default:
+        throw ArgumentError('TipeTransaksi tidak dapat dipetakan ke TipeKategori: $this');
+    }
+  }
 }
 
 class Transaksi {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:admin/model/paket_model.dart';
+import 'package:admin_wifi/model/paket_model.dart';
 
 class DetailPaketPage extends StatelessWidget {
   final Paket paket;

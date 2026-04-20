@@ -1,4 +1,8 @@
 // lib/model/dompet_model.dart
+// Model ini merepresentasikan entitas dompet dalam aplikasi.
+// Ini mencakup properti seperti ID, nama dompet, saldo, dan tanggal diperbarui.
+// Digunakan untuk mengelola data dompet dari dan ke Firestore.
+
 class Dompet {
   final String? id;
   final String namaDompet;
