@@ -13,6 +13,7 @@ Aplikasi Admin WiFi adalah sebuah sistem manajemen lengkap yang dirancang untuk 
 *   **Manajemen Paket:** Mengatur berbagai paket layanan WiFi yang ditawarkan.
 *   **Manajemen Keuangan:** Melacak pemasukan dan pengeluaran melalui fitur dompet digital.
 *   **Interaksi Pengguna:** Menyediakan platform bagi pengguna untuk memberikan kritik dan saran.
+*   **Notifikasi Otomatis:** Memberikan pengingat proaktif mengenai paket pelanggan yang akan berakhir.
 
 ---
 
@@ -22,7 +23,7 @@ Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan ska
 
 *   **`lib/`**: Direktori utama kode sumber aplikasi.
     *   **`main.dart`**: Titik masuk utama aplikasi.
-    *   **`data/`**: Logika pengelolaan data (operasi SQLite, servis sinkronisasi Firebase).
+    *   **`data/`**: Logika pengelolaan data (operasi SQLite, servis sinkronisasi Firebase, servis notifikasi).
     *   **`model/`**: Definisi kelas model data.
     *   **`halaman/`**: Komponen antarmuka pengguna (UI), diatur per fitur.
     *   **`utils/`**: Kode utilitas yang dapat digunakan kembali.
@@ -72,14 +73,25 @@ Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegras
 *   **File Terkait:** `lib/data/servis/firebase_servis.dart`.
 *   **Proses:** Layanan ini secara periodik melakukan **sinkronisasi inkremental**. Ia mengunggah data lokal yang baru dan mengunduh data terbaru dari Firebase, hanya berdasarkan data yang berubah sejak sinkronisasi terakhir. Proses ini sangat efisien karena menggunakan *timestamp* `diperbarui` pada setiap model data.
 
+### **Notifikasi & Pengingat Jatuh Tempo**
+*   **Tujuan:** Memberikan pengingat otomatis kepada admin agar dapat menindaklanjuti paket pelanggan yang akan segera berakhir masa aktifnya.
+*   **File Terkait:**
+    *   **`lib/data/servis/notifikasi_servis.dart`**: Layanan inti yang bertanggung jawab untuk menginisialisasi dan menjadwalkan notifikasi lokal menggunakan paket `flutter_local_notifications`.
+    *   **`lib/halaman/tab/pelanggan_aktif.dart`**: Halaman ini memicu penjadwalan notifikasi setiap kali daftar pelanggan aktif dimuat.
+*   **Mekanisme:**
+    1.  Saat daftar pelanggan aktif ditampilkan, sistem akan memeriksa setiap pelanggan.
+    2.  Notifikasi akan dijadwalkan untuk dua kondisi:
+        *   **3 hari sebelum** tanggal kadaluarsa.
+        *   **Tepat pada hari** kadaluarsa.
+    3.  Untuk memastikan setiap notifikasi unik, ID notifikasi digenerasi dari `hashCode` ID pelanggan yang berupa string, sehingga menghindari konflik dan error saat runtime.
+
 ### **Kritik dan Saran Pengguna**
 *   **Tujuan:** Menyediakan wadah bagi pengguna untuk memberikan masukan, yang kemudian dapat dilihat oleh administrator. Fitur ini sepenuhnya terintegrasi dengan sistem sinkronisasi data.
 *   **File Terkait:**
-    *   **`lib/model/kritik_saran_model.dart`**: Mendefinisikan struktur data untuk setiap masukan, termasuk `isi`, `tanggal`, `userId`, dan `diperbarui` untuk melacak perubahan.
-    *   **`lib/data/operasi/kritik_saran_operasi.dart`**: Menangani semua operasi CRUD untuk data kritik dan saran di database SQLite lokal.
-    *   **`lib/halaman/lainnya/kritik_saran.dart`**: Halaman antarmuka pengguna (UI) yang menampilkan daftar semua kritik dan saran yang masuk.
-    *   **`lib/widget/nama_dari_id.dart`**: Widget efisien yang digunakan di halaman ini untuk menampilkan nama pengirim berdasarkan `userId`.
-    *   **`lib/data/servis/firebase_servis.dart`**: Mengintegrasikan `KritikSaranOperasi` ke dalam alur sinkronisasi, memastikan masukan dari pengguna selalu sinkron antara aplikasi dan Firebase.
+    *   **`lib/model/kritik_saran_model.dart`**: Mendefinisikan struktur data untuk setiap masukan.
+    *   **`lib/data/operasi/kritik_saran_operasi.dart`**: Menangani operasi CRUD di database SQLite lokal.
+    *   **`lib/halaman/lainnya/kritik_saran.dart`**: Antarmuka pengguna untuk menampilkan daftar masukan.
+    *   **`lib/data/servis/firebase_servis.dart`**: Mengintegrasikan sinkronisasi data kritik dan saran.
 
 ---
 
