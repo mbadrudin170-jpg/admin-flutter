@@ -1,4 +1,6 @@
-// lib/data/operasi/paket_operasi.dart
+// path: lib/data/operasi/paket_operasi.dart
+// Mengelola operasi CRUD untuk data paket di database lokal.
+
 import 'dart:developer' as developer;
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/paket_model.dart';
@@ -8,7 +10,7 @@ class PaketOperasi {
   // Perbaikan: Gunakan instance singleton
   final dbHelper = DatabaseHelper.instance;
 
-  // lib/data/operasi/paket_operasi.dart
+  // Fungsi untuk membuat paket baru di database
   Future<int> createPaket(Paket paket) async {
     try {
       developer.log("Mencoba mendapatkan database...");
@@ -40,9 +42,21 @@ class PaketOperasi {
     }
   }
 
+  // diubah: Mengubah query untuk mengurutkan berdasarkan masa aktif paket dari yang terpendek ke terlama.
   Future<List<Paket>> getPaket() async {
     final db = await dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query('paket');
+    // diubah: Menggunakan rawQuery untuk menambahkan logika sorting custom berdasarkan durasi.
+    final List<Map<String, dynamic>> maps = await db.rawQuery('''
+      SELECT *,
+        CASE tipe
+          WHEN 'jam' THEN durasi
+          WHEN 'hari' THEN durasi * 24
+          WHEN 'bulan' THEN durasi * 24 * 30
+          ELSE 999999
+        END as urutan
+      FROM paket
+      ORDER BY urutan ASC
+    ''');
     return List.generate(maps.length, (i) {
       return Paket.fromMap(maps[i]);
     });
