@@ -1,13 +1,33 @@
-// lib/data/operasi/kritik_saran_operasi.dart
-// File ini berisi kelas untuk mengelola operasi data terkait kritik dan saran di Firestore.
-
+// path: lib/data/operasi/kritik_saran_operasi.dart
+import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/kritik_saran_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sqflite/sqflite.dart';
 
+// Kelas ini menangani semua operasi database untuk entitas KritikSaran.
 class KritikSaranOperasi {
-  final CollectionReference _kritikSaranCollection = FirebaseFirestore.instance.collection('kritik_saran');
+  final dbHelper = DatabaseHelper.instance;
 
+  // Fungsi untuk menyisipkan data kritik dan saran baru ke dalam database lokal.
   Future<void> createKritikSaran(KritikSaran kritikSaran) async {
-    await _kritikSaranCollection.add(kritikSaran.toMap());
+    final db = await dbHelper.database;
+    final now = DateTime.now();
+    // ditambah: Menambahkan timestamp 'diperbarui' sebelum menyimpan.
+    final data = kritikSaran.toMap()..['diperbarui'] = now.toIso8601String();
+
+    await db.insert(
+      'kritik_saran',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // Fungsi untuk mengambil semua data kritik dan saran dari database lokal.
+  Future<List<KritikSaran>> getKritikSaran() async {
+    final db = await dbHelper.database;
+    // ditambah: Mengurutkan hasil berdasarkan tanggal terbaru.
+    final List<Map<String, dynamic>> maps = await db.query('kritik_saran', orderBy: 'tanggal DESC');
+    return List.generate(maps.length, (i) {
+      return KritikSaran.fromMap(maps[i]);
+    });
   }
 }

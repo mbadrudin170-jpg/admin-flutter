@@ -1,39 +1,45 @@
-// lib/data/sqlite.dart
+// path: lib/data/sqlite.dart
 import 'dart:io';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
+// Kelas ini berfungsi sebagai pusat pengelolaan koneksi dan skema database SQLite.
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._internal();
   static Database? _database;
 
   DatabaseHelper._internal();
 
+  // Fungsi untuk mendapatkan instance database, atau menginisialisasi jika belum ada.
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB();
     return _database!;
   }
 
+  // Fungsi untuk menginisialisasi database.
   Future<Database> _initDB() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      version: 5, // Naikkan versi karena struktur berubah kembali ke TEXT
+      // diubah: Versi database dinaikkan ke 6 karena ada penambahan tabel baru.
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
   }
 
+  // Fungsi yang dipanggil saat database dibuat untuk pertama kalinya.
   Future<void> _onCreate(Database db, int version) async {
     await _createTables(db);
   }
 
+  // Fungsi untuk menangani migrasi skema saat versi database berubah.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // ditambah: Logika migrasi untuk versi < 5 yang sudah ada.
     if (oldVersion < 5) {
-      // Hapus tabel lama untuk menerapkan perubahan TEXT PRIMARY KEY
       await db.execute("DROP TABLE IF EXISTS kategori");
       await db.execute("DROP TABLE IF EXISTS sub_kategori");
       await db.execute("DROP TABLE IF EXISTS paket");
@@ -43,8 +49,23 @@ class DatabaseHelper {
       await db.execute("DROP TABLE IF EXISTS dompet");
       await _createTables(db);
     }
+
+    // ditambah: Logika migrasi untuk versi 6, menambahkan tabel kritik_saran.
+    if (oldVersion < 6) {
+      await db.execute('''
+        CREATE TABLE kritik_saran(
+          id TEXT PRIMARY KEY,
+          isi TEXT NOT NULL,
+          tanggal TEXT NOT NULL,
+          userId TEXT NOT NULL,
+          diperbarui TEXT NOT NULL,
+          FOREIGN KEY (userId) REFERENCES pelanggan (id) ON DELETE CASCADE
+        )
+      ''');
+    }
   }
 
+  // Fungsi untuk membuat semua tabel dalam database.
   Future<void> _createTables(Database db) async {
     // 1. Kategori
     await db.execute('''
@@ -132,6 +153,23 @@ class DatabaseHelper {
         namaDompet TEXT NOT NULL,
         saldo REAL NOT NULL,
         diperbarui TEXT NOT NULL
+      )
+    ''');
+    
+    // ditambah: Skema tabel baru untuk menyimpan data kritik dan saran.
+    await _createKritikSaranTable(db);
+  }
+  
+  // ditambah: Fungsi terpisah untuk membuat tabel kritik_saran.
+  Future<void> _createKritikSaranTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS kritik_saran(
+        id TEXT PRIMARY KEY,
+        isi TEXT NOT NULL,
+        tanggal TEXT NOT NULL,
+        userId TEXT NOT NULL,
+        diperbarui TEXT NOT NULL,
+        FOREIGN KEY (userId) REFERENCES pelanggan (id) ON DELETE CASCADE
       )
     ''');
   }

@@ -33,8 +33,10 @@ Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan ska
     *   **`tab/`**: Widget untuk setiap tab utama pada bilah navigasi bawah.
     *   **`form/`**: Halaman untuk menambah atau mengedit data.
     *   **`detail/`**: Halaman untuk menampilkan informasi rinci.
+    *   **`lainnya/`**: Berisi halaman-halaman tambahan seperti `kritik_saran.dart`, yang menampilkan masukan dari pengguna.
 *   **`lib/utils/`**: Kode utilitas yang dapat digunakan kembali (misalnya, format tanggal, palet warna).
 *   **`lib/widget/`**: Komponen UI kustom yang dapat digunakan kembali.
+    *   **`nama_dari_id.dart`**: Widget efisien yang menerima `userId`, mengambil data pelanggan dari database lokal, dan menampilkan nama pelanggan tersebut. Ini digunakan untuk menerjemahkan ID pengguna menjadi nama yang dapat dibaca di seluruh aplikasi, contohnya pada halaman Kritik & Saran.
 *   **`assets/fonts/`**: Direktori berisi file font lokal yang digunakan di seluruh aplikasi.
 
 ---
