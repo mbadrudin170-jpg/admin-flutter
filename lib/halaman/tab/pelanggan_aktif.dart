@@ -1,6 +1,8 @@
 // path : lib/halaman/tab/pelanggan_aktif.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 
+// ditambah: Impor NotifikasiServis untuk menjadwalkan notifikasi.
+import 'package:admin_wifi/data/servis/notifikasi_servis.dart';
 import 'package:admin_wifi/data/servis/firebase_servis.dart';
 import 'package:admin_wifi/utils/format.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +35,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
   final FirebaseService _firebaseService = FirebaseService();
   late Future<List<PelangganAktif>> _listaPelangganAktifFuture;
+  // ditambah: Inisialisasi NotifikasiServis.
+  final NotifikasiServis _notifikasiServis = NotifikasiServis();
 
   @override
   void initState() {
@@ -40,10 +44,37 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     _loadPelangganAktif();
   }
 
+  // ditambah: Metode untuk memeriksa dan menjadwalkan notifikasi.
+  void _periksaDanJadwalkanNotifikasi(List<PelangganAktif> pelanggan) {
+    final sekarang = DateTime.now();
+    for (var p in pelanggan) {
+      final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(
+        const Duration(days: 3),
+      );
+      // ditambah: Hanya jadwalkan notifikasi jika waktu 3 hari sebelum kadaluarsa belum lewat
+      // dan paket masih aktif.
+      if (tigaHariSebelumKadaluarsa.isAfter(sekarang)) {
+        _notifikasiServis.jadwalNotifikasi(
+          id: int.parse(p.id!),
+          title: 'Paket Akan Berakhir',
+          body: 'Paket untuk pelanggan akan berakhir dalam 3 hari.',
+          jadwal: tigaHariSebelumKadaluarsa,
+        );
+      }
+    }
+  }
+
   void _loadPelangganAktif() {
     setState(() {
       _listaPelangganAktifFuture = _pelangganAktifOperasi
           .ambilSemuaPelangganAktif();
+    });
+
+    // ditambah: Panggil metode untuk menjadwalkan notifikasi setelah data dimuat.
+    _listaPelangganAktifFuture.then((pelanggan) {
+      if (pelanggan.isNotEmpty) {
+        _periksaDanJadwalkanNotifikasi(pelanggan);
+      }
     });
   }
 

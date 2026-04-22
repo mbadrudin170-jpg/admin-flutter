@@ -2,31 +2,30 @@
 
 ### **1. Prinsip Utama: Interaksi dan Bahasa**
 
-*   **1.1. Alur Kerja Berbasis Konfirmasi:** Sebelum melakukan modifikasi apa pun, AI **wajib** menjelaskan rencana kerjanya secara rinci kepada pengguna. Pekerjaan hanya dapat dimulai setelah menerima persetujuan eksplisit (misalnya, "setuju", "oke", "ok", "ya", "yes"). Jika pengguna menolak (misalnya, "jangan", "tidak", "nggk", "nggak"), AI harus menghentikan rencana tersebut dan menunggu instruksi lebih lanjut.
-*   **1.2. Standar Bahasa Indonesia:** Seluruh komunikasi dengan pengguna, serta semua penamaan dalam kode (nama file, variabel, fungsi, parameter), harus menggunakan Bahasa Indonesia yang formal dan jelas.
+*   **1.1. Alur Kerja Berbasis Konfirmasi:** Sebelum melakukan tindakan modifikasi apa pun, AI **wajib** menyajikan rencana kerja yang terperinci kepada pengguna. Pekerjaan hanya dapat dilanjutkan setelah mendapatkan persetujuan eksplisit (misalnya, "setuju", "oke", "ok", "ya", "yes"). Jika pengguna menolak (misalnya, "jangan", "tidak", "nggk", "nggak"), AI harus membatalkan rencana tersebut dan menunggu arahan selanjutnya.
+*   **1.2. Standar Bahasa Indonesia:** Seluruh komunikasi dengan pengguna, serta semua penamaan dalam kode (nama file, variabel, fungsi, parameter), harus konsisten menggunakan Bahasa Indonesia yang formal, baku, dan jelas.
 
 ### **2. Dokumentasi dan Manajemen Kode**
 
-*   **2.1. Baca `README.md`:** Sebelum memulai tugas apa pun, AI harus selalu membaca file `README.md` untuk memahami konteks, alur kerja, dan status proyek saat ini.
+*   **2.1. Baca `README.md`:** Sebelum memulai tugas baru, AI wajib membaca file `README.md` terlebih dahulu untuk memahami konteks, alur kerja, dan status terakhir proyek.
 *   **2.2. Komentar Kode Wajib:**
-    *   **Path File:** Setiap file yang diedit harus memiliki komentar di baris paling atas yang menunjukkan path-nya.
-        *Contoh:* `// path: lib/main.dart`
-    *   **Deskripsi Fungsi:** Setiap fungsi harus didahului oleh komentar yang menjelaskan tujuannya.
-        *Contoh:* `// Fungsi ini untuk menavigasi ke halaman A.`
-    *   **Logika Perubahan:** Setiap baris kode yang ditambah, diubah, atau dihapus harus disertai komentar di atas atau di sampingnya yang menjelaskan alasan perubahan.
-        *Struktur:* `// ditambah: [alasan penambahan]`, `// diubah: [alasan perubahan]`, atau `// dihapus: [alasan penghapusan]`.
-    *   **Keterangan Tambahan:** Jika ada logika yang kompleks, tambahkan komentar secukupnya untuk mempermudah pemahaman.
-*   **2.3. Pembaruan `README.md`:** Setelah setiap tugas selesai, AI **wajib** memperbarui file `README.md`. Dokumentasi harus mencakup tujuan file yang diubah, fitur yang diimplementasikan, dan fungsi utama yang terkait. Hindari detail teknis yang tidak relevan atau penjelasan negatif (misalnya, "dihapus karena menyebabkan error").
+    *   **Path File:** Setiap file yang dimodifikasi harus mencantumkan path lengkapnya dalam bentuk komentar di baris paling atas. *Contoh:* `// path: lib/main.dart`.
+    *   **Deskripsi Fungsi:** Setiap fungsi harus memiliki komentar deskriptif di atasnya yang menjelaskan tujuan dan cara kerjanya. *Contoh:* `// Fungsi untuk menavigasi pengguna ke halaman profil.`.
+    *   **Logika Perubahan:** Setiap baris kode yang ditambah, diubah, atau dihapus harus disertai komentar di atas atau di sampingnya dengan struktur yang jelas: `// ditambah: [alasan penambahan]`, `// diubah: [alasan perubahan]`, atau `// dihapus: [alasan penghapusan]`.
+    *   **Keterangan Tambahan:** Untuk logika atau alur kode yang kompleks, tambahkan komentar secukupnya untuk memastikan kode mudah dipahami oleh manusia.
+*   **2.3. Pembaruan `README.md`:** Setelah menyelesaikan sebuah tugas, AI **wajib** memperbarui file `README.md`. Pembaruan harus mendokumentasikan tujuan, fitur, dan fungsi utama dari file-file yang telah dimodifikasi. Hindari penjelasan teknis yang tidak relevan, detail implementasi yang berlebihan, atau catatan negatif (misalnya, "kode lama dihapus karena error").
 
 ### **3. Kualitas, Build, dan Konsistensi**
 
-*   **3.1. Analisis Kode:** Setelah semua modifikasi selesai, jalankan perintah `flutter analyze` untuk memastikan tidak ada error atau *warning* yang tersisa.
+*   **3.1. Analisis Kode:** Setelah semua modifikasi kode selesai, jalankan perintah `flutter analyze` untuk memastikan tidak ada error atau *warning* yang tersisa.
 *   **3.2. Proses Build Aplikasi:**
-    *   Proses build **hanya** boleh dilakukan atas perintah eksplisit dari pengguna.
-    *   Sebelum membangun, periksa `README.md` untuk mengidentifikasi apakah perubahan tersebut adalah **fitur baru** atau **perbaikan bug**.
-    *   Jika hanya **perbaikan bug**, hanya naikkan nomor *build* di `pubspec.yaml` (misalnya, dari `version: 1.0.0+1` menjadi `1.0.0+2`). Versi utama tidak boleh diubah.
-    *   Jalankan perintah berikut untuk proses *build*: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
-*   **3.3. Jaga Konsistensi:** AI harus selalu menjaga konsistensi dan kejelasan dalam struktur kode, penamaan, dan dokumentasi di seluruh proyek.
+    *   Proses build **hanya** boleh dieksekusi atas perintah eksplisit dari pengguna.
+    *   Sebelum memulai build, periksa `README.md` untuk mengidentifikasi apakah perubahan terakhir merupakan **fitur baru** atau hanya **perbaikan bug**.
+    *   Jika hanya **perbaikan bug**, yang dinaikkan hanyalah nomor *build* di `pubspec.yaml` (misalnya, dari `1.0.0+1` menjadi `1.0.0+2`). Versi utama (`1.0.0`) tidak boleh diubah.
+    *   Gunakan perintah berikut untuk proses build: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
+*   **3.3. Perintah `clean`:** Jika pengguna memberikan perintah `clean`, jalankan `flutter clean && flutter pub get` di terminal.
+*   **3.4. Hindari Asumsi:** AI tidak boleh membuat asumsi yang tidak berdasar atau "liar" yang dapat mengganggu sinkronisasi dan konsistensi antar file dalam proyek.
+*   **3.5. Jaga Konsistensi:** AI harus selalu menjaga konsistensi dan kejelasan dalam struktur kode, penamaan, dan alur dokumentasi di seluruh proyek.
 
 # **Panduan Pengembangan AI untuk Flutter di Firebase Studio**
 
@@ -110,7 +109,7 @@ flutter pub add google_fonts
 *Contoh `TextTheme` dengan `google_fonts`:*
 
 ```dart
-import \'\'\'package:google_fonts/google_fonts.dart\'\'\';
+import \'package:google_fonts/google_fonts.dart\';
 
 final TextTheme myTextTheme = TextTheme(
   displayLarge: GoogleFonts.oswald(fontSize: 57, fontWeight: FontWeight.bold),
@@ -138,9 +137,9 @@ flutter pub add provider
 ```
 
 ```dart
-import 'package:flutter/material.dart';
-import \'\'\'package:google_fonts/google_fonts.dart\'\'\';
-import \'\'\'package:provider/provider.dart\'\'\'; // Impor Provider
+import \'package:flutter/material.dart\';
+import \'package:google_fonts/google_fonts.dart\';
+import \'package:provider/provider.dart\'; // Impor Provider
 
 void main() {
   runApp(
@@ -233,7 +232,7 @@ class MyApp extends StatelessWidget {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
-          title: \'\'\'Flutter Material AI App\'\'\',
+          title: \'Flutter Material AI App\',
           theme: lightTheme,
           darkTheme: darkTheme,
           themeMode: themeProvider.themeMode,
@@ -253,17 +252,17 @@ class MyHomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(\'\'\'Material AI Demo\'\'\'),
+        title: const Text(\'Material AI Demo\'),
         actions: [
           IconButton(
             icon: Icon(themeProvider.themeMode == ThemeMode.dark ? Icons.light_mode : Icons.dark_mode),
             onPressed: () => themeProvider.toggleTheme(),
-            tooltip: \'\'\'Toggle Theme\'\'\',
+            tooltip: \'Toggle Theme\',
           ),
           IconButton(
             icon: const Icon(Icons.auto_mode),
             onPressed: () => themeProvider.setSystemTheme(),
-            tooltip: \'\'\'Set System Theme\'\'\',
+            tooltip: \'Set System Theme\',
           ),
         ],
       ),
@@ -271,11 +270,11 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(\'\'\'Welcome!\'\'\', style: Theme.of(context).textTheme.displayLarge),
+            Text(\'Welcome!\', style: Theme.of(context).textTheme.displayLarge),
             const SizedBox(height: 20),
-            Text(\'\'\'This text uses a custom font.\'\'\', style: Theme.of(context).textTheme.bodyMedium),
+            Text(\'This text uses a custom font.\', style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 30),
-            ElevatedButton(onPressed: () {}, child: const Text(\'\'\'Press Me\'\'\')),
+            ElevatedButton(onPressed: () {}, child: const Text(\'Press Me\')),
           ],
         ),
       ),
@@ -302,9 +301,9 @@ flutter:
 * **Image.asset**: Menampilkan gambar dari bundel aset aplikasi.
 
 ```dart
-// Dengan asumsi \'\'\'assets/images/placeholder.png\'\'\' dideklarasikan di pubspec.yaml
+// Dengan asumsi \'assets/images/placeholder.png\' dideklarasikan di pubspec.yaml
 Image.asset(
-  \'\'\'assets/images/placeholder.png\'\'\',
+  \'assets/images/placeholder.png\',
   width: 100,
   height: 100,
   fit: BoxFit.cover,
@@ -315,7 +314,7 @@ Image.asset(
 
 ```dart
 Image.network(
-  \'\'\'https://picsum.photos/200/300\'\'\',
+  \'https://picsum.photos/200/300\',
   width: 200,
   height: 300,
   fit: BoxFit.cover,
@@ -346,9 +345,9 @@ const Icon(
 * **ImageIcon**: Menampilkan ikon dari ImageProvider (berguna untuk ikon kustom yang tidak ada di kelas Ikon).
 
 ```dart
-// Dengan asumsi \'\'\'assets/icons/custom_icon.png\'\'\' dideklarasikan di pubspec.yaml
+// Dengan asumsi \'assets/icons/custom_icon.png\' dideklarasikan di pubspec.yaml
 ImageIcon(
-  const AssetImage(\'\'\'assets/icons/custom_icon.png\'\'\'),
+  const AssetImage(\'assets/icons/custom_icon.png\'),
   size: 24,
   color: Colors.green,
 )
@@ -397,8 +396,8 @@ flutter pub add go_router
 
 ```dart
 // Di main.dart atau file router.dart khusus
-import \'\'\'package:flutter/material.dart\'\'\';
-import \'\'\'package:go_router/go_router.dart\'\'\';
+import \'package:flutter/material.dart\';
+import \'package:go_router/go_router.dart\';
 
 // Definisikan rute Anda
 final GoRouter _router = GoRouter(
@@ -436,7 +435,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: _router,
-      title: \'\'\'GoRouter Example\'\'\',
+      title: \'GoRouter Example\',
       // ... data tema Anda
     );
   }
@@ -449,18 +448,18 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(\'\'\'Home Screen\'\'\')),
+      appBar: AppBar(title: const Text(\'Home Screen\')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              onPressed: () => context.go(\'\'\'/details/123\'\'\'), // Navigasi ke detail dengan ID
-              child: const Text(\'\'\'Go to Details 123\'\'\'),
+              onPressed: () => context.go(\'/details/123\'), // Navigasi ke detail dengan ID
+              child: const Text(\'Go to Details 123\'),
             ),
             ElevatedButton(
-              onPressed: () => context.go(\'\'\'/settings\'\'\'), // Navigasi ke pengaturan
-              child: const Text(\'\'\'Go to Settings\'\'\'),
+              onPressed: () => context.go(\'/settings\'), // Navigasi ke pengaturan
+              child: const Text(\'Go to Settings\'),
             ),
           ],
         ),
@@ -475,11 +474,11 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(\'\'\'Detail Screen: $id\'\'\')),
+      appBar: AppBar(title: Text(\'Detail Screen: $id\')),
       body: Center(
         child: ElevatedButton(
           onPressed: () => context.pop(), // Kembali
-          child: const Text(\'\'\'Go Back\'\'\'),
+          child: const Text(\'Go Back\'),
         ),
       ),
     );
@@ -491,11 +490,11 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(\'\'\'Settings Screen\'\'\')),
+      appBar: AppBar(title: const Text(\'Settings Screen\')),
       body: Center(
         child: ElevatedButton(
           onPressed: () => context.pop(), // Kembali
-          child: const Text(\'\'\'Go Back\'\'\'),
+          child: const Text(\'Go Back\'),
         ),
       ),
     );
@@ -537,7 +536,7 @@ final ValueNotifier<int> _counter = ValueNotifier<int>(0);
 ValueListenableBuilder<int>(
   valueListenable: _counter,
   builder: (context, value, child) {
-    return Text(\'\'\'Count: $value\'\'\');
+    return Text(\'Count: $value\');
   },
 )
 
@@ -591,9 +590,9 @@ Untuk debugging dan pemantauan yang efektif, AI akan menggunakan pustaka `dart:d
 * **Pencatatan Dasar**: Untuk pesan sederhana, fungsi `log` digunakan.
 
 ```dart
-import \'\'\'dart:developer\'\'\' as developer;
+import \'dart:developer\' as developer;
 
-developer.log(\'\'\'This is a simple log message.\'\'\');
+developer.log(\'This is a simple log message.\');
 ```
 
 * **Pencatatan Terstruktur**: Untuk log yang lebih detail, fungsi `log` menerima beberapa parameter opsional:
@@ -607,14 +606,14 @@ developer.log(\'\'\'This is a simple log message.\'\'\');
   *Contoh:*
 
 ```dart
-import \'\'\'dart:developer\'\'\' as developer;
+import \'dart:developer\' as developer;
 
 try {
-  throw \'\'\'Something went wrong!\'\'\';
+  throw \'Something went wrong!\';
 } catch (e, s) {
   developer.log(
-    \'\'\'An error occurred\'\'\',
-    name: \'\'\'my_app.network\'\'\',
+    \'An error occurred\',
+    name: \'my_app.network\',
     level: 900, // WARNING
     error: e,
     stackTrace: s,
@@ -642,8 +641,8 @@ flutter pub add firebase_core firebase_ai
 3. **Inisialisasi Firebase**: AI akan memastikan Firebase diinisialisasi di `lib/main.dart`.
 
 ```dart
-import \'\'\'package:firebase_core/firebase_core.dart\'\'\';
-import \'\'\'firebase_options.dart\'\'\';
+import \'package:firebase_core/firebase_core.dart\';
+import \'firebase_options.dart\';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -664,20 +663,20 @@ Untuk fitur pembuatan teks, peringkasan, atau obrolan, AI akan menggunakan model
 * **Implementasi**:
 
 ```dart
-import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
+import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<String> generateText(String promptText) async {
   try {
     // 1. Dapatkan model generatif
-    final model = FirebaseVertexAI.instance.generativeModel(model: \'\'\'gemini-1.5-flash\'\'\');
+    final model = FirebaseVertexAI.instance.generativeModel(model: \'gemini-1.5-flash\');
 
     // 2. Hasilkan konten
     final response = await model.generateContent([Content.text(promptText)]);
 
     // 3. Kembalikan teks
-    return response.text ?? \'\'\'No response from model.\'\'\';
+    return response.text ?? \'No response from model.\';
   } catch (e) {
-    return \'\'\'Error generating text: $e\'\'\';
+    return \'Error generating text: $e\';
   }
 }
 ```
@@ -689,27 +688,27 @@ Untuk fitur yang memerlukan pemahaman gambar (misalnya, "apa yang ada di gambar 
 * **Implementasi**: AI akan mengharapkan data gambar sebagai `Uint8List`.
 
 ```dart
-import \'\'\'dart:typed_data\'\'\';
-import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
+import \'dart:typed_data\';
+import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<String> analyzeImage(String promptText, Uint8List imageData) async {
   try {
     // 1. Dapatkan model generatif
-    final model = FirebaseVertexAI.instance.generativeModel(model: \'\'\'gemini-1.5-flash-vision\'\'\');
+    final model = FirebaseVertexAI.instance.generativeModel(model: \'gemini-1.5-flash-vision\');
 
     // 2. Buat konten multimodal
     final content = Content.multi([
       TextPart(promptText),
-      DataPart(\'\'\'image/jpeg\'\'\', imageData), // Mengasumsikan format JPEG
+      DataPart(\'image/jpeg\', imageData), // Mengasumsikan format JPEG
     ]);
 
     // 3. Hasilkan konten
     final response = await model.generateContent([content]);
 
     // 4. Kembalikan teks
-    return response.text ?? \'\'\'No response from model.\'\'\';
+    return response.text ?? \'No response from model.\';
   } catch (e) {
-    return \'\'\'Error analyzing image: $e\'\'\';
+    return \'Error analyzing image: $e\';
   }
 }
 ```
@@ -721,7 +720,7 @@ Untuk menghasilkan gambar berkualitas tinggi dari perintah teks, AI akan menggun
 * **Implementasi**:
 
 ```dart
-import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
+import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<List<ImageData>> generateImage(String prompt) async {
   try {
@@ -752,12 +751,12 @@ Untuk fitur yang memerlukan pencarian semantik, klasifikasi, atau pengelompokan,
 * **Implementasi**:
 
 ```dart
-import \'\'\'package:firebase_ai/firebase_ai.dart\'\'\';
+import \'package:firebase_ai/firebase_ai.dart\';
 
 Future<List<double>?> generateEmbedding(String text) async {
   try {
     // 1. Dapatkan model penyematan
-    final embeddingModel = FirebaseVertexAI.instance.embeddingModel(model: \'\'\'text-embedding-004\'\'\');
+    final embeddingModel = FirebaseVertexAI.instance.embeddingModel(model: \'text-embedding-004\');
 
     // 2. Hasilkan penyematan
     final result = await embeddingModel.embedContent([Content.text(text)]);
@@ -803,9 +802,9 @@ Saat diminta, AI akan memfasilitasi pembuatan dan pelaksanaan tes, memastikan ke
 1. Font - Pilih tipografi yang ekspresif dan relevan. Tekankan dan tekankan ukuran font untuk memudahkan pemahaman, misalnya, teks pahlawan, tajuk bagian, tajuk daftar, kata kunci dalam paragraf, dll.
 2. Warna - Sertakan berbagai konsentrasi warna dan rona dalam palet untuk menciptakan tampilan dan nuansa yang cerah dan energik.
 3. Tekstur - Terapkan tekstur noise halus ke latar belakang utama untuk menambahkan nuansa premium dan taktil.
-4. Efek visual - Bayangan jatuh berlapis-lapis menciptakan kesan kedalaman yang kuat. Kartu memiliki bayangan lembut dan dalam agar terlihat "terangkat".
+4. Efek visual - Bayangan jatuh berlapis-lapis menciptakan kesan kedalaman yang kuat. Kartu memiliki bayangan lembut dan dalam agar terlihat \"terangkat\".
 5. Ikonografi - Gabungkan ikon untuk meningkatkan pemahaman pengguna dan navigasi logis aplikasi.
-6. Interaktivitas - Tombol, kotak centang, bilah geser, daftar, bagan, grafik, dan elemen interaktif lainnya memiliki bayangan dengan penggunaan warna yang elegan untuk menciptakan efek "bersinar".
+6. Interaktivitas - Tombol, kotak centang, bilah geser, daftar, bagan, grafik, dan elemen interaktif lainnya memiliki bayangan dengan penggunaan warna yang elegan untuk menciptakan efek \"bersinar\".
 
 ## **Standar Aksesibilitas atau A11Y:** Terapkan fitur aksesibilitas untuk memberdayakan semua pengguna, dengan asumsi berbagai pengguna dengan kemampuan fisik, kemampuan mental, kelompok usia, tingkat pendidikan, dan gaya belajar yang berbeda.
 

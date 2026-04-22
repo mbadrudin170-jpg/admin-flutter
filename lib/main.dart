@@ -3,6 +3,7 @@
 // Fungsinya adalah untuk menginisialisasi Firebase, database lokal (SQLite),
 // dan layanan lainnya sebelum menjalankan aplikasi.
 
+import 'package:admin_wifi/data/servis/notifikasi_servis.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -20,6 +21,10 @@ void main() async {
     // Inisialisasi Firebase.
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+    // ditambah: Inisialisasi layanan notifikasi.
+    final notifikasiServis = NotifikasiServis();
+    await notifikasiServis.inisialisasi();
+
     // Inisialisasi data lokalisasi untuk format tanggal.
     await initializeDateFormatting('id_ID', null);
 
@@ -32,7 +37,6 @@ void main() async {
     FirebaseService().sinkronkanSemuaData().catchError((error) {
       debugPrint("Gagal melakukan sinkronisasi otomatis: $error");
     });
-
   } catch (e) {
     // Tangkap error jika terjadi kegagalan inisialisasi agar aplikasi tidak langsung crash.
     debugPrint("Terjadi kesalahan saat inisialisasi: $e");
@@ -55,7 +59,8 @@ class MyApp extends StatelessWidget {
         fontSize: 57,
         fontWeight: FontWeight.bold,
       ),
-      titleLarge: TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w500),
+      titleLarge:
+          TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w500),
       bodyMedium: TextStyle(fontFamily: 'Open Sans', fontSize: 14),
     );
 
