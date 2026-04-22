@@ -1,4 +1,4 @@
-// lib/halaman/form/form_transaksi.dart
+// path: lib/halaman/form/form_transaksi.dart
 // Halaman ini menyediakan formulir untuk menambah atau mengedit transaksi.
 
 import 'package:admin_wifi/data/operasi/kategori_operasi.dart';
@@ -39,6 +39,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
     _loadInitialData();
   }
 
+  // Fungsi untuk memuat data awal yang diperlukan oleh formulir.
   Future<void> _loadInitialData() async {
     try {
       final dompetList = await _dompetOperasi.getDompet();
@@ -58,6 +59,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
     }
   }
 
+  // Fungsi untuk memuat ulang daftar kategori berdasarkan tipe transaksi yang dipilih.
   Future<void> _loadKategori() async {
     final kategoriList =
         await _kategoriOperasi.getKategoriByTipe(_tipe.toTipeKategori());
@@ -68,6 +70,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
     });
   }
 
+  // Fungsi untuk menyimpan data dari formulir.
   void _simpanForm() {
     if (_formKey.currentState!.validate()) {
       // Logic to save the form
@@ -146,8 +149,10 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2101),
                         );
-                        if (picked != _tanggal) {
+                        // diubah: Menambahkan pengecekan null untuk memastikan 'picked' memiliki nilai sebelum melakukan assignment.
+                        if (picked != null && picked != _tanggal) {
                           setState(() {
+                            // diubah: Meng-assign nilai 'picked' yang sudah pasti tidak null ke '_tanggal'.
                             _tanggal = picked;
                           });
                         }

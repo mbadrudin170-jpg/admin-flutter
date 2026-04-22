@@ -78,7 +78,7 @@ Berikut adalah penjelasan rinci untuk setiap komponen utama dalam aplikasi.
 
 *   **Tab Utama (`lib/halaman/tab/`)**
     *   `home.dart`: Menampilkan ringkasan atau dasbor utama.
-    *   `pelanggan_aktif.dart`: Menampilkan daftar pelanggan yang sedang aktif.
+    *   `pelanggan_aktif.dart`: Menampilkan daftar pelanggan yang statusnya aktif. Halaman ini dilengkapi dengan **fitur pengurutan**, yang memungkinkan admin untuk mengurutkan daftar pelanggan berdasarkan nama (A-Z atau Z-A) untuk mempermudah pencarian dan manajemen.
     *   `transaksi.dart`: Menampilkan riwayat semua transaksi.
     *   `dompet.dart`: Menampilkan saldo dan riwayat keuangan.
     *   `lainnya.dart`: Menyediakan menu navigasi ke halaman sekunder seperti Kategori, Paket, dan Pelanggan.
