@@ -16,7 +16,7 @@
     *   **Logika Perubahan:** Setiap baris kode yang ditambah, diubah, atau dihapus harus disertai komentar di atas atau di sampingnya yang menjelaskan alasan perubahan.
         *Struktur:* `// ditambah: [alasan penambahan]`, `// diubah: [alasan perubahan]`, atau `// dihapus: [alasan penghapusan]`.
     *   **Keterangan Tambahan:** Jika ada logika yang kompleks, tambahkan komentar secukupnya untuk mempermudah pemahaman.
-*   **2.3. Pembaruan `README.md`:** Setelah setiap tugas selesai, AI **wajib** memperbarui file `README.md`. Dokumentasi harus mencakup tujuan file yang diubah, fitur yang diimplementasikan, dan fungsi utama yang terkait. Hindari detail teknis yang tidak relevan atau penjelasan negatif (misalnya, "menghindari error X").
+*   **2.3. Pembaruan `README.md`:** Setelah setiap tugas selesai, AI **wajib** memperbarui file `README.md`. Dokumentasi harus mencakup tujuan file yang diubah, misalnya file lib/jome.dart fitur yang diimplementasikan, dan fungsi utama yang terkait. Hindari detail teknis yang tidak relevan atau penjelasan negatif (misalnya, "menghindari error X").
 
 ### **3. Kualitas, Build, dan Konsistensi**
 
