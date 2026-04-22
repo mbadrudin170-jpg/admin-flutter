@@ -21,23 +21,13 @@ Aplikasi Admin WiFi adalah sebuah sistem manajemen lengkap yang dirancang untuk 
 Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan skalabilitas dan kemudahan pemeliharaan.
 
 *   **`lib/`**: Direktori utama kode sumber aplikasi.
-    *   **`main.dart`**: Titik masuk utama aplikasi, tempat inisialisasi dan konfigurasi tema.
-    *   **`splash_screen.dart`**: Halaman awal yang ditampilkan saat aplikasi dimuat.
-    *   **`halaman_utama.dart`**: Kerangka utama yang mengatur navigasi tab aplikasi.
-*   **`lib/data/`**: Berisi semua logika yang berhubungan dengan pengelolaan data.
-    *   **`sqlite.dart`**: Kelas *handler* untuk operasi database SQLite lokal.
-    *   **`operasi/`**: Kelas-kelas untuk operasi *CRUD (Create, Read, Update, Delete)* pada setiap tabel.
-    *   **`servis/`**: Layanan untuk sinkronisasi data dengan backend (Firebase).
-*   **`lib/model/`**: Definisi struktur data (kelas model) yang merepresentasikan objek dalam aplikasi.
-*   **`lib/halaman/`**: Semua file yang terkait dengan antarmuka pengguna (UI).
-    *   **`tab/`**: Widget untuk setiap tab utama pada bilah navigasi bawah.
-    *   **`form/`**: Halaman untuk menambah atau mengedit data.
-    *   **`detail/`**: Halaman untuk menampilkan informasi rinci.
-    *   **`lainnya/`**: Berisi halaman-halaman tambahan seperti `kritik_saran.dart`, yang menampilkan masukan dari pengguna.
-*   **`lib/utils/`**: Kode utilitas yang dapat digunakan kembali (misalnya, format tanggal, palet warna).
-*   **`lib/widget/`**: Komponen UI kustom yang dapat digunakan kembali.
-    *   **`nama_dari_id.dart`**: Widget efisien yang menerima `userId`, mengambil data pelanggan dari database lokal, dan menampilkan nama pelanggan tersebut. Ini digunakan untuk menerjemahkan ID pengguna menjadi nama yang dapat dibaca di seluruh aplikasi, contohnya pada halaman Kritik & Saran.
-*   **`assets/fonts/`**: Direktori berisi file font lokal yang digunakan di seluruh aplikasi.
+    *   **`main.dart`**: Titik masuk utama aplikasi.
+    *   **`data/`**: Logika pengelolaan data (operasi SQLite, servis sinkronisasi Firebase).
+    *   **`model/`**: Definisi kelas model data.
+    *   **`halaman/`**: Komponen antarmuka pengguna (UI), diatur per fitur.
+    *   **`utils/`**: Kode utilitas yang dapat digunakan kembali.
+    *   **`widget/`**: Komponen UI kustom yang dapat digunakan kembali.
+*   **`assets/`**: Berisi aset statis seperti font lokal.
 
 ---
 
@@ -45,28 +35,53 @@ Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan ska
 
 ### **Manajemen Status (State Management)**
 
-Aplikasi ini menggunakan paket **`provider`** untuk manajemen status. Pendekatan ini memisahkan logika antarmuka pengguna (UI) dari logika bisnis, sehingga membuat aplikasi lebih mudah untuk dipelihara dan diskalakan. Pola `ChangeNotifier` dan `ChangeNotifierProvider` digunakan untuk menyediakan status aplikasi ke pohon widget.
+Aplikasi ini menggunakan paket **`provider`** untuk memisahkan logika UI dari logika bisnis, dengan pola `ChangeNotifier` dan `ChangeNotifierProvider`.
 
 ### **Desain Visual & Tema (Visual Design & Theming)**
 
-Antarmuka pengguna aplikasi ini dibangun mengikuti prinsip **Desain Material 3** untuk memastikan pengalaman pengguna yang modern dan intuitif.
+Antarmuka pengguna mengikuti prinsip **Desain Material 3**.
 
-*   **Tema:** Tema terpusat didefinisikan di `lib/main.dart` menggunakan `ThemeData`. Warna primer aplikasi dihasilkan dari `seedColor` **`Colors.deepPurple`**.
-*   **Tipografi:** Untuk memastikan tipografi yang konsisten dan kinerja yang optimal, aplikasi ini menggunakan **font kustom yang di-hosting secara lokal** di direktori `assets/fonts/`. Ini menggantikan ketergantungan sebelumnya pada paket `google_fonts`, sehingga menghilangkan unduhan saat runtime dan potensi kegagalan jaringan. Font yang digunakan adalah:
-    *   **Oswald:** Digunakan untuk judul utama dan teks yang menonjol (`displayLarge`, `appBarTheme`).
-    *   **Roboto:** Digunakan untuk judul standar dan tombol (`titleLarge`, `elevatedButtonTheme`).
-    *   **Open Sans:** Digunakan untuk teks isi (`bodyMedium`).
+*   **Tema:** Tema terpusat didefinisikan di `lib/main.dart` dengan `seedColor` **`Colors.deepPurple`**.
+*   **Tipografi:** Menggunakan **font kustom lokal** dari `assets/fonts/` (Oswald, Roboto, Open Sans) untuk kinerja optimal dan tampilan yang konsisten.
 
 ### **Navigasi (Navigation)**
 
-Navigasi utama ditangani oleh `BottomNavigationBar` yang terletak di `lib/halaman_utama.dart`, yang mengontrol perpindahan antar tab utama. Navigasi ke halaman detail atau formulir dilakukan secara imperatif menggunakan `Navigator.push` dengan `MaterialPageRoute`.
+Navigasi utama menggunakan `BottomNavigationBar` di `lib/halaman_utama.dart`. Navigasi sekunder menggunakan `Navigator.push` dengan `MaterialPageRoute`.
 
 ---
 
-## **4. Alur Kerja Pengembangan**
+## **4. Fungsionalitas Inti**
 
-1.  **Perencanaan & Blueprint:** Sebelum memulai perubahan, AI akan menganalisis permintaan dan memperbarui file `blueprint.md` di root proyek. File ini berfungsi sebagai sumber kebenaran untuk fitur proyek dan tujuan pengembangan saat ini.
-2.  **Implementasi:** AI akan mengimplementasikan perubahan sesuai dengan standar kode yang ditetapkan dalam panduan.
+Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegrasi.
+
+### **Manajemen Data (Pelanggan, Paket, Transaksi)**
+*   **Tujuan:** Mengelola data inti bisnis, termasuk informasi pelanggan, layanan yang ditawarkan, dan riwayat pembayaran.
+*   **File Terkait:** `lib/model/`, `lib/data/operasi/`, `lib/halaman/`.
+
+### **Dompet Digital (Manajemen Keuangan)**
+*   **Tujuan:** Melacak saldo, pemasukan, dan pengeluaran untuk memberikan gambaran keuangan yang jelas.
+*   **File Terkait:** `lib/model/dompet_model.dart`, `lib/data/operasi/dompet_operasi.dart`, `lib/halaman/tab/dompet.dart`.
+
+### **Sinkronisasi Data dengan Firebase**
+*   **Tujuan:** Memastikan konsistensi data antara database lokal (SQLite) dan backend (Firebase). Ini memungkinkan data tetap *up-to-date* dan dapat diakses dari mana saja.
+*   **File Terkait:** `lib/data/servis/firebase_servis.dart`.
+*   **Proses:** Layanan ini secara periodik melakukan **sinkronisasi inkremental**. Ia mengunggah data lokal yang baru dan mengunduh data terbaru dari Firebase, hanya berdasarkan data yang berubah sejak sinkronisasi terakhir. Proses ini sangat efisien karena menggunakan *timestamp* `diperbarui` pada setiap model data.
+
+### **Kritik dan Saran Pengguna**
+*   **Tujuan:** Menyediakan wadah bagi pengguna untuk memberikan masukan, yang kemudian dapat dilihat oleh administrator. Fitur ini sepenuhnya terintegrasi dengan sistem sinkronisasi data.
+*   **File Terkait:**
+    *   **`lib/model/kritik_saran_model.dart`**: Mendefinisikan struktur data untuk setiap masukan, termasuk `isi`, `tanggal`, `userId`, dan `diperbarui` untuk melacak perubahan.
+    *   **`lib/data/operasi/kritik_saran_operasi.dart`**: Menangani semua operasi CRUD untuk data kritik dan saran di database SQLite lokal.
+    *   **`lib/halaman/lainnya/kritik_saran.dart`**: Halaman antarmuka pengguna (UI) yang menampilkan daftar semua kritik dan saran yang masuk.
+    *   **`lib/widget/nama_dari_id.dart`**: Widget efisien yang digunakan di halaman ini untuk menampilkan nama pengirim berdasarkan `userId`.
+    *   **`lib/data/servis/firebase_servis.dart`**: Mengintegrasikan `KritikSaranOperasi` ke dalam alur sinkronisasi, memastikan masukan dari pengguna selalu sinkron antara aplikasi dan Firebase.
+
+---
+
+## **5. Alur Kerja Pengembangan**
+
+1.  **Perencanaan & Blueprint:** AI akan menganalisis permintaan dan memperbarui file `blueprint.md` sebelum memulai kode.
+2.  **Implementasi:** AI akan mengimplementasikan perubahan sesuai dengan standar kode yang ditetapkan.
 3.  **Dokumentasi:** AI akan memperbarui komentar kode dan file `README.md` ini jika ada perubahan signifikan.
-4.  **Verifikasi & Kualitas Kode:** Setelah setiap perubahan, AI akan menjalankan `flutter analyze` dan `dart format .` untuk memastikan kualitas kode dan mendeteksi kesalahan secara otomatis.
-5.  **Logging:** Untuk tujuan debugging, aplikasi menggunakan pustaka `dart:developer` untuk pencatatan terstruktur, yang dapat dilihat di konsol debug atau Dart DevTools.
+4.  **Verifikasi & Kualitas Kode:** Setelah setiap perubahan, AI akan menjalankan `flutter analyze` dan `dart format .` untuk memastikan kualitas kode.
+5.  **Logging:** Aplikasi menggunakan pustaka `dart:developer` untuk pencatatan terstruktur.
