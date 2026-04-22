@@ -1,35 +1,31 @@
 # **Aturan lainnya untuk AI**
 
-1.  **Bahasa dan Penamaan:**
-    *   Selalu gunakan Bahasa Indonesia untuk semua penamaan dalam kode, termasuk nama fungsi, variabel, parameter, dan nama file.
-    *   Semua komunikasi dan percakapan harus dilakukan dalam Bahasa Indonesia.
+### **1. Prinsip Utama: Interaksi dan Bahasa**
 
-2.  **Dokumentasi dan Komentar:**
-    *   **Komentar Path File:** Di setiap file yang dikerjakan, selalu tambahkan komentar di baris paling atas yang menunjukkan path file tersebut. Contoh: `// path: lib/main.dart`.
-    *   **Penjelasan Fungsi:** Berikan komentar penjelasan di atas setiap fungsi untuk mendeskripsikan tujuannya. Contoh: `// untuk menavigasi ke halaman A`.
-    *   **Komentar Perubahan Kode:** Untuk setiap kode yang diubah atau ditambah, berikan komentar di samping atau di atasnya dengan format: `diubah: [alasan]` atau `ditambah: [alasan]`.
-    *   **Komentar Penjelas:** Tambahkan komentar pada beberapa bagian kode yang mungkin kompleks agar lebih mudah dipahami.
-    *   **Pembaruan `README.md`:** Setelah selesai mengerjakan tugas, edit file `README.md` untuk mendokumentasikan perubahan. Jelaskan tujuan, fitur, dan fungsi dari file yang baru saja dikerjakan. Hindari mencantumkan detail implementasi teknis yang tidak relevan (contoh: "menambahkan kode value pada kode anu karena akan menyebabkan error").
+*   **1.1. Alur Kerja Berbasis Konfirmasi:** Sebelum melakukan modifikasi apa pun, AI **wajib** menjelaskan rencana kerjanya secara rinci kepada pengguna. Pekerjaan hanya dapat dimulai setelah menerima persetujuan eksplisit (misalnya, "setuju", "oke", "ok", "ya", "yes"). Jika pengguna menolak (misalnya, "jangan", "tidak", "nggk", "nggak"), AI harus menghentikan rencana tersebut dan menunggu instruksi lebih lanjut.
+*   **1.2. Standar Bahasa Indonesia:** Seluruh komunikasi dengan pengguna, serta semua penamaan dalam kode (nama file, variabel, fungsi, parameter), harus menggunakan Bahasa Indonesia yang formal dan jelas.
 
-3.  **Alur Kerja dan Konfirmasi:**
-    *   **Baca `README.md`:** Sebelum memulai pekerjaan, selalu baca file `README.md` untuk memahami alur kerja dan konteks proyek.
-    *   **Minta Konfirmasi:** Sebelum melakukan pekerjaan, jelaskan terlebih dahulu apa yang akan Anda lakukan. Tunggu konfirmasi dari saya (misalnya: "setuju", "oke", "ok", "ya", "yes"). Jika saya merespons dengan "jangan", "tidak", "nggk", atau "nggak", jangan lanjutkan pekerjaan.
-    *   **Analisis Kode:** Setelah selesai melakukan perubahan, selalu jalankan `flutter analyze` di terminal untuk memastikan tidak ada error atau warning.
+### **2. Dokumentasi dan Manajemen Kode**
 
-4.  **Proses Build dan Rilis:**
-    *   **Manajemen Versi:** Sebelum melakukan build, periksa `README.md` untuk menentukan apakah perubahan tersebut adalah fitur baru atau hanya perbaikan bug.
-        *   Jika hanya **perbaikan bug**, naikkan nomor build di `pubspec.yaml` (misalnya, dari `+1` menjadi `+2`), tetapi jangan ubah versi utama (misalnya, `1.0.0`).
-        *   Jika ada **fitur baru**, versi utama boleh dinaikkan.
-    *   **Perintah Build:** Jalankan perintah berikut untuk proses build:
-        ```shell
-        flutter clean && flutter pub get && flutter build apk --release --split-per-abi
-        ```
+*   **2.1. Baca `README.md`:** Sebelum memulai tugas apa pun, AI harus selalu membaca file `README.md` untuk memahami konteks, alur kerja, dan status proyek saat ini.
+*   **2.2. Komentar Kode Wajib:**
+    *   **Path File:** Setiap file yang diedit harus memiliki komentar di baris paling atas yang menunjukkan path-nya.
+        *Contoh:* `// path: lib/main.dart`
+    *   **Deskripsi Fungsi:** Setiap fungsi harus didahului oleh komentar yang menjelaskan tujuannya.
+        *Contoh:* `// Fungsi ini untuk memproses data pengguna yang masuk.`
+    *   **Logika Perubahan:** Setiap baris kode yang ditambah, diubah, atau dihapus harus disertai komentar di atas atau di sampingnya yang menjelaskan alasan perubahan.
+        *Struktur:* `// ditambah: [alasan penambahan]`, `// diubah: [alasan perubahan]`, atau `// dihapus: [alasan penghapusan]`.
+    *   **Keterangan Tambahan:** Jika ada logika yang kompleks, tambahkan komentar secukupnya untuk mempermudah pemahaman.
+*   **2.3. Pembaruan `README.md`:** Setelah setiap tugas selesai, AI **wajib** memperbarui file `README.md`. Dokumentasi harus mencakup tujuan file yang diubah, fitur yang diimplementasikan, dan fungsi utama yang terkait. Hindari detail teknis yang tidak relevan atau penjelasan negatif (misalnya, "menghindari error X").
 
-5.  **Spesifikasi Teknis:**
-    *   **Versi Android:** Pastikan aplikasi dapat diinstal pada perangkat dengan versi Android 5 (Lollipop) atau yang lebih baru.
+### **3. Kualitas, Build, dan Konsistensi**
 
-6.  **Konsistensi:**
-    *   Selalu jaga konsistensi dan kejelasan dalam seluruh aspek proyek.
+*   **3.1. Analisis Kode:** Setelah semua modifikasi selesai, jalankan perintah `flutter analyze` untuk memastikan tidak ada error atau *warning* yang tersisa.
+*   **3.2. Proses Build Aplikasi:**
+    *   Sebelum membangun aplikasi, periksa `README.md` untuk mengidentifikasi apakah perubahan tersebut adalah **fitur baru** atau **perbaikan bug**.
+    *   Jika hanya **perbaikan bug**, hanya naikkan nomor *build* di `pubspec.yaml` (misalnya, dari `+1` ke `+2`). Versi utama (misalnya, `1.0.0`) tidak boleh diubah.
+    *   Jalankan perintah berikut untuk proses *build*: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
+*   **3.3. Jaga Konsistensi:** AI harus selalu menjaga konsistensi dan kejelasan dalam struktur kode, penamaan, dan dokumentasi di seluruh proyek.
 
 # **Panduan Pengembangan AI untuk Flutter di Firebase Studio**
 
@@ -57,7 +53,7 @@ AI beroperasi di dalam lingkungan pengembangan Firebase Studio, yang menyediakan
 
 AI diberdayakan untuk memodifikasi basis kode Flutter dan mengelola dependensinya secara mandiri berdasarkan permintaan pengguna dan masalah yang terdeteksi. AI bersifat kreatif dan mengantisipasi fitur yang mungkin dibutuhkan pengguna meskipun tidak diminta secara eksplisit.
 
-* **Asumsi Kode Inti:** Ketika pengguna meminta perubahan (misalnya, "Tambahkan tombol untuk menavigasi ke layar baru"), AI akan fokus utama pada modifikasi kode Dart. lib/main.dart diasumsikan sebagai titik masuk utama, dan AI akan menyimpulkan file relevan lainnya (misalnya, membuat file widget baru, memperbarui pubspec.yaml).
+* **Asumsi Kode Inti:** Ketika pengguna meminta perubahan (misalnya, \"Tambahkan tombol untuk menavigasi ke layar baru\"), AI akan fokus utama pada modifikasi kode Dart. lib/main.dart diasumsikan sebagai titik masuk utama, dan AI akan menyimpulkan file relevan lainnya (misalnya, membuat file widget baru, memperbarui pubspec.yaml).
 * **Manajemen Paket:** Jika fitur baru memerlukan paket eksternal, AI akan mengidentifikasi paket yang paling sesuai dan stabil dari pub.dev.
   * Untuk menambahkan dependensi biasa, ia akan menjalankan `flutter pub add <nama_paket>`.
   * Untuk menambahkan dependensi pengembangan (misalnya, untuk pengujian atau pembuatan kode), ia akan menjalankan `flutter pub add dev:<nama_paket>`.
@@ -141,7 +137,7 @@ flutter pub add provider
 ```
 
 ```dart
-import 'package:flutter/material.dart';
+import \'package:flutter/material.dart\';
 import \'package:google_fonts/google_fonts.dart\';
 import \'package:provider/provider.dart\'; // Impor Provider
 
