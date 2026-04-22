@@ -34,7 +34,10 @@ class PelangganAktifPage extends StatefulWidget {
 class _PelangganAktifPageState extends State<PelangganAktifPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
   final FirebaseService _firebaseService = FirebaseService();
-  late Future<List<PelangganAktif>> _listaPelangganAktifFuture;
+  // diubah: Inisialisasi langsung dengan Future kosong untuk menghindari LateError
+  late Future<List<PelangganAktif>> _listaPelangganAktifFuture = Future.value(
+    [],
+  );
   // ditambah: Inisialisasi NotifikasiServis.
   final NotifikasiServis _notifikasiServis = NotifikasiServis();
 
@@ -42,6 +45,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   void initState() {
     super.initState();
     _inisialisasiNotifikasi();
+    // diubah: Panggil _loadPelangganAktif tanpa await, tapi Future sudah diinisialisasi
     _loadPelangganAktif();
   }
 
@@ -72,7 +76,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
       if (tigaHariSebelumKadaluarsa.isAfter(sekarang)) {
         await _notifikasiServis.jadwalNotifikasi(
-          id: int.parse(p.id!) + 1000, // Offset ID untuk menghindari konflik
+          // diubah: Menggunakan hashCode untuk menghasilkan ID integer unik dari string.
+          id: p.id.hashCode.abs() + 1000, // Offset ID untuk menghindari konflik
           title: '⏰ Paket Akan Berakhir',
           body:
               'Paket $namaPelanggan akan berakhir dalam 3 hari (${Format.formatTanggal(p.tanggalBerakhir)})',
@@ -86,8 +91,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       // Hanya jadwalkan jika waktu kadaluarsa belum lewat
       if (waktuKadaluarsa.isAfter(sekarang)) {
         await _notifikasiServis.jadwalNotifikasi(
+          // diubah: Menggunakan hashCode untuk menghasilkan ID integer unik dari string.
           id:
-              int.parse(p.id!) +
+              p.id.hashCode.abs() +
               2000, // Offset ID berbeda untuk notifikasi kadaluarsa
           title: '🔔 Paket Berakhir Sekarang',
           body:
@@ -98,10 +104,29 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
   }
 
-  void _loadPelangganAktif() {
+  // diubah: Method _loadPelangganAktif sekarang mengurutkan data default A-Z
+  Future<void> _loadPelangganAktif() async {
+    // Ambil data pelanggan untuk mapping nama
+    final pelangganOperasi = PelangganOperasi();
+    final semuaPelanggan = await pelangganOperasi.getPelanggan();
+    final namaMap = <String, String>{};
+    for (var p in semuaPelanggan) {
+      namaMap[p.id] = p.nama;
+    }
+
+    // diubah: Set state langsung dengan Future yang baru
     setState(() {
       _listaPelangganAktifFuture = _pelangganAktifOperasi
-          .ambilSemuaPelangganAktif();
+          .ambilSemuaPelangganAktif()
+          .then((list) {
+            // diubah: Urutkan list berdasarkan nama A-Z secara default
+            list.sort((a, b) {
+              final namaA = namaMap[a.idPelanggan] ?? '';
+              final namaB = namaMap[b.idPelanggan] ?? '';
+              return namaA.compareTo(namaB);
+            });
+            return list;
+          });
     });
 
     // ditambah: Panggil metode untuk menjadwalkan notifikasi setelah data dimuat.
@@ -148,8 +173,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     if (konfirmasi == true) {
       try {
         // Hapus dari database lokal (ID di-parse ke int)
+        // diubah: Menggunakan hashCode untuk menghasilkan ID integer unik dari string.
         await _pelangganAktifOperasi.hapusPelangganAktif(
-          int.parse(pelanggan.id!),
+          pelanggan.id.hashCode.abs(),
         );
         // Hapus dari Firebase (ID sudah string)
         await _firebaseService.hapusPelangganAktif(pelanggan.id!);

@@ -1,3 +1,6 @@
+// path: android/app/build.gradle.kts
+// Konfigurasi build Gradle untuk aplikasi Android.
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -12,6 +15,8 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // Format yang benar untuk Kotlin DSL
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -21,14 +26,14 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.adminwifi"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // Hardcode minSdk ke 21
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Enable MultiDex
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -42,4 +47,10 @@ android {
 
 flutter {
     source = "../.."
+}
+
+// diubah: Gunakan versi yang tersedia (2.1.4 atau 2.1.5)
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    implementation("androidx.multidex:multidex:2.0.1")
 }

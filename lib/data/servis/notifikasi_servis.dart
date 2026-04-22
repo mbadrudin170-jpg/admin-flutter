@@ -1,17 +1,14 @@
 // path: lib/data/servis/notifikasi_servis.dart
-// diubah: File ini diperbarui untuk memperbaiki error akibat perubahan besar pada API flutter_local_notifications.
-// Perubahan ini didasarkan pada pesan error dari 'flutter analyze' yang mengindikasikan bahwa
-// parameter positional telah diganti dengan parameter named.
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-// ditambah: Placeholder function untuk menangani saat notifikasi di-tap.
 void onDidReceiveNotificationResponse(
   NotificationResponse notificationResponse,
 ) async {
-  // Misalnya, navigasi ke halaman detail pelanggan.
+  // TODO: Implementasikan logika untuk menangani notifikasi saat di-tap.
 }
 
 class NotifikasiServis {
@@ -19,27 +16,33 @@ class NotifikasiServis {
       FlutterLocalNotificationsPlugin();
 
   Future<void> inisialisasi() async {
-    const AndroidInitializationSettings androidInitializationSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    try {
+      const AndroidInitializationSettings androidInitializationSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const DarwinInitializationSettings darwinInitializationSettings =
-        DarwinInitializationSettings();
+      const DarwinInitializationSettings darwinInitializationSettings =
+          DarwinInitializationSettings();
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(
-          android: androidInitializationSettings,
-          iOS: darwinInitializationSettings,
-        );
+      const InitializationSettings initializationSettings =
+          InitializationSettings(
+            android: androidInitializationSettings,
+            iOS: darwinInitializationSettings,
+          );
 
-    // diubah: Menyesuaikan pemanggilan inisialisasi. Sekarang menggunakan named parameter 'settings'.
-    await _flutterLocalNotificationsPlugin.initialize(
-      settings: initializationSettings,
-      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-      onDidReceiveBackgroundNotificationResponse:
-          onDidReceiveNotificationResponse,
-    );
+      await _flutterLocalNotificationsPlugin.initialize(
+        settings: initializationSettings,
+        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+        onDidReceiveBackgroundNotificationResponse:
+            onDidReceiveNotificationResponse,
+      );
 
-    tz.initializeTimeZones();
+      tz.initializeTimeZones();
+
+      // Untuk debugging
+      debugPrint('NotifikasiServis: Inisialisasi berhasil');
+    } catch (e) {
+      debugPrint('NotifikasiServis: Error inisialisasi - $e');
+    }
   }
 
   Future<void> jadwalNotifikasi({
@@ -48,29 +51,36 @@ class NotifikasiServis {
     required String body,
     required DateTime jadwal,
   }) async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-          'id_kadaluarsa_paket',
-          'Notifikasi Kadaluarsa Paket',
-          channelDescription:
-              'Channel untuk notifikasi paket yang akan berakhir',
-          importance: Importance.max,
-          priority: Priority.high,
-          showWhen: false,
-        );
+    try {
+      const AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+            'id_kadaluarsa_paket',
+            'Notifikasi Kadaluarsa Paket',
+            channelDescription:
+                'Channel untuk notifikasi paket yang akan berakhir',
+            importance: Importance.max,
+            priority: Priority.high,
+            showWhen: false,
+          );
 
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-    );
+      const NotificationDetails notificationDetails = NotificationDetails(
+        android: androidNotificationDetails,
+      );
 
-    // diubah: zonedSchedule sekarang sepenuhnya menggunakan named parameters.
-    await _flutterLocalNotificationsPlugin.zonedSchedule(
-      id: id,
-      title: title,
-      body: body,
-      scheduledDate: tz.TZDateTime.from(jadwal, tz.local),
-      notificationDetails: notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    );
+      await _flutterLocalNotificationsPlugin.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: tz.TZDateTime.from(jadwal, tz.local),
+        notificationDetails: notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+
+      debugPrint(
+        'NotifikasiServis: Notifikasi dijadwalkan - ID: $id, Waktu: $jadwal',
+      );
+    } catch (e) {
+      debugPrint('NotifikasiServis: Error jadwal notifikasi - $e');
+    }
   }
 }
