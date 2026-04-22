@@ -146,7 +146,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2101),
                         );
-                        if (picked != null && picked != _tanggal) {
+                        if (picked != _tanggal) {
                           setState(() {
                             _tanggal = picked;
                           });
