@@ -1,6 +1,35 @@
-# Aturan untuk AI
+# **Aturan lainnya untuk AI**
 
-1. 
+1.  **Bahasa dan Penamaan:**
+    *   Selalu gunakan Bahasa Indonesia untuk semua penamaan dalam kode, termasuk nama fungsi, variabel, parameter, dan nama file.
+    *   Semua komunikasi dan percakapan harus dilakukan dalam Bahasa Indonesia.
+
+2.  **Dokumentasi dan Komentar:**
+    *   **Komentar Path File:** Di setiap file yang dikerjakan, selalu tambahkan komentar di baris paling atas yang menunjukkan path file tersebut. Contoh: `// path: lib/main.dart`.
+    *   **Penjelasan Fungsi:** Berikan komentar penjelasan di atas setiap fungsi untuk mendeskripsikan tujuannya. Contoh: `// untuk menavigasi ke halaman A`.
+    *   **Komentar Perubahan Kode:** Untuk setiap kode yang diubah atau ditambah, berikan komentar di samping atau di atasnya dengan format: `diubah: [alasan]` atau `ditambah: [alasan]`.
+    *   **Komentar Penjelas:** Tambahkan komentar pada beberapa bagian kode yang mungkin kompleks agar lebih mudah dipahami.
+    *   **Pembaruan `README.md`:** Setelah selesai mengerjakan tugas, edit file `README.md` untuk mendokumentasikan perubahan. Jelaskan tujuan, fitur, dan fungsi dari file yang baru saja dikerjakan. Hindari mencantumkan detail implementasi teknis yang tidak relevan (contoh: "menambahkan kode value pada kode anu karena akan menyebabkan error").
+
+3.  **Alur Kerja dan Konfirmasi:**
+    *   **Baca `README.md`:** Sebelum memulai pekerjaan, selalu baca file `README.md` untuk memahami alur kerja dan konteks proyek.
+    *   **Minta Konfirmasi:** Sebelum melakukan pekerjaan, jelaskan terlebih dahulu apa yang akan Anda lakukan. Tunggu konfirmasi dari saya (misalnya: "setuju", "oke", "ok", "ya", "yes"). Jika saya merespons dengan "jangan", "tidak", "nggk", atau "nggak", jangan lanjutkan pekerjaan.
+    *   **Analisis Kode:** Setelah selesai melakukan perubahan, selalu jalankan `flutter analyze` di terminal untuk memastikan tidak ada error atau warning.
+
+4.  **Proses Build dan Rilis:**
+    *   **Manajemen Versi:** Sebelum melakukan build, periksa `README.md` untuk menentukan apakah perubahan tersebut adalah fitur baru atau hanya perbaikan bug.
+        *   Jika hanya **perbaikan bug**, naikkan nomor build di `pubspec.yaml` (misalnya, dari `+1` menjadi `+2`), tetapi jangan ubah versi utama (misalnya, `1.0.0`).
+        *   Jika ada **fitur baru**, versi utama boleh dinaikkan.
+    *   **Perintah Build:** Jalankan perintah berikut untuk proses build:
+        ```shell
+        flutter clean && flutter pub get && flutter build apk --release --split-per-abi
+        ```
+
+5.  **Spesifikasi Teknis:**
+    *   **Versi Android:** Pastikan aplikasi dapat diinstal pada perangkat dengan versi Android 5 (Lollipop) atau yang lebih baru.
+
+6.  **Konsistensi:**
+    *   Selalu jaga konsistensi dan kejelasan dalam seluruh aspek proyek.
 
 # **Panduan Pengembangan AI untuk Flutter di Firebase Studio**
 
