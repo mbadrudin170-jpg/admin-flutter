@@ -24,9 +24,14 @@ class _PelangganPageState extends State<PelangganPage> {
     _loadPelanggan();
   }
 
-  void _loadPelanggan() {
+  // diubah: Method _loadPelanggan sekarang mengurutkan data default A-Z
+  Future<void> _loadPelanggan() async {
     setState(() {
-      _listaPelangganFuture = _pelangganOperasi.getPelanggan();
+      _listaPelangganFuture = _pelangganOperasi.getPelanggan().then((list) {
+        // diubah: Urutkan list berdasarkan nama A-Z secara default
+        list.sort((a, b) => a.nama.compareTo(b.nama));
+        return list;
+      });
     });
   }
 
