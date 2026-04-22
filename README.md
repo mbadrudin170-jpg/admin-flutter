@@ -21,80 +21,50 @@ Aplikasi Admin WiFi adalah sebuah sistem manajemen lengkap yang dirancang untuk 
 Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan skalabilitas dan kemudahan pemeliharaan.
 
 *   **`lib/`**: Direktori utama kode sumber aplikasi.
-    *   **`main.dart`**: Titik masuk utama aplikasi.
-    *   **`splash_screen.dart`**: Halaman awal yang ditampilkan saat aplikasi pertama kali dimuat.
-    *   **`halaman_utama.dart`**: Halaman utama yang mengatur navigasi tab setelah splash screen.
+    *   **`main.dart`**: Titik masuk utama aplikasi, tempat inisialisasi dan konfigurasi tema.
+    *   **`splash_screen.dart`**: Halaman awal yang ditampilkan saat aplikasi dimuat.
+    *   **`halaman_utama.dart`**: Kerangka utama yang mengatur navigasi tab aplikasi.
 *   **`lib/data/`**: Berisi semua logika yang berhubungan dengan pengelolaan data.
-    *   **`sqlite.dart`**: Kelas *handler* utama untuk operasi database SQLite.
-    *   **`operasi/`**: Direktori yang berisi kelas-kelas untuk operasi *CRUD (Create, Read, Update, Delete)* pada setiap tabel di database.
-    *   **`servis/`**: Terkait dengan layanan eksternal, seperti sinkronisasi data dengan Firebase.
-*   **`lib/model/`**: Berisi definisi struktur data (kelas model) yang merepresentasikan objek dalam aplikasi (misalnya, `Pelanggan`, `Transaksi`, `Paket`).
-*   **`lib/halaman/`**: Berisi semua file yang terkait dengan antarmuka pengguna (UI).
+    *   **`sqlite.dart`**: Kelas *handler* untuk operasi database SQLite lokal.
+    *   **`operasi/`**: Kelas-kelas untuk operasi *CRUD (Create, Read, Update, Delete)* pada setiap tabel.
+    *   **`servis/`**: Layanan untuk sinkronisasi data dengan backend (Firebase).
+*   **`lib/model/`**: Definisi struktur data (kelas model) yang merepresentasikan objek dalam aplikasi.
+*   **`lib/halaman/`**: Semua file yang terkait dengan antarmuka pengguna (UI).
     *   **`tab/`**: Widget untuk setiap tab utama pada bilah navigasi bawah.
     *   **`form/`**: Halaman untuk menambah atau mengedit data.
-    *   **`detail/`**: Halaman untuk menampilkan informasi rinci dari sebuah item data.
-    *   **`lainnya/`**: Halaman-halaman tambahan yang dapat diakses dari tab "Lainnya".
-*   **`lib/utils/`**: Berisi kode utilitas yang dapat digunakan kembali di seluruh aplikasi, seperti format tanggal, manajemen warna, dll.
-*   **`lib/widget/`**: Berisi komponen-komponen UI kustom yang dapat digunakan kembali.
+    *   **`detail/`**: Halaman untuk menampilkan informasi rinci.
+*   **`lib/utils/`**: Kode utilitas yang dapat digunakan kembali (misalnya, format tanggal, palet warna).
+*   **`lib/widget/`**: Komponen UI kustom yang dapat digunakan kembali.
+*   **`assets/fonts/`**: Direktori berisi file font lokal yang digunakan di seluruh aplikasi.
 
 ---
 
-## **3. Deskripsi File dan Fungsionalitas**
+## **3. Arsitektur & Desain**
 
-Berikut adalah penjelasan rinci untuk setiap komponen utama dalam aplikasi.
+### **Manajemen Status (State Management)**
 
-### **File Utama**
+Aplikasi ini menggunakan paket **`provider`** untuk manajemen status. Pendekatan ini memisahkan logika antarmuka pengguna (UI) dari logika bisnis, sehingga membuat aplikasi lebih mudah untuk dipelihara dan diskalakan. Pola `ChangeNotifier` dan `ChangeNotifierProvider` digunakan untuk menyediakan status aplikasi ke pohon widget.
 
-*   **`lib/main.dart`**
-    *   **Tujuan:** Menginisialisasi aplikasi dan Firebase, serta mendefinisikan tema global.
-    *   **Fitur:** Titik masuk aplikasi Flutter.
-*   **`lib/splash_screen.dart`**
-    *   **Tujuan:** Menampilkan layar pembuka (logo atau animasi) saat aplikasi dimuat.
-    *   **Fitur:** Navigasi otomatis ke halaman utama setelah beberapa detik.
-*   **`lib/halaman_utama.dart`**
-    *   **Tujuan:** Menjadi kerangka utama aplikasi yang menampung bilah navigasi bawah.
-    *   **Fitur:** Mengatur perpindahan antar tab utama (Home, Pelanggan Aktif, Transaksi, Dompet, Lainnya).
+### **Desain Visual & Tema (Visual Design & Theming)**
 
-### **Manajemen Data (`lib/data/`)**
+Antarmuka pengguna aplikasi ini dibangun mengikuti prinsip **Desain Material 3** untuk memastikan pengalaman pengguna yang modern dan intuitif.
 
-*   **`lib/data/sqlite.dart`**
-    *   **Tujuan:** Mengelola seluruh siklus hidup database SQLite, mulai dari pembuatan tabel hingga koneksi.
-    *   **Fungsi:** `initDB()`: Membuat atau membuka database dan tabel-tabel yang diperlukan.
-*   **Operasi CRUD (`lib/data/operasi/`)**
-    *   **Tujuan:** Setiap file di direktori ini bertanggung jawab untuk operasi database pada satu tabel spesifik (misalnya, `pelanggan_operasi.dart` untuk tabel pelanggan).
-    *   **Fungsi Umum:** `tambah`, `semua`, `hapus`, `perbarui`, `cari`.
-*   **`lib/data/servis/firebase_servis.dart`**
-    *   **Tujuan:** Mengelola sinkronisasi data antara database lokal (SQLite) dan Firebase Firestore.
-    *   **Fitur:** Sinkronisasi dua arah untuk memastikan konsistensi data.
+*   **Tema:** Tema terpusat didefinisikan di `lib/main.dart` menggunakan `ThemeData`. Warna primer aplikasi dihasilkan dari `seedColor` **`Colors.deepPurple`**.
+*   **Tipografi:** Untuk memastikan tipografi yang konsisten dan kinerja yang optimal, aplikasi ini menggunakan **font kustom yang di-hosting secara lokal** di direktori `assets/fonts/`. Ini menggantikan ketergantungan sebelumnya pada paket `google_fonts`, sehingga menghilangkan unduhan saat runtime dan potensi kegagalan jaringan. Font yang digunakan adalah:
+    *   **Oswald:** Digunakan untuk judul utama dan teks yang menonjol (`displayLarge`, `appBarTheme`).
+    *   **Roboto:** Digunakan untuk judul standar dan tombol (`titleLarge`, `elevatedButtonTheme`).
+    *   **Open Sans:** Digunakan untuk teks isi (`bodyMedium`).
 
-### **Model Data (`lib/model/`)**
+### **Navigasi (Navigation)**
 
-*   **Tujuan:** Setiap file `.dart` di direktori ini mendefinisikan sebuah kelas model yang mencerminkan struktur sebuah tabel di database. Ini membantu memastikan tipe data yang konsisten di seluruh aplikasi.
-    *   `pelanggan_model.dart`: Merepresentasikan data seorang pelanggan.
-    *   `transaksi_model.dart`: Merepresentasikan sebuah transaksi pembayaran.
-    *   Dan seterusnya untuk model lainnya.
-
-### **Halaman (UI) (`lib/halaman/`)**
-
-*   **Tab Utama (`lib/halaman/tab/`)**
-    *   `home.dart`: Menampilkan ringkasan atau dasbor utama.
-    *   `pelanggan_aktif.dart`: Menampilkan daftar pelanggan yang statusnya aktif. Halaman ini dilengkapi dengan **fitur pengurutan**, yang memungkinkan admin untuk mengurutkan daftar pelanggan berdasarkan nama (A-Z atau Z-A) untuk mempermudah pencarian dan manajemen.
-    *   `transaksi.dart`: Menampilkan riwayat semua transaksi.
-    *   `dompet.dart`: Menampilkan saldo dan riwayat keuangan.
-    *   `lainnya.dart`: Menyediakan menu navigasi ke halaman sekunder seperti Kategori, Paket, dan Pelanggan.
-*   **Formulir (`lib/halaman/form/`)**
-    *   **Tujuan:** Menyediakan antarmuka bagi admin untuk memasukkan atau mengubah data.
-    *   **Contoh:** `form_pelanggan.dart` berisi formulir untuk menambah atau mengedit detail pelanggan.
-*   **Detail (`lib/halaman/detail/`)**
-    *   **Tujuan:** Menampilkan informasi lengkap tentang item tertentu yang dipilih dari daftar.
-    *   **Contoh:** `detail_pelanggan.dart` menampilkan semua informasi terkait seorang pelanggan, termasuk riwayat pembayarannya.
+Navigasi utama ditangani oleh `BottomNavigationBar` yang terletak di `lib/halaman_utama.dart`, yang mengontrol perpindahan antar tab utama. Navigasi ke halaman detail atau formulir dilakukan secara imperatif menggunakan `Navigator.push` dengan `MaterialPageRoute`.
 
 ---
 
 ## **4. Alur Kerja Pengembangan**
 
-1.  **Analisis & Perencanaan:** Sebelum melakukan perubahan, AI akan menganalisis permintaan dan membuat rencana kerja.
-2.  **Konfirmasi:** Rencana akan diajukan kepada pengguna untuk mendapatkan persetujuan.
-3.  **Implementasi:** Setelah disetujui, AI akan mengimplementasikan perubahan sesuai standar kode yang ditetapkan.
-4.  **Dokumentasi:** AI akan memperbarui komentar kode dan file `README.md` ini.
-5.  **Verifikasi:** AI akan menjalankan `flutter analyze` untuk memastikan kualitas kode sebelum menyelesaikan tugas.
+1.  **Perencanaan & Blueprint:** Sebelum memulai perubahan, AI akan menganalisis permintaan dan memperbarui file `blueprint.md` di root proyek. File ini berfungsi sebagai sumber kebenaran untuk fitur proyek dan tujuan pengembangan saat ini.
+2.  **Implementasi:** AI akan mengimplementasikan perubahan sesuai dengan standar kode yang ditetapkan dalam panduan.
+3.  **Dokumentasi:** AI akan memperbarui komentar kode dan file `README.md` ini jika ada perubahan signifikan.
+4.  **Verifikasi & Kualitas Kode:** Setelah setiap perubahan, AI akan menjalankan `flutter analyze` dan `dart format .` untuk memastikan kualitas kode dan mendeteksi kesalahan secara otomatis.
+5.  **Logging:** Untuk tujuan debugging, aplikasi menggunakan pustaka `dart:developer` untuk pencatatan terstruktur, yang dapat dilihat di konsol debug atau Dart DevTools.

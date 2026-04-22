@@ -5,7 +5,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 
@@ -50,13 +49,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color primarySeedColor = Colors.deepPurple;
 
-    final TextTheme appTextTheme = TextTheme(
-      displayLarge: GoogleFonts.oswald(
+    final TextTheme appTextTheme = const TextTheme(
+      displayLarge: TextStyle(
+        fontFamily: 'Oswald',
         fontSize: 57,
         fontWeight: FontWeight.bold,
       ),
-      titleLarge: GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.w500),
-      bodyMedium: GoogleFonts.openSans(fontSize: 14),
+      titleLarge: TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w500),
+      bodyMedium: TextStyle(fontFamily: 'Open Sans', fontSize: 14),
     );
 
     final ThemeData lightTheme = ThemeData(
@@ -66,10 +66,11 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       textTheme: appTextTheme,
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: primarySeedColor,
         foregroundColor: Colors.white,
-        titleTextStyle: GoogleFonts.oswald(
+        titleTextStyle: TextStyle(
+          fontFamily: 'Oswald',
           fontSize: 24,
           fontWeight: FontWeight.bold,
         ),
@@ -80,7 +81,8 @@ class MyApp extends StatelessWidget {
           backgroundColor: primarySeedColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: GoogleFonts.roboto(
+          textStyle: const TextStyle(
+            fontFamily: 'Roboto',
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),

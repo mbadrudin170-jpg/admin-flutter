@@ -1,4 +1,4 @@
-// lib/halaman/tab/pelanggan_aktif.dart
+// path : lib/halaman/tab/pelanggan_aktif.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 // Fitur utama:
 // - Menampilkan daftar pelanggan aktif dari database.
@@ -7,16 +7,29 @@
 // - Menyediakan opsi untuk menambah pelanggan aktif baru.
 // - Menyediakan opsi untuk menghapus semua pelanggan atau hanya yang sudah kedaluwarsa.
 // - Navigasi ke halaman detail saat item daftar diklik.
+// - Menyediakan opsi pengurutan daftar pelanggan.
 
 import 'package:admin_wifi/utils/format.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/halaman/detail/detail_pelanggan_aktif.dart';
 import 'package:admin_wifi/halaman/form/form_pelanggan_aktif.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
+import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:admin_wifi/widget/nama_pelanggan.dart';
 
 enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
+
+enum OpsiUrutkan {
+  namaAZ,
+  namaZA,
+  lunas,
+  belumLunas,
+  paketAktif,
+  paketTidakAktif,
+  batal,
+}
 
 class PelangganAktifPage extends StatefulWidget {
   const PelangganAktifPage({super.key});
@@ -137,12 +150,136 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
   }
 
+  void _showUrutkanDialog() async {
+    final OpsiUrutkan? pilihan = await showDialog<OpsiUrutkan>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Urutkan Berdasarkan'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiUrutkan.namaAZ);
+              },
+              child: const Text('Nama (A-Z)'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiUrutkan.namaZA);
+              },
+              child: const Text('Nama (Z-A)'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiUrutkan.lunas);
+              },
+              child: const Text('Status Pembayaran (Lunas)'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiUrutkan.belumLunas);
+              },
+              child: const Text('Status Pembayaran (Belum Lunas)'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiUrutkan.paketAktif);
+              },
+              child: const Text('Status Paket (Aktif)'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiUrutkan.paketTidakAktif);
+              },
+              child: const Text('Status Paket (Tidak Aktif)'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, OpsiUrutkan.batal);
+              },
+              child: const Text('Batal'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!mounted || pilihan == null || pilihan == OpsiUrutkan.batal) return;
+
+    setState(() {
+      _listaPelangganAktifFuture = _listaPelangganAktifFuture.then((
+        list,
+      ) async {
+        final PelangganOperasi pelangganOperasi = PelangganOperasi();
+        switch (pilihan) {
+          case OpsiUrutkan.namaAZ:
+          case OpsiUrutkan.namaZA:
+            final enrichedList = await Future.wait(
+              list.map((p) async {
+                // diubah: menggunakan nama metode yang benar 'ambilSatuPelangganById'
+                final Pelanggan? pelanggan = await pelangganOperasi
+                    .ambilSatuPelangganById(p.idPelanggan);
+                final String nama = pelanggan?.nama ?? 'Tidak Diketahui';
+                return {'pelanggan': p, 'nama': nama};
+              }).toList(),
+            );
+
+            enrichedList.sort((a, b) {
+              final namaA = a['nama'] as String;
+              final namaB = b['nama'] as String;
+              return pilihan == OpsiUrutkan.namaAZ
+                  ? namaA.compareTo(namaB)
+                  : namaB.compareTo(namaA);
+            });
+            return enrichedList
+                .map((e) => e['pelanggan'] as PelangganAktif)
+                .toList();
+
+          case OpsiUrutkan.lunas:
+          case OpsiUrutkan.belumLunas:
+            list.sort((a, b) {
+              final isLunasA = a.status == StatusPembayaran.lunas;
+              final isLunasB = b.status == StatusPembayaran.lunas;
+              if (isLunasA == isLunasB) return 0;
+              if (pilihan == OpsiUrutkan.lunas) {
+                return isLunasA ? -1 : 1;
+              } else {
+                return isLunasA ? 1 : -1;
+              }
+            });
+            break;
+          case OpsiUrutkan.paketAktif:
+          case OpsiUrutkan.paketTidakAktif:
+            list.sort((a, b) {
+              final isAktifA = a.tanggalBerakhir.isAfter(DateTime.now());
+              final isAktifB = b.tanggalBerakhir.isAfter(DateTime.now());
+              if (isAktifA == isAktifB) return 0;
+              if (pilihan == OpsiUrutkan.paketAktif) {
+                return isAktifA ? -1 : 1;
+              } else {
+                return isAktifA ? 1 : -1;
+              }
+            });
+            break;
+          case OpsiUrutkan.batal:
+            break;
+        }
+        return list;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pelanggan Aktif'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.sort),
+            onPressed: _showUrutkanDialog,
+            tooltip: 'Urutkan',
+          ),
           IconButton(
             icon: const Icon(Icons.delete_forever),
             onPressed: _opsiHapus,
@@ -167,13 +304,11 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
               itemBuilder: (context, index) {
                 final pelanggan = snapshot.data![index];
 
-                // Logika status paket
                 final sekarang = DateTime.now();
                 final isAktif = pelanggan.tanggalBerakhir.isAfter(sekarang);
                 final statusPaketText = isAktif ? 'Aktif' : 'Tidak Aktif';
                 final statusPaketColor = isAktif ? Colors.green : Colors.red;
 
-                // Logika status pembayaran
                 final statusPembayaranText = pelanggan.status.displayName;
                 final statusPembayaranColor =
                     pelanggan.status == StatusPembayaran.lunas
