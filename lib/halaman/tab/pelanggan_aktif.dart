@@ -1,6 +1,7 @@
 // path : lib/halaman/tab/pelanggan_aktif.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 
+import 'package:admin_wifi/data/servis/firebase_servis.dart';
 import 'package:admin_wifi/utils/format.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
@@ -30,6 +31,7 @@ class PelangganAktifPage extends StatefulWidget {
 
 class _PelangganAktifPageState extends State<PelangganAktifPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
+  final FirebaseService _firebaseService = FirebaseService();
   late Future<List<PelangganAktif>> _listaPelangganAktifFuture;
 
   @override
@@ -43,6 +45,67 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       _listaPelangganAktifFuture = _pelangganAktifOperasi
           .ambilSemuaPelangganAktif();
     });
+  }
+
+  Future<void> _hapusPelangganAktif(PelangganAktif pelanggan) async {
+    final bool? konfirmasi = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: Wrap(
+            children: [
+              const Text('Apakah Anda yakin ingin menghapus '),
+              NamaPelangganWidget(
+                idPelanggan: pelanggan.idPelanggan,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const Text('?'),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                'Hapus',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (konfirmasi == true) {
+      try {
+        // Hapus dari database lokal (ID di-parse ke int)
+        await _pelangganAktifOperasi.hapusPelangganAktif(
+          int.parse(pelanggan.id!),
+        );
+        // Hapus dari Firebase (ID sudah string)
+        await _firebaseService.hapusPelangganAktif(pelanggan.id!);
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Pelanggan aktif berhasil dihapus.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        _loadPelangganAktif();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal menghapus pelanggan: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _urutkanList(OpsiUrutkan pilihan) async {
@@ -293,6 +356,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
+                    onLongPress: () {
+                      _hapusPelangganAktif(pelanggan);
+                    },
                     onTap: () async {
                       final result = await Navigator.push(
                         context,

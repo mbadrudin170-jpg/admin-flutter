@@ -27,7 +27,10 @@ class FirebaseService {
 
   void startSync() {
     _timer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      developer.log('Memulai sinkronisasi periodik...', name: 'FirebaseService');
+      developer.log(
+        'Memulai sinkronisasi periodik...',
+        name: 'FirebaseService',
+      );
       sinkronkanSemuaData();
     });
     // Jalankan sinkronisasi segera saat aplikasi dimulai
@@ -39,7 +42,10 @@ class FirebaseService {
   }
 
   Future<void> sinkronkanSemuaData() async {
-    developer.log('Memulai sinkronisasi data inkremental...', name: 'FirebaseService');
+    developer.log(
+      'Memulai sinkronisasi data inkremental...',
+      name: 'FirebaseService',
+    );
     final lastSync = await _syncManager.getLastSyncTimestamp();
     final now = DateTime.now();
 
@@ -73,8 +79,10 @@ class FirebaseService {
 
       // 3. Simpan waktu sinkronisasi yang berhasil
       await _syncManager.setLastSyncTimestamp(now);
-      developer.log('Sinkronisasi inkremental berhasil diselesaikan.', name: 'FirebaseService');
-
+      developer.log(
+        'Sinkronisasi inkremental berhasil diselesaikan.',
+        name: 'FirebaseService',
+      );
     } catch (e, s) {
       developer.log(
         'Kesalahan besar saat sinkronisasi inkremental',
@@ -85,15 +93,26 @@ class FirebaseService {
     }
   }
 
-  Future<void> _unggahPerubahan(DateTime lastSync, Map<String, List<dynamic>> dataPerubahan) async {
-    developer.log('Mengunggah perubahan sejak $lastSync', name: 'FirebaseService');
+  Future<void> _unggahPerubahan(
+    DateTime lastSync,
+    Map<String, List<dynamic>> dataPerubahan,
+  ) async {
+    developer.log(
+      'Mengunggah perubahan sejak $lastSync',
+      name: 'FirebaseService',
+    );
     final batch = _firestore.batch();
 
     dataPerubahan.forEach((collectionName, items) {
       if (items.isNotEmpty) {
-        developer.log('  - Menemukan ${items.length} perubahan di koleksi $collectionName', name: 'FirebaseService');
+        developer.log(
+          '  - Menemukan ${items.length} perubahan di koleksi $collectionName',
+          name: 'FirebaseService',
+        );
         for (var item in items) {
-          final docRef = _firestore.collection(collectionName).doc(item.id.toString());
+          final docRef = _firestore
+              .collection(collectionName)
+              .doc(item.id.toString());
           batch.set(docRef, item.toMap());
         }
       }
@@ -103,22 +122,33 @@ class FirebaseService {
     developer.log('Pengunggahan batch selesai.', name: 'FirebaseService');
   }
 
- Future<void> _unduhPerubahan(DateTime lastSync, Map<String, dynamic> operasiMap) async {
-    developer.log('Mengunduh perubahan sejak $lastSync', name: 'FirebaseService');
+  Future<void> _unduhPerubahan(
+    DateTime lastSync,
+    Map<String, dynamic> operasiMap,
+  ) async {
+    developer.log(
+      'Mengunduh perubahan sejak $lastSync',
+      name: 'FirebaseService',
+    );
 
     for (var collectionName in operasiMap.keys) {
-        final querySnapshot = await _firestore
-            .collection(collectionName)
-            .where('diperbarui', isGreaterThan: lastSync.toIso8601String())
-            .get();
+      final querySnapshot = await _firestore
+          .collection(collectionName)
+          .where('diperbarui', isGreaterThan: lastSync.toIso8601String())
+          .get();
 
-        if (querySnapshot.docs.isNotEmpty) {
-            developer.log('  - Menemukan ${querySnapshot.docs.length} perubahan di koleksi $collectionName dari Firebase', name: 'FirebaseService');
-            final op = operasiMap[collectionName];
-            final items = querySnapshot.docs.map((doc) {
+      if (querySnapshot.docs.isNotEmpty) {
+        developer.log(
+          '  - Menemukan ${querySnapshot.docs.length} perubahan di koleksi $collectionName dari Firebase',
+          name: 'FirebaseService',
+        );
+        final op = operasiMap[collectionName];
+
+        final items = querySnapshot.docs
+            .map((doc) {
+              try {
                 final data = doc.data();
-                // Pastikan ID disetel dari ID dokumen Firebase
-                data['id'] ??= int.tryParse(doc.id) ?? doc.id; 
+                data['id'] ??= int.tryParse(doc.id) ?? doc.id;
                 if (op is KategoriOperasi) {
                   return Kategori.fromMap(data);
                 }
@@ -137,28 +167,36 @@ class FirebaseService {
                 if (op is PelangganAktifOperasi) {
                   return PelangganAktif.fromMap(data);
                 }
-                return null;
-            }).where((item) => item != null).toList();
+              } catch (e, s) {
+                developer.log(
+                  'Gagal mem-parsing dokumen ${doc.id} dari koleksi $collectionName',
+                  error: e,
+                  stackTrace: s,
+                  name: 'FirebaseService',
+                );
+              }
+              return null;
+            })
+            .where((item) => item != null)
+            .toList();
 
-            // --- PERBAIKAN: Cast list ke tipe yang benar ---
-            if (op is KategoriOperasi) {
-              await op.sisipkanAtauPerbaruiBatch(items.cast<Kategori>());
-            } else if (op is DompetOperasi) {
-              await op.sisipkanAtauPerbaruiBatch(items.cast<Dompet>());
-            } else if (op is TransaksiOperasi) {
-              await op.sisipkanAtauPerbaruiBatch(items.cast<Transaksi>());
-            } else if (op is PelangganOperasi) {
-              await op.sisipkanAtauPerbaruiBatch(items.cast<Pelanggan>());
-            } else if (op is PaketOperasi) {
-              await op.sisipkanAtauPerbaruiBatch(items.cast<Paket>());
-            } else if (op is PelangganAktifOperasi) {
-              await op.sisipkanAtauPerbaruiBatch(items.cast<PelangganAktif>());
-            }
+        if (op is KategoriOperasi) {
+          await op.sisipkanAtauPerbaruiBatch(items.cast<Kategori>());
+        } else if (op is DompetOperasi) {
+          await op.sisipkanAtauPerbaruiBatch(items.cast<Dompet>());
+        } else if (op is TransaksiOperasi) {
+          await op.sisipkanAtauPerbaruiBatch(items.cast<Transaksi>());
+        } else if (op is PelangganOperasi) {
+          await op.sisipkanAtauPerbaruiBatch(items.cast<Pelanggan>());
+        } else if (op is PaketOperasi) {
+          await op.sisipkanAtauPerbaruiBatch(items.cast<Paket>());
+        } else if (op is PelangganAktifOperasi) {
+          await op.sisipkanAtauPerbaruiBatch(items.cast<PelangganAktif>());
         }
+      }
     }
     developer.log('Pengunduhan perubahan selesai.', name: 'FirebaseService');
-}
-
+  }
 
   Future<void> hapusPelangganAktif(String id) async {
     try {

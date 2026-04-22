@@ -17,7 +17,6 @@ class PelangganAktifOperasi {
     );
   }
 
-  // Perbaikan: Mengganti nama metode
   Future<List<PelangganAktif>> ambilSemuaPelangganAktif() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query('pelanggan_aktif');
@@ -26,7 +25,6 @@ class PelangganAktifOperasi {
     });
   }
 
-  // Perbaikan: Menambahkan metode yang hilang
   Future<PelangganAktif?> ambilSatuPelangganAktif(String id) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -53,22 +51,18 @@ class PelangganAktifOperasi {
     );
   }
 
-  Future<void> deletePelangganAktif(int id) async {
+  Future<void> hapusPelangganAktif(int id) async {
     final db = await dbHelper.database;
     await db.delete('pelanggan_aktif', where: 'id = ?', whereArgs: [id]);
   }
 
-  // Perbaikan: Menambahkan metode yang hilang
   Future<void> hapusSemuaPelangganAktif() async {
     final db = await dbHelper.database;
     await db.delete('pelanggan_aktif');
   }
 
-  // Perbaikan: Menambahkan metode yang hilang
   Future<int> hapusPelangganKadaluarsa() async {
-    // Ganti void jadi int
     final db = await dbHelper.database;
-    // db.delete mengembalikan jumlah baris yang terhapus
     return await db.delete(
       'pelanggan_aktif',
       where: 'tanggalBerakhir < ?',
