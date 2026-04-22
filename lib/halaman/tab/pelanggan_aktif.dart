@@ -1,13 +1,5 @@
 // path : lib/halaman/tab/pelanggan_aktif.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
-// Fitur utama:
-// - Menampilkan daftar pelanggan aktif dari database.
-// - Menambahkan status paket "Aktif" (hijau) atau "Tidak Aktif" (merah) berdasarkan tanggal kedaluwarsa.
-// - Menambahkan status pembayaran "Lunas" (hijau) atau "Belum Lunas" (merah).
-// - Menyediakan opsi untuk menambah pelanggan aktif baru.
-// - Menyediakan opsi untuk menghapus semua pelanggan atau hanya yang sudah kedaluwarsa.
-// - Navigasi ke halaman detail saat item daftar diklik.
-// - Menyediakan opsi pengurutan daftar pelanggan.
 
 import 'package:admin_wifi/utils/format.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +8,6 @@ import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/halaman/detail/detail_pelanggan_aktif.dart';
 import 'package:admin_wifi/halaman/form/form_pelanggan_aktif.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
-import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:admin_wifi/widget/nama_pelanggan.dart';
 
 enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
@@ -28,7 +19,6 @@ enum OpsiUrutkan {
   belumLunas,
   paketAktif,
   paketTidakAktif,
-  batal,
 }
 
 class PelangganAktifPage extends StatefulWidget {
@@ -53,6 +43,106 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       _listaPelangganAktifFuture = _pelangganAktifOperasi
           .ambilSemuaPelangganAktif();
     });
+  }
+
+  Future<void> _urutkanList(OpsiUrutkan pilihan) async {
+    final list = await _listaPelangganAktifFuture;
+    final pelangganOperasi = PelangganOperasi();
+
+    final Map<String, String> namaMap = {};
+    final semuaPelanggan = await pelangganOperasi.getPelanggan();
+    for (var p in semuaPelanggan) {
+      namaMap[p.id] = p.nama;
+    }
+
+    int Function(PelangganAktif, PelangganAktif) comparator;
+
+    switch (pilihan) {
+      case OpsiUrutkan.namaAZ:
+      case OpsiUrutkan.namaZA:
+        comparator = (a, b) {
+          final namaA = namaMap[a.idPelanggan] ?? '';
+          final namaB = namaMap[b.idPelanggan] ?? '';
+          return pilihan == OpsiUrutkan.namaAZ
+              ? namaA.compareTo(namaB)
+              : namaB.compareTo(namaA);
+        };
+        break;
+      case OpsiUrutkan.lunas:
+      case OpsiUrutkan.belumLunas:
+        comparator = (a, b) {
+          final isLunasA = a.status == StatusPembayaran.lunas;
+          final isLunasB = b.status == StatusPembayaran.lunas;
+          if (isLunasA == isLunasB) return 0;
+          return (pilihan == OpsiUrutkan.lunas)
+              ? (isLunasA ? -1 : 1)
+              : (isLunasA ? 1 : -1);
+        };
+        break;
+      case OpsiUrutkan.paketAktif:
+      case OpsiUrutkan.paketTidakAktif:
+        comparator = (a, b) {
+          final isAktifA = a.tanggalBerakhir.isAfter(DateTime.now());
+          final isAktifB = b.tanggalBerakhir.isAfter(DateTime.now());
+          if (isAktifA == isAktifB) return 0;
+          return (pilihan == OpsiUrutkan.paketAktif)
+              ? (isAktifA ? -1 : 1)
+              : (isAktifA ? 1 : -1);
+        };
+        break;
+    }
+
+    list.sort(comparator);
+
+    setState(() {
+      _listaPelangganAktifFuture = Future.value(list);
+    });
+  }
+
+  void _showUrutkanDialog() async {
+    final OpsiUrutkan? pilihan = await showDialog<OpsiUrutkan>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Urutkan Berdasarkan'),
+          children: <Widget>[
+            SimpleDialogOption(
+              child: const Text('Nama (A-Z)'),
+              onPressed: () => Navigator.pop(context, OpsiUrutkan.namaAZ),
+            ),
+            SimpleDialogOption(
+              child: const Text('Nama (Z-A)'),
+              onPressed: () => Navigator.pop(context, OpsiUrutkan.namaZA),
+            ),
+            SimpleDialogOption(
+              child: const Text('Status Pembayaran (Lunas)'),
+              onPressed: () => Navigator.pop(context, OpsiUrutkan.lunas),
+            ),
+            SimpleDialogOption(
+              child: const Text('Status Pembayaran (Belum Lunas)'),
+              onPressed: () => Navigator.pop(context, OpsiUrutkan.belumLunas),
+            ),
+            SimpleDialogOption(
+              child: const Text('Status Paket (Aktif)'),
+              onPressed: () => Navigator.pop(context, OpsiUrutkan.paketAktif),
+            ),
+            SimpleDialogOption(
+              child: const Text('Status Paket (Tidak Aktif)'),
+              onPressed: () =>
+                  Navigator.pop(context, OpsiUrutkan.paketTidakAktif),
+            ),
+            SimpleDialogOption(
+              child: const Text('Batal'),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (pilihan != null) {
+      _urutkanList(pilihan);
+    }
   }
 
   void _tambahPelangganAktif() async {
@@ -148,125 +238,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       default:
         break;
     }
-  }
-
-  void _showUrutkanDialog() async {
-    final OpsiUrutkan? pilihan = await showDialog<OpsiUrutkan>(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: const Text('Urutkan Berdasarkan'),
-          children: <Widget>[
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiUrutkan.namaAZ);
-              },
-              child: const Text('Nama (A-Z)'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiUrutkan.namaZA);
-              },
-              child: const Text('Nama (Z-A)'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiUrutkan.lunas);
-              },
-              child: const Text('Status Pembayaran (Lunas)'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiUrutkan.belumLunas);
-              },
-              child: const Text('Status Pembayaran (Belum Lunas)'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiUrutkan.paketAktif);
-              },
-              child: const Text('Status Paket (Aktif)'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiUrutkan.paketTidakAktif);
-              },
-              child: const Text('Status Paket (Tidak Aktif)'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiUrutkan.batal);
-              },
-              child: const Text('Batal'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (!mounted || pilihan == null || pilihan == OpsiUrutkan.batal) return;
-
-    setState(() {
-      _listaPelangganAktifFuture = _listaPelangganAktifFuture.then((
-        list,
-      ) async {
-        final PelangganOperasi pelangganOperasi = PelangganOperasi();
-        switch (pilihan) {
-          case OpsiUrutkan.namaAZ:
-          case OpsiUrutkan.namaZA:
-            final enrichedList = await Future.wait(
-              list.map((p) async {
-                // diubah: menggunakan nama metode yang benar 'ambilSatuPelangganById'
-                final Pelanggan? pelanggan = await pelangganOperasi
-                    .ambilSatuPelangganById(p.idPelanggan);
-                final String nama = pelanggan?.nama ?? 'Tidak Diketahui';
-                return {'pelanggan': p, 'nama': nama};
-              }).toList(),
-            );
-
-            enrichedList.sort((a, b) {
-              final namaA = a['nama'] as String;
-              final namaB = b['nama'] as String;
-              return pilihan == OpsiUrutkan.namaAZ
-                  ? namaA.compareTo(namaB)
-                  : namaB.compareTo(namaA);
-            });
-            return enrichedList
-                .map((e) => e['pelanggan'] as PelangganAktif)
-                .toList();
-
-          case OpsiUrutkan.lunas:
-          case OpsiUrutkan.belumLunas:
-            list.sort((a, b) {
-              final isLunasA = a.status == StatusPembayaran.lunas;
-              final isLunasB = b.status == StatusPembayaran.lunas;
-              if (isLunasA == isLunasB) return 0;
-              if (pilihan == OpsiUrutkan.lunas) {
-                return isLunasA ? -1 : 1;
-              } else {
-                return isLunasA ? 1 : -1;
-              }
-            });
-            break;
-          case OpsiUrutkan.paketAktif:
-          case OpsiUrutkan.paketTidakAktif:
-            list.sort((a, b) {
-              final isAktifA = a.tanggalBerakhir.isAfter(DateTime.now());
-              final isAktifB = b.tanggalBerakhir.isAfter(DateTime.now());
-              if (isAktifA == isAktifB) return 0;
-              if (pilihan == OpsiUrutkan.paketAktif) {
-                return isAktifA ? -1 : 1;
-              } else {
-                return isAktifA ? 1 : -1;
-              }
-            });
-            break;
-          case OpsiUrutkan.batal:
-            break;
-        }
-        return list;
-      });
-    });
   }
 
   @override
