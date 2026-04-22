@@ -1,3 +1,4 @@
+
 {
   "project_info": {
     "project_number": "816519063489",
@@ -10,64 +11,6 @@
         "mobilesdk_app_id": "1:816519063489:android:e19514ae5a608576ce7140",
         "android_client_info": {
           "package_name": "com.example.adminwifi"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "816519063489-uguscs9q40eiekfjigb6d5hbutac62v8.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAcXaRHRpoSDGS_ZcMAUSZLNy_64CvaADA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "816519063489-uguscs9q40eiekfjigb6d5hbutac62v8.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:816519063489:android:034d3103dcedc1a3ce7140",
-        "android_client_info": {
-          "package_name": "com.example.myapp"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "816519063489-uguscs9q40eiekfjigb6d5hbutac62v8.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAcXaRHRpoSDGS_ZcMAUSZLNy_64CvaADA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "816519063489-uguscs9q40eiekfjigb6d5hbutac62v8.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:816519063489:android:32a150cc4a382888ce7140",
-        "android_client_info": {
-          "package_name": "com.example.pelangganwifi.v1"
         }
       },
       "oauth_client": [

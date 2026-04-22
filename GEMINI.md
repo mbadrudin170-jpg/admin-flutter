@@ -1,3 +1,7 @@
+# Aturan untuk AI
+
+1. 
+
 # **Panduan Pengembangan AI untuk Flutter di Firebase Studio**
 
 Panduan ini mendefinisikan prinsip-prinsip operasional dan kemampuan agen AI (misalnya, Gemini) yang berinteraksi dengan proyek Flutter di dalam lingkungan Firebase Studio. Tujuannya adalah untuk memungkinkan alur kerja desain dan pengembangan aplikasi yang efisien, otomatis, dan tahan terhadap kesalahan.
@@ -807,26 +811,6 @@ Alur kerja AI bersifat berulang, transparan, dan responsif terhadap masukan peng
   * **Konsol Pratinjau:** Konsol browser yang ditautkan ke pratinjau web, atau output logcat untuk emulator Android, akan menampilkan kesalahan runtime, pernyataan cetak, dan masalah terkait jaringan. AI akan memanfaatkan output ini.
 
 Pendekatan terstruktur ini memastikan bahwa AI dapat secara efektif membantu dalam mengembangkan dan memelihara aplikasi Flutter yang kuat di Firebase Studio, membuat proses pengembangan lebih otomatis dan efisien.
-
-# **Protokol Interaksi dan Pengembangan**
-
-Bagian ini mendefinisikan serangkaian aturan dan protokol yang harus diikuti oleh AI untuk memastikan konsistensi, kejelasan, dan efisiensi selama proses pengembangan.
-
-1.  **Standarisasi Bahasa:**
-    *   **Bahasa Pemrograman dan Kode:** Di seluruh basis kode, termasuk nama *file*, *variabel*, *fungsi*, *parameter*, dan *class*, wajib menggunakan Bahasa Indonesia yang baik dan benar.
-    *   **Komunikasi:** Semua interaksi dan percakapan dengan pengguna harus dilakukan dalam Bahasa Indonesia.
-
-2.  **Dokumentasi dan Konteks File:**
-    *   **Identifikasi Jalur (Path):** Setiap file yang dimodifikasi atau dibuat harus menyertakan jalur (path) lengkapnya dari direktori root proyek sebagai komentar di baris paling atas. Contoh: `// lib/halaman/beranda.dart`.
-    *   **Deskripsi Fitur:** Setelah menyelesaikan tugas pada sebuah file, AI wajib menambahkan atau memperbarui blok komentar di bagian atas file (setelah komentar path) yang menjelaskan fungsionalitas utama, fitur, dan tujuan dari kode di dalam file tersebut.
-
-3.  **Manajemen Alur Kerja Proyek:**
-    *   **Referensi Utama (`blueprint.md`):** Sebelum memulai tugas atau modifikasi apa pun, AI harus selalu membaca dan memahami konten dari file `blueprint.md`. File ini adalah sumber kebenaran tunggal (`single source of truth`) yang berisi alur kerja, arsitektur, dan rencana pengembangan proyek.
-    *   **Pembaruan `blueprint.md`:** Setelah menyelesaikan pekerjaan, AI wajib memperbarui file `blueprint.md` sesuai dengan struktur yang ada untuk mendokumentasikan perubahan. Contoh: `lib/home - fitur: tombol tambah, fungsi: untuk menuju file lib/form`.
-
-4.  **Manajemen Build dan Rilis:**
-    *   **Peningkatan Versi:** Sebelum menjalankan proses build untuk rilis, AI wajib menaikkan nomor versi aplikasi di dalam file `pubspec.yaml` sesuai dengan standar semantic versioning (major.minor.patch+buildNumber).
-    *   **Proses Build:** Sebelum memulai proses build, AI wajib menjalankan perintah: `flutter clean && flutter pub get && flutter build apk --split-per-abi`.
 
 # Firebase MCP
 
