@@ -30,4 +30,31 @@ class KritikSaranOperasi {
       return KritikSaran.fromMap(maps[i]);
     });
   }
+
+  // ditambah: Fungsi untuk mendapatkan perubahan data sejak sinkronisasi terakhir.
+  Future<List<KritikSaran>> getPerubahan(DateTime lastSync) async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'kritik_saran',
+      where: 'diperbarui > ?',
+      whereArgs: [lastSync.toIso8601String()],
+    );
+    return List.generate(maps.length, (i) {
+      return KritikSaran.fromMap(maps[i]);
+    });
+  }
+
+  // ditambah: Fungsi untuk menyisipkan atau memperbarui data secara batch.
+  Future<void> sisipkanAtauPerbaruiBatch(List<KritikSaran> daftarKritikSaran) async {
+    final db = await dbHelper.database;
+    final batch = db.batch();
+    for (var kritikSaran in daftarKritikSaran) {
+      batch.insert(
+        'kritik_saran',
+        kritikSaran.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit(noResult: true);
+  }
 }

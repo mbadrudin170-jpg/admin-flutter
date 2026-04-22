@@ -8,12 +8,16 @@ import 'dart:developer' as developer;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_wifi/data/operasi/dompet_operasi.dart';
 import 'package:admin_wifi/data/operasi/kategori_operasi.dart';
+// ditambah: Mengimpor operasi dan model kritik dan saran.
+import 'package:admin_wifi/data/operasi/kritik_saran_operasi.dart';
 import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
 import 'package:admin_wifi/model/dompet_model.dart';
 import 'package:admin_wifi/model/kategori_model.dart';
+// ditambah: Mengimpor operasi dan model kritik dan saran.
+import 'package:admin_wifi/model/kritik_saran_model.dart';
 import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
@@ -55,6 +59,8 @@ class FirebaseService {
     final pelangganOperasi = PelangganOperasi();
     final paketOperasi = PaketOperasi();
     final pelangganAktifOperasi = PelangganAktifOperasi();
+    // ditambah: Membuat instance untuk operasi kritik dan saran.
+    final kritikSaranOperasi = KritikSaranOperasi();
 
     try {
       // 1. Unggah perubahan lokal ke Firebase
@@ -65,6 +71,8 @@ class FirebaseService {
         'pelanggan': (await pelangganOperasi.getPerubahan(lastSync)),
         'paket': (await paketOperasi.getPerubahan(lastSync)),
         'pelanggan_aktif': (await pelangganAktifOperasi.getPerubahan(lastSync)),
+        // ditambah: Menambahkan data perubahan kritik dan saran untuk diunggah.
+        'kritik_saran': (await kritikSaranOperasi.getPerubahan(lastSync)),
       });
 
       // 2. Unduh perubahan dari Firebase ke lokal
@@ -75,6 +83,8 @@ class FirebaseService {
         'pelanggan': pelangganOperasi,
         'paket': paketOperasi,
         'pelanggan_aktif': pelangganAktifOperasi,
+        // ditambah: Menambahkan operasi kritik dan saran untuk proses unduh.
+        'kritik_saran': kritikSaranOperasi,
       });
 
       // 3. Simpan waktu sinkronisasi yang berhasil
@@ -167,6 +177,10 @@ class FirebaseService {
                 if (op is PelangganAktifOperasi) {
                   return PelangganAktif.fromMap(data);
                 }
+                // ditambah: Menambahkan parsing untuk model KritikSaran.
+                if (op is KritikSaranOperasi) {
+                  return KritikSaran.fromMap(data);
+                }
               } catch (e, s) {
                 developer.log(
                   'Gagal mem-parsing dokumen ${doc.id} dari koleksi $collectionName',
@@ -192,6 +206,10 @@ class FirebaseService {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Paket>());
         } else if (op is PelangganAktifOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<PelangganAktif>());
+        } 
+        // ditambah: Menambahkan pemanggilan batch untuk KritikSaran.
+        else if (op is KritikSaranOperasi) {
+          await op.sisipkanAtauPerbaruiBatch(items.cast<KritikSaran>());
         }
       }
     }

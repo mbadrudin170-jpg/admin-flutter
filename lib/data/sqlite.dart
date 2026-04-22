@@ -155,11 +155,11 @@ class DatabaseHelper {
         diperbarui TEXT NOT NULL
       )
     ''');
-    
+
     // ditambah: Skema tabel baru untuk menyimpan data kritik dan saran.
     await _createKritikSaranTable(db);
   }
-  
+
   // ditambah: Fungsi terpisah untuk membuat tabel kritik_saran.
   Future<void> _createKritikSaranTable(Database db) async {
     await db.execute('''

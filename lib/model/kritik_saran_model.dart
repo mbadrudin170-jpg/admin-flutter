@@ -1,4 +1,4 @@
-// lib/model/kritik_saran_model.dart
+// path: lib/model/kritik_saran_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class KritikSaran {
@@ -6,12 +6,16 @@ class KritikSaran {
   final String isi;
   final DateTime tanggal;
   final String userId;
+  // ditambah: Menambahkan properti untuk melacak waktu pembaruan.
+  final DateTime? diperbarui;
 
   KritikSaran({
     this.id,
     required this.isi,
     required this.tanggal,
     required this.userId,
+    // ditambah: Menambahkan 'diperbarui' ke konstruktor.
+    this.diperbarui,
   });
 
   // Konversi dari objek ke Map untuk Firestore/SQLite
@@ -19,8 +23,11 @@ class KritikSaran {
     return {
       'id': id,
       'isi': isi,
-      'tanggal': tanggal.toIso8601String(), // Selalu simpan sebagai string di SQLite
+      'tanggal': tanggal
+          .toIso8601String(), // Selalu simpan sebagai string di SQLite
       'userId': userId,
+      // ditambah: Menyimpan 'diperbarui' sebagai string ISO 8601.
+      'diperbarui': diperbarui?.toIso8601String(),
     };
   }
 
@@ -31,8 +38,15 @@ class KritikSaran {
       isi: map['isi'] ?? '',
       userId: map['userId'] ?? '',
       tanggal: (map['tanggal'] is Timestamp)
-          ? (map['tanggal'] as Timestamp).toDate() // Dari Firestore
+          ? (map['tanggal'] as Timestamp)
+                .toDate() // Dari Firestore
           : DateTime.parse(map['tanggal'] as String), // Dari SQLite
+      // ditambah: Mengonversi 'diperbarui' dari Timestamp atau String.
+      diperbarui: (map['diperbarui'] is Timestamp)
+          ? (map['diperbarui'] as Timestamp).toDate()
+          : (map['diperbarui'] != null)
+          ? DateTime.parse(map['diperbarui'] as String)
+          : null,
     );
   }
 }
