@@ -41,24 +41,58 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   @override
   void initState() {
     super.initState();
+    _inisialisasiNotifikasi();
     _loadPelangganAktif();
   }
 
+  // ditambah: Metode untuk inisialisasi notifikasi.
+  Future<void> _inisialisasiNotifikasi() async {
+    await _notifikasiServis.inisialisasi();
+  }
+
   // ditambah: Metode untuk memeriksa dan menjadwalkan notifikasi.
-  void _periksaDanJadwalkanNotifikasi(List<PelangganAktif> pelanggan) {
+  void _periksaDanJadwalkanNotifikasi(List<PelangganAktif> pelanggan) async {
     final sekarang = DateTime.now();
+
     for (var p in pelanggan) {
+      // Pastikan ID valid untuk parsing
+      if (p.id == null) continue;
+
+      // Dapatkan nama pelanggan
+      final pelangganOperasi = PelangganOperasi();
+      final dataPelanggan = await pelangganOperasi.ambilSatuPelangganById(
+        p.idPelanggan,
+      );
+      final namaPelanggan = dataPelanggan?.nama ?? 'Pelanggan';
+
+      // 1. Notifikasi untuk 3 hari sebelum kadaluarsa
       final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(
         const Duration(days: 3),
       );
-      // ditambah: Hanya jadwalkan notifikasi jika waktu 3 hari sebelum kadaluarsa belum lewat
-      // dan paket masih aktif.
+
       if (tigaHariSebelumKadaluarsa.isAfter(sekarang)) {
-        _notifikasiServis.jadwalNotifikasi(
-          id: int.parse(p.id!),
-          title: 'Paket Akan Berakhir',
-          body: 'Paket untuk pelanggan akan berakhir dalam 3 hari.',
+        await _notifikasiServis.jadwalNotifikasi(
+          id: int.parse(p.id!) + 1000, // Offset ID untuk menghindari konflik
+          title: '⏰ Paket Akan Berakhir',
+          body:
+              'Paket $namaPelanggan akan berakhir dalam 3 hari (${Format.formatTanggal(p.tanggalBerakhir)})',
           jadwal: tigaHariSebelumKadaluarsa,
+        );
+      }
+
+      // ditambah: 2. Notifikasi untuk tepat saat kadaluarsa (jam sekarang jika belum lewat)
+      final waktuKadaluarsa = p.tanggalBerakhir;
+
+      // Hanya jadwalkan jika waktu kadaluarsa belum lewat
+      if (waktuKadaluarsa.isAfter(sekarang)) {
+        await _notifikasiServis.jadwalNotifikasi(
+          id:
+              int.parse(p.id!) +
+              2000, // Offset ID berbeda untuk notifikasi kadaluarsa
+          title: '🔔 Paket Berakhir Sekarang',
+          body:
+              'Paket $namaPelanggan telah berakhir hari ini (${Format.formatTanggal(waktuKadaluarsa)}). Harap perbarui paket.',
+          jadwal: waktuKadaluarsa,
         );
       }
     }

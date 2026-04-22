@@ -26,6 +26,9 @@ class _FormPelangganState extends State<FormPelanggan> {
   final _passwordFocusNode = FocusNode();
   final _macAddressFocusNode = FocusNode();
 
+  // ditambah: Variable untuk melacak status visibilitas password
+  bool _isPasswordVisible = false;
+
   @override
   void dispose() {
     _namaController.dispose();
@@ -55,7 +58,7 @@ class _FormPelangganState extends State<FormPelanggan> {
       await PelangganOperasi().createPelanggan(newPelanggan);
       if (mounted) {
         // Kembalikan nilai true untuk menandakan ada perubahan
-        Navigator.pop(context, true); 
+        Navigator.pop(context, true);
       }
     }
   }
@@ -126,11 +129,30 @@ class _FormPelangganState extends State<FormPelanggan> {
                   return null;
                 },
               ),
+              // diubah: TextFormField untuk password dengan suffixIcon untuk toggle visibility
               TextFormField(
                 controller: _passwordController,
                 focusNode: _passwordFocusNode,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  // ditambah: Ikon mata di bagian kanan field
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      // ditambah: Mengubah ikon berdasarkan status visibility
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      // ditambah: Toggle status visibility saat ikon ditekan
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
+                ),
+                // diubah: obscureText menggunakan variable _isPasswordVisible
+                obscureText: !_isPasswordVisible,
                 textInputAction: TextInputAction.next,
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(_macAddressFocusNode);
