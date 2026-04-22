@@ -115,6 +115,27 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
                 ),
               ],
             ),
+            const SizedBox(height: 20), // Ditambah: Spasi sebelum tombol
+            // Ditambah: Tombol untuk menyalin semua informasi pelanggan
+            ElevatedButton(
+              onPressed: () {
+                final allInfo = '''
+Nama: ${widget.pelanggan.nama}
+Telepon: ${widget.pelanggan.telepon}
+Alamat: ${widget.pelanggan.alamat}
+MAC Address: ${widget.pelanggan.macAddress}
+Password: ${widget.pelanggan.password}
+''';
+                Clipboard.setData(ClipboardData(text: allInfo));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Semua informasi pelanggan berhasil disalin!'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: const Text('Salin Semua Info'),
+            ),
           ],
         ),
       ),
