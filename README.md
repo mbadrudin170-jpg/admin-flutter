@@ -57,6 +57,11 @@ Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegras
 ### **Manajemen Data (Pelanggan, Paket, Transaksi)**
 *   **Tujuan:** Mengelola data inti bisnis, termasuk informasi pelanggan, layanan yang ditawarkan, dan riwayat pembayaran.
 *   **File Terkait:** `lib/model/`, `lib/data/operasi/`, `lib/halaman/`.
+*   **Fitur Detail Pelanggan:** Halaman `lib/halaman/detail/detail_pelanggan.dart` menyediakan tampilan lengkap informasi pelanggan. Fitur ini mencakup:
+    *   Menampilkan semua detail pelanggan (Nama, Telepon, Alamat, MAC Address).
+    *   Tombol untuk menyalin informasi individu seperti nomor telepon dan MAC Address.
+    *   Kemampuan untuk melihat atau menyembunyikan password.
+    *   **Tombol "Salin Semua Info":** Untuk kemudahan, ditambahkan sebuah tombol yang memungkinkan admin menyalin seluruh informasi pelanggan (Nama, Telepon, Alamat, MAC Address, dan Password) ke clipboard dengan sekali tekan.
 
 ### **Dompet Digital (Manajemen Keuangan)**
 *   **Tujuan:** Melacak saldo, pemasukan, dan pengeluaran untuk memberikan gambaran keuangan yang jelas.
