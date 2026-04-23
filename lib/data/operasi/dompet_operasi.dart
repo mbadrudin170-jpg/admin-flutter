@@ -9,8 +9,11 @@ class DompetOperasi {
 
   Future<void> createDompet(Dompet dompet) async {
     final db = await dbHelper.database;
-    await db.insert('dompet', dompet.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    await db.insert(
+      'dompet',
+      dompet.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<List<Dompet>> getDompet() async {
@@ -34,13 +37,9 @@ class DompetOperasi {
 
   Future<void> deleteDompet(String id) async {
     final db = await dbHelper.database;
-    await db.delete(
-      'dompet',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('dompet', where: 'id = ?', whereArgs: [id]);
   }
-  
+
   // == METODE BARU UNTUK SINKRONISASI INKREMENTAL ==
 
   /// Mengambil record yang berubah (dibuat atau diperbarui) setelah waktu [since].

@@ -25,7 +25,10 @@ class KritikSaranOperasi {
   Future<List<KritikSaran>> getKritikSaran() async {
     final db = await dbHelper.database;
     // ditambah: Mengurutkan hasil berdasarkan tanggal terbaru.
-    final List<Map<String, dynamic>> maps = await db.query('kritik_saran', orderBy: 'tanggal DESC');
+    final List<Map<String, dynamic>> maps = await db.query(
+      'kritik_saran',
+      orderBy: 'tanggal DESC',
+    );
     return List.generate(maps.length, (i) {
       return KritikSaran.fromMap(maps[i]);
     });
@@ -45,7 +48,9 @@ class KritikSaranOperasi {
   }
 
   // ditambah: Fungsi untuk menyisipkan atau memperbarui data secara batch.
-  Future<void> sisipkanAtauPerbaruiBatch(List<KritikSaran> daftarKritikSaran) async {
+  Future<void> sisipkanAtauPerbaruiBatch(
+    List<KritikSaran> daftarKritikSaran,
+  ) async {
     final db = await dbHelper.database;
     final batch = db.batch();
     for (var kritikSaran in daftarKritikSaran) {

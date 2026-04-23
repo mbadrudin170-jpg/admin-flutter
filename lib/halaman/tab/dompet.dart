@@ -46,9 +46,7 @@ class _DompetPageState extends State<DompetPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dompet'),
-      ),
+      appBar: AppBar(title: const Text('Dompet')),
       body: Column(
         children: [
           const RingkasanKeuangan(),

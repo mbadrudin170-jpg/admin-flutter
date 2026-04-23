@@ -48,9 +48,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transaksi'),
-      ),
+      appBar: AppBar(title: const Text('Transaksi')),
       body: FutureBuilder<List<Transaksi>>(
         future: _listaTransaksiFuture,
         builder: (context, snapshot) {
@@ -83,15 +81,20 @@ class _TransaksiPageState extends State<TransaksiPage> {
                       final tanggal = groupedTransaksi.keys.elementAt(index);
                       final transaksiPadaTanggal = groupedTransaksi[tanggal]!;
                       final totalPadaTanggal = transaksiPadaTanggal.fold(
-                          0.0,
-                          (sum, item) =>
-                              sum + (item.tipe == TipeTransaksi.pemasukan ? item.jumlah : -item.jumlah));
+                        0.0,
+                        (sum, item) =>
+                            sum +
+                            (item.tipe == TipeTransaksi.pemasukan
+                                ? item.jumlah
+                                : -item.jumlah),
+                      );
 
                       return Column(
                         children: [
                           _bangunHeaderSeksi(tanggal, totalPadaTanggal),
-                          ...transaksiPadaTanggal
-                              .map((transaksi) => _bangunItemTransaksi(transaksi))
+                          ...transaksiPadaTanggal.map(
+                            (transaksi) => _bangunItemTransaksi(transaksi),
+                          ),
                         ],
                       );
                     },
@@ -109,7 +112,11 @@ class _TransaksiPageState extends State<TransaksiPage> {
     );
   }
 
-  Widget _bangunRingkasan(double pemasukan, double pengeluaran, double transfer) {
+  Widget _bangunRingkasan(
+    double pemasukan,
+    double pengeluaran,
+    double transfer,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -171,25 +178,36 @@ class _TransaksiPageState extends State<TransaksiPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(transaksi.kategori.nama),
-          Text(transaksi.subKategori.nama, style: const TextStyle(fontSize: 12)),
+          Text(
+            transaksi.subKategori.nama,
+            style: const TextStyle(fontSize: 12),
+          ),
         ],
       ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(transaksi.keterangan),
-          Text(transaksi.namaDompet, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          Text(
+            transaksi.namaDompet,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
         ],
       ),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ').format(transaksi.jumlah),
+            NumberFormat.currency(
+              locale: 'id_ID',
+              symbol: 'Rp ',
+            ).format(transaksi.jumlah),
             style: TextStyle(
               color: transaksi.tipe == TipeTransaksi.pemasukan
                   ? Colors.green
-                  : (transaksi.tipe == TipeTransaksi.pengeluaran ? Colors.red : Colors.blue),
+                  : (transaksi.tipe == TipeTransaksi.pengeluaran
+                        ? Colors.red
+                        : Colors.blue),
             ),
           ),
           Text(Format.formatJam(transaksi.tanggal)),
@@ -198,7 +216,9 @@ class _TransaksiPageState extends State<TransaksiPage> {
     );
   }
 
-  Map<DateTime, List<Transaksi>> _groupTransaksiByDate(List<Transaksi> transaksi) {
+  Map<DateTime, List<Transaksi>> _groupTransaksiByDate(
+    List<Transaksi> transaksi,
+  ) {
     final Map<DateTime, List<Transaksi>> grouped = {};
     for (final t in transaksi) {
       final date = DateTime(t.tanggal.year, t.tanggal.month, t.tanggal.day);

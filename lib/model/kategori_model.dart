@@ -3,10 +3,7 @@
 // Ini termasuk tipe kategori (pemasukan atau pengeluaran) dan daftar sub-kategori.
 // Digunakan untuk mengelola data kategori dari dan ke Firestore.
 
-enum TipeKategori {
-  pemasukan,
-  pengeluaran,
-}
+enum TipeKategori { pemasukan, pengeluaran }
 
 class Kategori {
   String? id;
@@ -34,7 +31,9 @@ class Kategori {
       subKategori: (map['subKategori'] as List<dynamic>? ?? [])
           .map((subMap) => SubKategori.fromMap(subMap as Map<String, dynamic>))
           .toList(),
-      diperbarui: map['diperbarui'] != null ? DateTime.parse(map['diperbarui']) : null,
+      diperbarui: map['diperbarui'] != null
+          ? DateTime.parse(map['diperbarui'])
+          : null,
     );
   }
 
@@ -60,7 +59,9 @@ class SubKategori {
     return SubKategori(
       id: map['id'],
       nama: map['nama'] ?? '',
-      diperbarui: map['diperbarui'] != null ? DateTime.parse(map['diperbarui']) : null,
+      diperbarui: map['diperbarui'] != null
+          ? DateTime.parse(map['diperbarui'])
+          : null,
     );
   }
 

@@ -33,10 +33,7 @@ class DetailDompet extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Saldo:',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Saldo:', style: Theme.of(context).textTheme.titleMedium),
             Text(
               'Rp ${dompet.saldo.toStringAsFixed(2)}',
               style: Theme.of(context).textTheme.bodyLarge,

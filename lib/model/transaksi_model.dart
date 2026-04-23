@@ -3,11 +3,7 @@
 
 import 'package:admin_wifi/model/kategori_model.dart';
 
-enum TipeTransaksi {
-  pemasukan,
-  pengeluaran,
-  transfer,
-}
+enum TipeTransaksi { pemasukan, pengeluaran, transfer }
 
 extension TipeTransaksiExtension on TipeTransaksi {
   TipeKategori toTipeKategori() {
@@ -17,7 +13,9 @@ extension TipeTransaksiExtension on TipeTransaksi {
       case TipeTransaksi.pengeluaran:
         return TipeKategori.pengeluaran;
       default:
-        throw ArgumentError('TipeTransaksi tidak dapat dipetakan ke TipeKategori: $this');
+        throw ArgumentError(
+          'TipeTransaksi tidak dapat dipetakan ke TipeKategori: $this',
+        );
     }
   }
 }

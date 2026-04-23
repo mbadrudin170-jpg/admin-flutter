@@ -43,8 +43,9 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
   Future<void> _loadInitialData() async {
     try {
       final dompetList = await _dompetOperasi.getDompet();
-      final kategoriList =
-          await _kategoriOperasi.getKategoriByTipe(_tipe.toTipeKategori());
+      final kategoriList = await _kategoriOperasi.getKategoriByTipe(
+        _tipe.toTipeKategori(),
+      );
 
       setState(() {
         _dompetList = dompetList;
@@ -61,8 +62,9 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
 
   // Fungsi untuk memuat ulang daftar kategori berdasarkan tipe transaksi yang dipilih.
   Future<void> _loadKategori() async {
-    final kategoriList =
-        await _kategoriOperasi.getKategoriByTipe(_tipe.toTipeKategori());
+    final kategoriList = await _kategoriOperasi.getKategoriByTipe(
+      _tipe.toTipeKategori(),
+    );
     setState(() {
       _kategoriList = kategoriList;
       _selectedKategori = null;
@@ -83,9 +85,7 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Form Transaksi'),
-        leading: BackButton(
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: BackButton(onPressed: () => Navigator.pop(context)),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -115,7 +115,9 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
                     // Keterangan
                     TextFormField(
                       controller: _keteranganController,
-                      decoration: const InputDecoration(labelText: 'Keterangan'),
+                      decoration: const InputDecoration(
+                        labelText: 'Keterangan',
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Keterangan tidak boleh kosong';
@@ -181,16 +183,18 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
                     if (_kategoriList.isNotEmpty)
                       DropdownButtonFormField<Kategori>(
                         initialValue: _selectedKategori,
-                        decoration:
-                            const InputDecoration(labelText: 'Kategori'),
+                        decoration: const InputDecoration(
+                          labelText: 'Kategori',
+                        ),
                         items: _kategoriList
                             .where((k) => k.tipe == _tipe.toTipeKategori())
                             .map((Kategori kategori) {
-                          return DropdownMenuItem<Kategori>(
-                            value: kategori,
-                            child: Text(kategori.nama),
-                          );
-                        }).toList(),
+                              return DropdownMenuItem<Kategori>(
+                                value: kategori,
+                                child: Text(kategori.nama),
+                              );
+                            })
+                            .toList(),
                         onChanged: (Kategori? newValue) {
                           setState(() {
                             _selectedKategori = newValue;
@@ -207,9 +211,11 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
                       DropdownButtonFormField<SubKategori>(
                         initialValue: _selectedSubKategori,
                         decoration: const InputDecoration(
-                            labelText: 'Sub Kategori'),
-                        items: _selectedKategori!.subKategori
-                            .map((SubKategori subKategori) {
+                          labelText: 'Sub Kategori',
+                        ),
+                        items: _selectedKategori!.subKategori.map((
+                          SubKategori subKategori,
+                        ) {
                           return DropdownMenuItem<SubKategori>(
                             value: subKategori,
                             child: Text(subKategori.nama),
@@ -220,9 +226,8 @@ class _FormTransaksiPageState extends State<FormTransaksiPage> {
                             _selectedSubKategori = newValue;
                           });
                         },
-                        validator: (value) => value == null
-                            ? 'Sub Kategori harus dipilih'
-                            : null,
+                        validator: (value) =>
+                            value == null ? 'Sub Kategori harus dipilih' : null,
                       ),
 
                     const SizedBox(height: 20),

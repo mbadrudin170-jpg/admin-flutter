@@ -34,10 +34,7 @@ class _FormKategoriPageState extends State<FormKategoriPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Form Kategori'),
-        leading: BackButton(),
-      ),
+      appBar: AppBar(title: const Text('Form Kategori'), leading: BackButton()),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -47,9 +44,7 @@ class _FormKategoriPageState extends State<FormKategoriPage> {
               TextFormField(
                 controller: _namaController,
                 focusNode: _namaFocusNode,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Kategori',
-                ),
+                decoration: const InputDecoration(labelText: 'Nama Kategori'),
                 textInputAction: TextInputAction.done, // Mengubah ke done
                 onFieldSubmitted: (_) {
                   // Menutup keyboard karena ini adalah input terakhir

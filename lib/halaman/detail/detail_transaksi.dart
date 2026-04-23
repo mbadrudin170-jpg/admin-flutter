@@ -30,10 +30,7 @@ class DetailTransaksiPage extends StatelessWidget {
           children: [
             _buildDetailRow('ID', transaksi.id),
             _buildDetailRow('Keterangan', transaksi.keterangan),
-            _buildDetailRow(
-              'Tanggal',
-              Format.formatTanggal(transaksi.tanggal),
-            ),
+            _buildDetailRow('Tanggal', Format.formatTanggal(transaksi.tanggal)),
             _buildDetailRow(
               'Jumlah',
               NumberFormat.currency(

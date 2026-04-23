@@ -51,7 +51,9 @@ class PelangganAktif {
         (e) => e.name == map['status'],
         orElse: () => StatusPembayaran.lunas,
       ),
-      diperbarui: map['diperbarui'] != null ? DateTime.parse(map['diperbarui']) : null,
+      diperbarui: map['diperbarui'] != null
+          ? DateTime.parse(map['diperbarui'])
+          : null,
       statusSinkronisasi: map['status_sinkronisasi'] ?? 'SINKRON',
     );
   }

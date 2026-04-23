@@ -33,7 +33,7 @@ class _FormDompetState extends State<FormDompet> {
         await _dompetOperasi.createDompet(nuevoDompet);
         if (!mounted) return;
         Navigator.pop(context, true); // Kembali dan tandai sukses
-        
+
         // Tampilkan Snackbar sukses
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -41,7 +41,6 @@ class _FormDompetState extends State<FormDompet> {
             backgroundColor: Colors.green,
           ),
         );
-
       } catch (e, s) {
         // Tangkap dan log error
         developer.log(

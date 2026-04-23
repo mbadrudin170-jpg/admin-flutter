@@ -119,7 +119,8 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
             // Ditambah: Tombol untuk menyalin semua informasi pelanggan
             ElevatedButton(
               onPressed: () {
-                final allInfo = '''
+                final allInfo =
+                    '''
 Nama: ${widget.pelanggan.nama}
 Telepon: ${widget.pelanggan.telepon}
 Alamat: ${widget.pelanggan.alamat}
@@ -129,7 +130,9 @@ Password: ${widget.pelanggan.password}
                 Clipboard.setData(ClipboardData(text: allInfo));
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Semua informasi pelanggan berhasil disalin!'),
+                    content: Text(
+                      'Semua informasi pelanggan berhasil disalin!',
+                    ),
                     duration: Duration(seconds: 2),
                   ),
                 );

@@ -45,9 +45,7 @@ class _KategoriPageState extends State<KategoriPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Kategori'),
-      ),
+      appBar: AppBar(title: const Text('Kategori')),
       body: Column(
         children: [
           Row(
@@ -90,7 +88,9 @@ class _KategoriPageState extends State<KategoriPage> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('Tidak ada kategori ditemukan.'));
+                  return const Center(
+                    child: Text('Tidak ada kategori ditemukan.'),
+                  );
                 } else {
                   final filteredKategori = snapshot.data!
                       .where((k) => k.tipe == _selectedTipe)
@@ -104,9 +104,7 @@ class _KategoriPageState extends State<KategoriPage> {
                         child: ExpansionTile(
                           title: Text(kategori.nama),
                           children: kategori.subKategori.map((sub) {
-                            return ListTile(
-                              title: Text(sub.nama),
-                            );
+                            return ListTile(title: Text(sub.nama));
                           }).toList(),
                         ),
                       );

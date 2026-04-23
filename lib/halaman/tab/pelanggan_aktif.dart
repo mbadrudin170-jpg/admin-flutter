@@ -35,7 +35,8 @@ class PelangganAktifPage extends StatefulWidget {
 class _PelangganAktifPageState extends State<PelangganAktifPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
   // diubah: Menggunakan repositori untuk interaksi dengan Firebase.
-  final PelangganAktifRepositori _pelangganAktifRepositori = PelangganAktifRepositori();
+  final PelangganAktifRepositori _pelangganAktifRepositori =
+      PelangganAktifRepositori();
   late Future<List<PelangganAktif>> _listaPelangganAktifFuture = Future.value(
     [],
   );
@@ -369,11 +370,14 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         if (konfirmasi == true) {
           final isOnline = await KoneksiInternetService.cekKoneksi();
           if (isOnline) {
-            final semuaPelanggan = await _pelangganAktifOperasi.ambilSemuaPelangganAktif();
+            final semuaPelanggan = await _pelangganAktifOperasi
+                .ambilSemuaPelangganAktif();
             for (var pelanggan in semuaPelanggan) {
               if (pelanggan.id != null) {
                 // diubah: Memanggil repositori untuk menghapus dari Firebase.
-                await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);
+                await _pelangganAktifRepositori.hapusPelangganAktif(
+                  pelanggan.id!,
+                );
               }
             }
           }
@@ -384,13 +388,18 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       case OpsiHapusPilihan.hapusKadaluarsa:
         final isOnline = await KoneksiInternetService.cekKoneksi();
         if (isOnline) {
-          final semuaPelanggan = await _pelangganAktifOperasi.ambilSemuaPelangganAktif();
+          final semuaPelanggan = await _pelangganAktifOperasi
+              .ambilSemuaPelangganAktif();
           final sekarang = DateTime.now();
-          final pelangganKadaluarsa = semuaPelanggan.where((p) => p.tanggalBerakhir.isBefore(sekarang)).toList();
+          final pelangganKadaluarsa = semuaPelanggan
+              .where((p) => p.tanggalBerakhir.isBefore(sekarang))
+              .toList();
           for (var pelanggan in pelangganKadaluarsa) {
             if (pelanggan.id != null) {
               // diubah: Memanggil repositori untuk menghapus dari Firebase.
-              await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);
+              await _pelangganAktifRepositori.hapusPelangganAktif(
+                pelanggan.id!,
+              );
             }
           }
         }
