@@ -16,7 +16,9 @@ import 'package:admin_wifi/widget/nama_pelanggan.dart';
 
 enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
 
+// diubah: Menambahkan opsi urutkan berdasarkan tanggal.
 enum OpsiUrutkan {
+  tanggal,
   namaAZ,
   namaZA,
   lunas,
@@ -34,13 +36,14 @@ class PelangganAktifPage extends StatefulWidget {
 
 class _PelangganAktifPageState extends State<PelangganAktifPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
-  // diubah: Menggunakan repositori untuk interaksi dengan Firebase.
   final PelangganAktifRepositori _pelangganAktifRepositori =
       PelangganAktifRepositori();
   late Future<List<PelangganAktif>> _listaPelangganAktifFuture = Future.value(
     [],
   );
   final NotifikasiServis _notifikasiServis = NotifikasiServis();
+  // ditambah: Variabel untuk menyimpan status urutan yang aktif.
+  OpsiUrutkan _urutanAktif = OpsiUrutkan.tanggal;
 
   @override
   void initState() {
@@ -187,6 +190,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
   }
 
+  // diubah: Memperbarui logika untuk menangani opsi tanggal dan menyimpan status.
   Future<void> _urutkanList(OpsiUrutkan pilihan) async {
     final list = await _listaPelangganAktifFuture;
     final pelangganOperasi = PelangganOperasi();
@@ -200,6 +204,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     int Function(PelangganAktif, PelangganAktif) comparator;
 
     switch (pilihan) {
+      case OpsiUrutkan.tanggal:
+        comparator = (a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir);
+        break;
       case OpsiUrutkan.namaAZ:
       case OpsiUrutkan.namaZA:
         comparator = (a, b) {
@@ -238,40 +245,46 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
     setState(() {
       _listaPelangganAktifFuture = Future.value(list);
+      _urutanAktif = pilihan;
     });
   }
 
+  // diubah: Mengubah tampilan dialog untuk menunjukkan opsi aktif.
   void _showUrutkanDialog() async {
     final OpsiUrutkan? pilihan = await showDialog<OpsiUrutkan>(
       context: context,
       builder: (BuildContext context) {
+        Widget buildOption(String text, OpsiUrutkan value) {
+          final bool isSelected = _urutanAktif == value;
+          return Container(
+            color: isSelected ? Theme.of(context).highlightColor : null,
+            child: SimpleDialogOption(
+              onPressed: () => Navigator.pop(context, value),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
+          );
+        }
+
         return SimpleDialog(
           title: const Text('Urutkan Berdasarkan'),
           children: <Widget>[
-            SimpleDialogOption(
-              child: const Text('Nama (A-Z)'),
-              onPressed: () => Navigator.pop(context, OpsiUrutkan.namaAZ),
+            buildOption('Tanggal Berakhir', OpsiUrutkan.tanggal),
+            buildOption('Nama (A-Z)', OpsiUrutkan.namaAZ),
+            buildOption('Nama (Z-A)', OpsiUrutkan.namaZA),
+            buildOption('Status Pembayaran (Lunas)', OpsiUrutkan.lunas),
+            buildOption(
+              'Status Pembayaran (Belum Lunas)',
+              OpsiUrutkan.belumLunas,
             ),
-            SimpleDialogOption(
-              child: const Text('Nama (Z-A)'),
-              onPressed: () => Navigator.pop(context, OpsiUrutkan.namaZA),
-            ),
-            SimpleDialogOption(
-              child: const Text('Status Pembayaran (Lunas)'),
-              onPressed: () => Navigator.pop(context, OpsiUrutkan.lunas),
-            ),
-            SimpleDialogOption(
-              child: const Text('Status Pembayaran (Belum Lunas)'),
-              onPressed: () => Navigator.pop(context, OpsiUrutkan.belumLunas),
-            ),
-            SimpleDialogOption(
-              child: const Text('Status Paket (Aktif)'),
-              onPressed: () => Navigator.pop(context, OpsiUrutkan.paketAktif),
-            ),
-            SimpleDialogOption(
-              child: const Text('Status Paket (Tidak Aktif)'),
-              onPressed: () =>
-                  Navigator.pop(context, OpsiUrutkan.paketTidakAktif),
+            buildOption('Status Paket (Aktif)', OpsiUrutkan.paketAktif),
+            buildOption(
+              'Status Paket (Tidak Aktif)',
+              OpsiUrutkan.paketTidakAktif,
             ),
             SimpleDialogOption(
               child: const Text('Batal'),
