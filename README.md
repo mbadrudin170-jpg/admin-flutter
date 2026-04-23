@@ -1,113 +1,105 @@
 # **Aturan lainnya untuk AI**
-1. 
+
+### **1. Prinsip Utama: Interaksi dan Bahasa**
+
+*   **1.1. Alur Kerja Berbasis Konfirmasi:** Sebelum melakukan tindakan modifikasi apa pun, AI **wajib** menyajikan rencana kerja yang terperinci kepada pengguna. Pekerjaan hanya dapat dilanjutkan setelah mendapatkan persetujuan eksplisit (misalnya, "setuju", "oke", "ok", "ya", "yes"). Jika pengguna menolak (misalnya, "jangan", "tidak", "nggk", "nggak"), AI harus membatalkan rencana tersebut dan menunggu arahan selanjutnya.
+*   **1.2. Standar Bahasa Indonesia:** Seluruh komunikasi dengan pengguna, serta semua penamaan dalam kode (nama file, variabel, fungsi, parameter), harus konsisten menggunakan Bahasa Indonesia yang formal, baku, dan jelas.
+
+### **2. Dokumentasi dan Manajemen Kode**
+
+*   **2.1. Baca `README.md`:** Sebelum memulai tugas baru, AI wajib membaca file `README.md` terlebih dahulu untuk memahami konteks, alur kerja, dan status terakhir proyek.
+*   **2.2. Komentar Kode Wajib:**
+    *   **Path File:** Setiap file yang dimodifikasi harus mencantumkan path lengkapnya dalam bentuk komentar di baris paling atas. *Contoh:* `// path: lib/main.dart`.
+    *   **Deskripsi Fungsi:** Setiap fungsi harus memiliki komentar deskriptif di atasnya yang menjelaskan tujuan dan cara kerjanya. *Contoh:* `// Fungsi untuk menavigasi pengguna ke halaman profil.`.
+    *   **Logika Perubahan:** Setiap baris kode yang ditambah, diubah, atau dihapus harus disertai komentar di atas atau di sampingnya dengan struktur yang jelas: `// ditambah: [alasan penambahan]`, `// diubah: [alasan perubahan]`, atau `// dihapus: [alasan penghapusan]`.
+    *   **Keterangan Tambahan:** Untuk logika atau alur kode yang kompleks, tambahkan komentar secukupnya untuk memastikan kode mudah dipahami oleh manusia.
+*   **2.3. Pembaruan `README.md`:** Setelah menyelesaikan sebuah tugas, AI **wajib** memperbarui dokumentasi untuk file yang relevan di dalam `README.md`.
+    *   Pembaruan harus mengikuti format yang ditentukan secara ketat.
+    *   Hindari detail implementasi yang berlebihan atau catatan negatif (mis. "kode lama dihapus karena error").
+    *   **Format Pembaruan:**
+        ```
+        **File:** `lib/path/nama_file.dart`
+        **Fitur:** [Nama Fitur Utama yang Terkait dengan File]
+        **Daftar Fungsi:**
+        *   `namaFungsiA()`: Penjelasan singkat dan jelas mengenai kegunaan fungsi ini.
+        *   `namaFungsiB()`: Penjelasan singkat dan jelas mengenai kegunaan fungsi ini.
+        **Catatan:** [Informasi tambahan atau konteks penting jika diperlukan.]
+        ```
+
+### **3. Kualitas, Build, dan Konsistensi**
+
+*   **3.1. Analisis Kode:** Setelah semua modifikasi kode selesai, jalankan perintah `flutter analyze` untuk memastikan tidak ada error atau *warning* yang tersisa.
+*   **3.2. Proses Build Aplikasi:**
+    *   Proses build **hanya** boleh dieksekusi atas perintah eksplisit dari pengguna.
+    *   Sebelum memulai build, periksa `README.md` untuk mengidentifikasi apakah perubahan terakhir merupakan **fitur baru** atau hanya **perbaikan bug**.
+    *   Jika hanya **perbaikan bug**, yang dinaikkan hanyalah nomor *build* di `pubspec.yaml` (misalnya, dari `1.0.0+1` menjadi `1.0.0+2`). Versi utama (`1.0.0`) tidak boleh diubah.
+    *   Gunakan perintah berikut untuk proses build: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
+*   **3.3. Perintah `clean`:** Jika pengguna memberikan perintah `clean`, jalankan `flutter clean && flutter pub get` di terminal.
+*   **3.4. Hindari Asumsi:** AI tidak boleh membuat asumsi yang tidak berdasar atau "liar" yang dapat mengganggu sinkronisasi dan konsistensi antar file dalam proyek.
+*   **3.5. Jaga Konsistensi:** AI harus selalu menjaga konsistensi dan kejelasan dalam struktur kode, penamaan, dan alur dokumentasi di seluruh proyek.
+*   **3.6. Pola Asynchronous:** Setiap kali membuat fungsi yang melibatkan operasi I/O (misalnya, *network request* atau akses database), AI **wajib** menggunakan pola *Asynchronous* (`async`/`await`) dan membungkus hasilnya dalam objek `Future`. Hindari penggunaan metode `.then()` yang berantai untuk menjaga keterbacaan kode.
 
 # **Dokumentasi Proyek Aplikasi Admin WiFi**
 
 Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen ini berfungsi sebagai panduan utama untuk memahami arsitektur, fungsionalitas, dan alur kerja pengembangan aplikasi.
+Analisis File: lib/utils/format/format_jam.dart
+Tujuan Utama: Menjadi penyedia layanan tunggal (Single Source of Truth) untuk semua konformitas format waktu jam di aplikasi agar tampilan konsisten di seluruh halaman (UI).
 
----
+Dependencies: package:intl/intl.dart (Wajib ada di pubspec.yaml).
 
-## **1. Tujuan Aplikasi**
+1. Fitur & Fungsionalitas
+Standardisasi 24 Jam: Memastikan semua waktu ditampilkan dalam format 24 jam (00:00 - 23:59).
 
-Aplikasi Admin WiFi adalah sebuah sistem manajemen lengkap yang dirancang untuk membantu administrator dalam mengelola layanan jaringan WiFi. Fungsi utamanya meliputi:
+Graceful Error Handling: Mencegah aplikasi berhenti tiba-tiba (crash) saat menerima data waktu yang korup atau tidak valid dari database SQLite atau Firestore.
 
-*   **Manajemen Pelanggan:** Mengelola data pelanggan, baik yang aktif maupun yang sudah tidak berlangganan.
-*   **Manajemen Transaksi:** Mencatat semua transaksi pembayaran dari pelanggan.
-*   **Manajemen Paket:** Mengatur berbagai paket layanan WiFi yang ditawarkan.
-*   **Manajemen Keuangan:** Melacak pemasukan dan pengeluaran melalui fitur dompet digital.
-*   **Interaksi Pengguna:** Menyediakan platform bagi pengguna untuk memberikan kritik dan saran.
-*   **Notifikasi Otomatis:** Memberikan pengingat proaktif mengenai paket pelanggan yang akan berakhir.
-*   **Mode Offline:** Memberi tahu pengguna ketika aplikasi tidak terhubung ke internet.
-*   **Informasi Aplikasi:** Menyediakan halaman khusus "Tentang Aplikasi" yang menampilkan versi dan deskripsi.
+Abstraksi Parsing: Menyederhanakan proses perubahan dari tipe data String (Database) ke String (Display) tanpa perlu melakukan DateTime.parse berulang kali di lapisan UI.
 
----
+2. Dokumentasi Fungsi (API Reference)
+static String formatKeJamMenit(DateTime waktu)
 
-## **2. Struktur Direktori Proyek**
+Input: Objek DateTime valid.
 
-Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan skalabilitas dan kemudahan pemeliharaan.
+Output: String format "HH:mm".
 
-*   **`lib/`**: Direktori utama kode sumber aplikasi.
-    *   **`main.dart`**: Titik masuk utama aplikasi.
-    *   **`splash_screen.dart`**: Layar pembuka yang juga menangani pemeriksaan konektivitas awal.
-    *   **`data/`**: Logika pengelolaan data.
-        *   **`operasi/`**: Kelas-kelas yang bertanggung jawab untuk operasi CRUD pada database lokal (SQLite).
-        *   **`repositori/`**: Lapisan yang bertanggung jawab untuk operasi data (CRUD) langsung dengan sumber data eksternal seperti Firestore.
-        *   **`services/`**: Layanan latar belakang seperti sinkronisasi data dan notifikasi.
-    *   **`model/`**: Definisi kelas model data.
-    *   **`halaman/`**: Komponen antarmuka pengguna (UI), diatur per fitur.
-    *   **`utils/`**: Kode utilitas yang dapat digunakan kembali.
-    *   **`widget/`**: Komponen UI kustom yang dapat digunakan kembali.
-*   **`assets/`**: Berisi aset statis seperti font lokal.
+Kegunaan: Digunakan pada kartu pelanggan (pelanggan aktif) untuk menunjukkan jam mulai koneksi.
 
----
+static String formatKeJamLengkap(DateTime waktu)
 
-## **3. Arsitektur & Desain**
+Input: Objek DateTime valid.
 
-### **Manajemen Status (State Management)**
+Output: String format "HH:mm:ss".
 
-Aplikasi ini menggunakan paket **`provider`** untuk memisahkan logika UI dari logika bisnis, dengan pola `ChangeNotifier` dan `ChangeNotifierProvider`.
+Kegunaan: Digunakan pada sistem logging dan riwayat transaksi keuangan yang membutuhkan presisi tinggi hingga satuan detik.
 
-### **Desain Visual & Tema (Visual Design & Theming)**
+static String formatTeksKeJam(String teksWaktu)
 
-Antarmuka pengguna mengikuti prinsip **Desain Material 3**.
+Input: String mentah (ISO 8601).
 
-*   **Tema:** Tema terpusat didefinisikan di `lib/main.dart` dengan `seedColor` **`Colors.deepPurple`**.
-*   **Tipografi:** Menggunakan **font kustom lokal** dari `assets/fonts/` (Oswald, Roboto, Open Sans) untuk kinerja optimal dan tampilan yang konsisten.
+Logic: Menggunakan blok try-catch untuk membungkus DateTime.parse.
 
-### **Navigasi (Navigation)**
+Output: String "HH:mm" atau fallback "--:--" jika gagal.
 
-Navigasi utama menggunakan `BottomNavigationBar` di `lib/halaman_utama.dart`. Navigasi sekunder menggunakan `Navigator.push` dengan `MaterialPageRoute`.
+3. Aturan Ketat & Larangan (Constraint)
+Hindari: Menggunakan DateFormat secara manual di file UI (.dart di folder halaman/). Semua harus memanggil kelas FormatJam.
 
----
+Hindari: Memberikan nilai null pada parameter teksWaktu. Pastikan ada pengecekan awal atau gunakan fungsi formatTeksKeJam karena sudah memiliki proteksi error.
 
-## **4. Fungsionalitas Inti**
+Peringatan Kode: Penggunaan format 'HH' (kapital) sangat krusial. Jangan diubah menjadi 'hh' (kecil) karena akan merusak logika sistem admin yang berbasis waktu 24 jam (menghindari kerancuan AM/PM pada transaksi malam hari).
 
-Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegrasi.
+4. Alur Kerja Kode (Pseudo-logic)
+Teriman data (DateTime/String).
 
-### **Pemeriksaan Konektivitas & Mode Offline**
-*   **Tujuan:** Memberikan umpan balik langsung kepada pengguna mengenai status koneksi internet mereka untuk mengelola ekspektasi terkait sinkronisasi data.
-*   **File Terkait:** `lib/splash_screen.dart`, `lib/services/cek_koneksi_internet.dart`.
+Lakukan validasi format melalui library intl.
 
-### **Manajemen Data & Arsitektur Penghapusan**
-*   **Tujuan:** Mengelola data inti bisnis secara konsisten dengan pemisahan tanggung jawab yang jelas.
-*   **File Terkait:** `lib/data/operasi/`, `lib/data/repositori/`, `lib/halaman/tab/pelanggan_aktif.dart`.
-*   **Alur Penghapusan Data:** Proses penghapusan data diinisiasi dari lapisan UI, namun logikanya dienkapsulasi pada lapisan yang sesuai untuk memastikan pemisahan tanggung jawab (Separation of Concerns).
-    1.  **Pengecekan Koneksi:** UI (`pelanggan_aktif.dart`) memeriksa status koneksi internet.
-    2.  **Operasi Jarak Jauh (Online):** Jika aplikasi online, UI memanggil `PelangganAktifRepositori` (`lib/data/repositori/pelanggan_aktif_repositori.dart`) untuk menghapus dokumen yang relevan dari **Firestore**.
-    3.  **Operasi Lokal:** Setelah operasi jarak jauh (jika ada) selesai, UI memanggil `PelangganAktifOperasi` (`lib/data/operasi/pelanggan_aktif_operasi.dart`) untuk menghapus data dari **database SQLite lokal**.
-    *   Pendekatan ini memastikan bahwa logika interaksi dengan Firebase terisolasi di dalam **lapisan repositori**, sementara logika interaksi dengan database lokal berada di dalam **lapisan operasi**, sesuai dengan arsitektur yang bersih.
+Jika data tidak valid (pada fungsi teks), tangkap exception dan kembalikan nilai aman (--:--).
 
-### **Dompet Digital (Manajemen Keuangan)**
-*   **Tujuan:** Melacak saldo, pemasukan, dan pengeluaran untuk memberikan gambaran keuangan yang jelas.
-*   **File Terkait:** `lib/model/dompet_model.dart`, `lib/data/operasi/dompet_operasi.dart`, `lib/halaman/tab/dompet.dart`.
+Kembalikan hasil transformasi ke pemanggil (UI/Model).
 
-### **Sinkronisasi Data dengan Firebase**
-*   **Tujuan:** Memastikan konsistensi data antara database lokal (SQLite) dan backend (Firebase Firestore) secara efisien.
-*   **File Terkait:** `lib/data/services/sinkronisasi_database.dart`.
-*   **Mekanisme:** Proses sinkronisasi periodik yang berjalan di latar belakang untuk mengunggah dan mengunduh perubahan data secara inkremental.
-
-### **Notifikasi & Pengingat Jatuh Tempo**
-*   **Tujuan:** Memberikan pengingat otomatis kepada admin mengenai paket pelanggan yang akan segera berakhir.
-*   **File Terkait:** `lib/data/services/notifikasi_servis.dart`, `lib/halaman/tab/pelanggan_aktif.dart`.
-
-### **Kritik dan Saran Pengguna**
-*   **Tujuan:** Menyediakan wadah bagi pengguna untuk memberikan masukan, yang kemudian dapat dilihat oleh administrator.
-*   **File Terkait:** `lib/model/kritik_saran_model.dart`, `lib/data/operasi/kritik_saran_operasi.dart`, `lib/halaman/lainnya/kritik_saran.dart`.
-
-### **Halaman Tentang Aplikasi**
-*   **Tujuan:** Memberikan informasi penting kepada pengguna mengenai aplikasi, termasuk versi saat ini dan deskripsi singkat.
-*   **File Terkait:** `lib/halaman/lainnya/tentang_aplikasi.dart`, `lib/halaman/tab/lainnya.dart`.
-*   **Mekanisme:**
-    1.  Halaman ini dapat diakses melalui menu "Lainnya".
-    2.  Secara dinamis mengambil informasi versi aplikasi menggunakan paket `package_info_plus`.
-    3.  Menampilkan logo, nama aplikasi, versi, dan deskripsi dengan tata letak yang bersih.
-
----
-
-## **5. Alur Kerja Pengembangan**
-
-1.  **Perencanaan & Blueprint:** AI akan menganalisis permintaan dan memperbarui file `blueprint.md` sebelum memulai kode.
-2.  **Implementasi:** AI akan mengimplementasikan perubahan sesuai dengan standar kode yang ditetapkan.
-3.  **Dokumentasi:** AI akan memperbarui komentar kode dan file `README.md` ini jika ada perubahan signifikan.
-4.  **Verifikasi & Kualitas Kode:** Setelah setiap perubahan, AI akan menjalankan `flutter analyze` dan `dart format .` untuk memastikan kualitas kode.
-5.  **Logging:** Aplikasi menggunakan pustaka `dart:developer` untuk pencatatan terstruktur.
+**File:** `lib/halaman/detail/detail_pelanggan_aktif.dart`
+**Fitur:** Tampilan Detail Pelanggan Aktif
+**Daftar Fungsi:**
+*   `_loadDetails()`: Mengambil data detail pelanggan (nama, telepon) dan detail paket (nama paket) dari database secara asynchronous berdasarkan ID yang ada pada objek `PelangganAktif`.
+*   `_navigateToEdit()`: Menavigasi pengguna ke halaman `FormPelangganAktif` untuk mengubah data. Setelah data berhasil diubah, fungsi ini akan memuat ulang detail untuk menampilkan informasi terbaru.
+*   `_buildTeleponDisplay()`: Widget internal untuk menampilkan nomor telepon pelanggan. Menangani status `loading` dan kasus jika data tidak ditemukan.
+*   `_buildPaketDisplay()`: Widget internal untuk menampilkan nama paket yang digunakan pelanggan. Menangani status `loading` dan kasus jika data tidak ditemukan.
+**Catatan:** Halaman ini bertanggung jawab untuk menampilkan informasi lengkap dari seorang pelanggan yang sedang aktif berlangganan. Data diambil dari beberapa tabel (Pelanggan, Paket) dan digabungkan untuk ditampilkan.
