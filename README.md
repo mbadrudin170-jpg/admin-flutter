@@ -70,7 +70,7 @@ Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegras
 *   **File Terkait:** `lib/model/`, `lib/data/operasi/`, `lib/halaman/`.
 *   **Alur Penghapusan Data:** Proses penghapusan data, seperti pada pelanggan aktif, diatur secara terpusat dari lapisan UI (`lib/halaman/tab/pelanggan_aktif.dart`). Setelah pengguna mengonfirmasi, aplikasi akan memanggil dua fungsi secara berurutan:
     1.  Fungsi dari kelas `PelangganAktifOperasi` untuk menghapus data dari **database SQLite lokal**.
-    2.  Fungsi dari kelas `FirebaseService` untuk menghapus data dari **Firestore**.
+    2.  Fungsi dari kelas `SinkronisasiService` untuk menghapus data dari **Firestore**.
     *   Pendekatan ini memastikan data terhapus secara konsisten di kedua penyimpanan dan menjaga pemisahan tanggung jawab antar lapisan kode.
 
 ### **Dompet Digital (Manajemen Keuangan)**
@@ -78,14 +78,18 @@ Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegras
 *   **File Terkait:** `lib/model/dompet_model.dart`, `lib/data/operasi/dompet_operasi.dart`, `lib/halaman/tab/dompet.dart`.
 
 ### **Sinkronisasi Data dengan Firebase**
-*   **Tujuan:** Memastikan konsistensi data antara database lokal (SQLite) dan backend (Firebase Firestore).
-*   **File Terkait:** `lib/data/servis/firebase_servis.dart`.
-*   **Proses:** Layanan ini secara periodik melakukan **sinkronisasi inkremental**. Ia mengunggah data lokal yang baru dan mengunduh data terbaru dari Firebase, hanya berdasarkan data yang berubah sejak sinkronisasi terakhir. Proses ini sangat efisien karena menggunakan *timestamp* `diperbarui` pada setiap model data.
-*   **Penghapusan Data:** `FirebaseService` kini juga memiliki metode khusus (`hapusPelangganAktif`) untuk menangani penghapusan data di Firestore, yang dipanggil dari lapisan UI untuk memastikan sinkronisasi penghapusan antara lokal dan server.
+*   **Tujuan:** Memastikan konsistensi data antara database lokal (SQLite) dan backend (Firebase Firestore) secara efisien.
+*   **File Terkait:** `lib/data/services/sinkronisasi_database.dart`.
+*   **Mekanisme:**
+    1.  Layanan ini, yang diimplementasikan dalam kelas `SinkronisasiService`, berjalan secara periodik di latar belakang.
+    2.  Proses sinkronisasi bersifat **dua arah dan inkremental**:
+        *   **Unggah:** Perubahan yang terjadi di database lokal (data baru atau yang diperbarui) akan diunggah ke Firestore.
+        *   **Unduh:** Perubahan yang terjadi di Firestore akan diunduh dan disimpan ke database SQLite lokal.
+    3.  Sinkronisasi ini efisien karena hanya memproses data yang berubah sejak waktu sinkronisasi terakhir, menggunakan *timestamp* `diperbarui`.
 
 ### **Notifikasi & Pengingat Jatuh Tempo**
 *   **Tujuan:** Memberikan pengingat otomatis kepada admin agar dapat menindaklanjuti paket pelanggan yang akan segera berakhir masa aktifnya.
-*   **File Terkait:** `lib/data/servis/notifikasi_servis.dart`, `lib/halaman/tab/pelanggan_aktif.dart`.
+*   **File Terkait:** `lib/data/services/notifikasi_servis.dart`, `lib/halaman/tab/pelanggan_aktif.dart`.
 *   **Mekanisme:**
     1.  Saat daftar pelanggan aktif dimuat, sistem akan menjadwalkan notifikasi untuk setiap pelanggan yang relevan.
     2.  Notifikasi dijadwalkan untuk **3 hari sebelum** dan **tepat pada hari** kadaluarsa.
