@@ -1,6 +1,6 @@
-// lib/halaman/lainnya/kritik_saran.dart
-import 'package:admin_wifi/utils/format/format_tanggal.dart';
-import 'package:admin_wifi/utils/format/format_jam.dart';
+// path: lib/halaman/lainnya/kritik_saran.dart
+// diubah: Mengimpor file utilitas terpusat.
+import 'package:admin_wifi/utils/format_util.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/kritik_saran_operasi.dart';
 import 'package:admin_wifi/model/kritik_saran_model.dart';
@@ -84,14 +84,15 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          item.isi, // Diperbaiki dari item.pesan
+                          item.isi,
                           style: const TextStyle(fontSize: 15, height: 1.4),
                         ),
                         const Divider(height: 24),
                         Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            '${formatTanggal(item.tanggal)} ${FormatJam.formatKeJamMenit(item.tanggal)}',
+                            // diubah: Memperbaiki pemanggilan fungsi format tanggal dan jam.
+                            FormatTanggal.formatTanggalDanJam(item.tanggal),
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[600],

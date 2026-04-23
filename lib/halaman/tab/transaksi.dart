@@ -3,13 +3,12 @@
 // Ini juga mencakup ringkasan total pemasukan, pengeluaran, dan transfer.
 // Pengguna dapat menambahkan transaksi baru melalui tombol floating action.
 
+// diubah: Mengimpor utilitas format yang baru.
+import 'package:admin_wifi/utils/format_util.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
 import 'package:admin_wifi/halaman/form/form_transaksi.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
-import 'package:admin_wifi/utils/format/format_tanggal.dart';
-import 'package:admin_wifi/utils/format/format_jam.dart';
 
 import '../detail/detail_transaksi.dart';
 
@@ -135,8 +134,9 @@ class _TransaksiPageState extends State<TransaksiPage> {
     return Column(
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        // diubah: Menggunakan kelas FormatUang.
         Text(
-          NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(jumlah),
+          FormatUang.formatMataUang(jumlah),
           style: TextStyle(color: warna, fontWeight: FontWeight.bold),
         ),
       ],
@@ -149,12 +149,14 @@ class _TransaksiPageState extends State<TransaksiPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          // diubah: Menggunakan kelas FormatTanggal.
           Text(
-            formatTanggal(tanggal),
+            FormatTanggal.formatTanggalBasic(tanggal),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
+          // diubah: Menggunakan kelas FormatUang.
           Text(
-            NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(total),
+            FormatUang.formatMataUang(total),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: total >= 0 ? Colors.green : Colors.red,
@@ -198,12 +200,9 @@ class _TransaksiPageState extends State<TransaksiPage> {
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // diubah: Menggunakan kelas FormatUang.
           Text(
-            NumberFormat.currency(
-              locale: 'id_ID',
-              symbol: 'Rp ',
-              decimalDigits: 0,
-            ).format(transaksi.jumlah),
+            FormatUang.formatMataUang(transaksi.jumlah),
             style: TextStyle(
               color: transaksi.tipe == TipeTransaksi.pemasukan
                   ? Colors.green
@@ -212,7 +211,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
                         : Colors.blue),
             ),
           ),
-          Text(FormatJam.formatKeJamMenit(transaksi.tanggal)),
+          // diubah: Menggunakan kelas FormatJam.
+          Text(FormatJam.formatJamMenit(transaksi.tanggal)),
         ],
       ),
     );

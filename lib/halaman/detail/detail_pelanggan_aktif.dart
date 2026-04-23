@@ -8,10 +8,9 @@ import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
-// ditambah: Mengimpor fungsi formatTanggal untuk memformat tanggal.
-import 'package:admin_wifi/utils/format/format_tanggal.dart';
-// ditambah: Mengimpor kelas FormatJam untuk memformat waktu.
-import 'package:admin_wifi/utils/format/format_jam.dart';
+// diubah: Mengimpor file utilitas terpusat.
+import 'package:admin_wifi/utils/format_util.dart';
+import 'package:admin_wifi/utils/perhitungan_util.dart';
 
 class DetailPelangganAktif extends StatefulWidget {
   final PelangganAktif pelanggan;
@@ -46,13 +45,10 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
     final paketOperasi = PaketOperasi();
 
     try {
-      // PERBAIKAN: Langsung gunakan idPaket (String) tanpa konversi
       final idPaket = _pelangganAktif.idPaket;
 
-      // Muat data pelanggan dan paket secara bersamaan
       final results = await Future.wait([
         pelangganOperasi.ambilSatuPelangganById(_pelangganAktif.idPelanggan),
-        // PERBAIKAN: Panggil dengan ID String jika tidak kosong
         if (idPaket.isNotEmpty)
           paketOperasi.ambilSatuPaket(idPaket)
         else
@@ -99,7 +95,6 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
         setState(() {
           _pelangganAktif = updatedPelangganAktif;
         });
-        // Muat ulang semua detail setelah edit
         _loadDetails();
       }
     }
@@ -149,16 +144,30 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                     const SizedBox(height: 8),
                     _buildPaketDisplay(),
                     const SizedBox(height: 8),
-                    // diubah: Menggunakan formatTanggal dan FormatJam untuk menampilkan tanggal dan waktu mulai.
+                    // diubah: Menggunakan kelas FormatTanggal dan FormatJam.
                     Text(
-                      'Mulai: ${formatTanggalAngka(_pelangganAktif.tanggalMulai)} - ${FormatJam.formatKeJamMenit(_pelangganAktif.tanggalMulai)}',
+                      'Mulai: ${FormatTanggal.formatTanggalBasic(_pelangganAktif.tanggalMulai)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalMulai)}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
-                    // diubah: Menggunakan formatTanggal dan FormatJam untuk menampilkan tanggal dan waktu berakhir.
+                    // diubah: Menggunakan kelas FormatTanggal dan FormatJam.
                     Text(
-                      'Berakhir: ${formatTanggalAngka(_pelangganAktif.tanggalBerakhir)} - ${FormatJam.formatKeJamMenit(_pelangganAktif.tanggalBerakhir)}',
+                      'Berakhir: ${FormatTanggal.formatTanggalBasic(_pelangganAktif.tanggalBerakhir)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalBerakhir)}',
                       style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    // ditambah: Menampilkan sisa masa aktif menggunakan PerhitunganUtil.
+                    Text(
+                      PerhitunganUtil.getTeksSisaMasaAktif(
+                        _pelangganAktif.tanggalBerakhir,
+                      ),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: PerhitunganUtil.getWarnaSisaMasaAktif(
+                          _pelangganAktif.tanggalBerakhir,
+                        ),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),
@@ -190,12 +199,12 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
   }
 
   Widget _buildPaketDisplay() {
-    // if (_isLoading) {
-    //   return Text(
-    //     'Memuat nama paket...',
-    //     style: Theme.of(context).textTheme.titleMedium,
-    //   );
-    // }
+    if (_isLoading) {
+      return Text(
+        'Memuat nama paket...',
+        style: Theme.of(context).textTheme.titleMedium,
+      );
+    }
     if (_paket != null) {
       return Text(
         'Paket: ${_paket!.nama}',

@@ -1,4 +1,4 @@
-// lib/halaman/form/form_pelanggan_aktif.dart
+// path: lib/halaman/form/form_pelanggan_aktif.dart
 // Halaman ini menyediakan formulir untuk mengaktifkan pelanggan dengan paket tertentu.
 
 import 'dart:developer' as developer;
@@ -8,8 +8,8 @@ import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
-import 'package:admin_wifi/utils/format/format_tanggal.dart';
-import 'package:admin_wifi/utils/format/format_jam.dart';
+// diubah: Mengimpor file utilitas terpusat.
+import 'package:admin_wifi/utils/format_util.dart';
 import 'package:flutter/material.dart';
 
 class FormPelangganAktif extends StatefulWidget {
@@ -162,7 +162,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
     if (_formKey.currentState!.validate()) {
       final selectedPaket = _selectedPaket;
       if (_selectedPelanggan != null &&
-          selectedPaket != null && // PERBAIKAN: Cek null di sini
+          selectedPaket != null &&
           _selectedDate != null &&
           _selectedTime != null) {
         final DateTime tanggalMulai = DateTime(
@@ -175,13 +175,13 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
 
         final DateTime tanggalBerakhir = _hitungTanggalBerakhir(
           tanggalMulai,
-          selectedPaket, // PERBAIKAN: Gunakan variabel lokal
+          selectedPaket,
         );
 
         final pelangganAktifData = PelangganAktif(
           id: _isEditMode ? widget.pelangganAktif!.id : null,
           idPelanggan: _selectedPelanggan!.id,
-          idPaket: selectedPaket.id, // PERBAIKAN: Gunakan variabel lokal
+          idPaket: selectedPaket.id,
           tanggalMulai: tanggalMulai,
           tanggalBerakhir: tanggalBerakhir,
           status: _statusPembayaran,
@@ -307,7 +307,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                           label: Text(
                             _selectedDate == null
                                 ? 'Pilih Tanggal'
-                                : formatTanggal(_selectedDate!),
+                                : FormatTanggal.formatTanggalBasic(_selectedDate!),
                           ),
                         ),
                         TextButton.icon(
@@ -382,7 +382,13 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                             Text(
                               (_selectedDate == null || _selectedTime == null)
                                   ? 'Pilih Tanggal & Jam'
-                                  : '${formatTanggal(_selectedDate!)}, ${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}',
+                                  // diubah: Menghapus interpolasi string yang tidak perlu.
+                                  : FormatTanggal.formatTanggalDanJam(DateTime(
+                                      _selectedDate!.year,
+                                      _selectedDate!.month,
+                                      _selectedDate!.day,
+                                      _selectedTime!.hour,
+                                      _selectedTime!.minute)),
                             ),
                           ],
                         ),
@@ -408,9 +414,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                                   startDate,
                                   _selectedPaket!,
                                 );
-                                final timePart =
-                                    ', ${FormatJam.formatKeJamMenit(endDate)}';
-                                return '${formatTanggal(endDate)}$timePart';
+                                return FormatTanggal.formatTanggalDanJam(endDate);
                               } else {
                                 return 'Pilih paket & tanggal mulai';
                               }

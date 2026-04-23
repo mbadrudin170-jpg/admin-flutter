@@ -1,10 +1,11 @@
-// lib/halaman/detail/detail_transaksi.dart
+// path: lib/halaman/detail/detail_transaksi.dart
 // Halaman ini menampilkan detail dari satu transaksi.
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
-import 'package:admin_wifi/utils/format/format_tanggal.dart';
+// diubah: Mengimpor file utilitas terpusat.
+import 'package:admin_wifi/utils/format_util.dart';
 
 class DetailTransaksiPage extends StatelessWidget {
   final Transaksi transaksi;
@@ -30,7 +31,8 @@ class DetailTransaksiPage extends StatelessWidget {
           children: [
             _buildDetailRow('ID', transaksi.id),
             _buildDetailRow('Keterangan', transaksi.keterangan),
-            _buildDetailRow('Tanggal', formatTanggal(transaksi.tanggal)),
+            // diubah: Memperbaiki pemanggilan fungsi format tanggal.
+            _buildDetailRow('Tanggal', FormatTanggal.formatTanggalDanJam(transaksi.tanggal)),
             _buildDetailRow(
               'Jumlah',
               NumberFormat.currency(

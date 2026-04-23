@@ -1,12 +1,12 @@
 // path: lib/halaman/tab/pelanggan_aktif.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 
-// diubah: Impor layanan koneksi internet dan repositori yang baru.
+// diubah: Mengimpor utilitas terpusat.
+import 'package:admin_wifi/utils/format_util.dart';
+import 'package:admin_wifi/utils/perhitungan_util.dart';
 import 'package:admin_wifi/data/repositori/pelanggan_aktif_repositori.dart';
 import 'package:admin_wifi/services/cek_koneksi_internet.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
-import 'package:admin_wifi/utils/format/format_tanggal.dart';
-import 'package:admin_wifi/utils/format/format_jam.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
@@ -17,7 +17,6 @@ import 'package:admin_wifi/widget/nama_pelanggan.dart';
 
 enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
 
-// diubah: Menambahkan opsi urutkan berdasarkan tanggal.
 enum OpsiUrutkan {
   tanggal,
   namaAZ,
@@ -43,7 +42,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     [],
   );
   final NotifikasiServis _notifikasiServis = NotifikasiServis();
-  // ditambah: Variabel untuk menyimpan status urutan yang aktif.
   OpsiUrutkan _urutanAktif = OpsiUrutkan.tanggal;
 
   @override
@@ -78,7 +76,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           id: p.id.hashCode.abs() + 1000,
           title: '⏰ Paket Akan Berakhir',
           body:
-              'Paket $namaPelanggan akan berakhir dalam 3 hari (${formatTanggal(p.tanggalBerakhir)})',
+              'Paket $namaPelanggan akan berakhir dalam 3 hari (${FormatTanggal.formatTanggalBasic(p.tanggalBerakhir)})',
           jadwal: tigaHariSebelumKadaluarsa,
         );
       }
@@ -90,7 +88,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           id: p.id.hashCode.abs() + 2000,
           title: '🔔 Paket Berakhir Sekarang',
           body:
-              'Paket $namaPelanggan telah berakhir hari ini (${formatTanggal(waktuKadaluarsa)}). Harap perbarui paket.',
+              'Paket $namaPelanggan telah berakhir hari ini (${FormatTanggal.formatTanggalBasic(waktuKadaluarsa)}). Harap perbarui paket.',
           jadwal: waktuKadaluarsa,
         );
       }
@@ -102,7 +100,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       _listaPelangganAktifFuture = _pelangganAktifOperasi
           .ambilSemuaPelangganAktif()
           .then((list) {
-            // diubah: Mengubah urutan default menjadi berdasarkan tanggal berakhir.
             list.sort((a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir));
             return list;
           });
@@ -152,7 +149,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
     if (konfirmasi == true) {
       try {
-        // diubah: Memanggil repositori untuk menghapus dari Firebase.
         final isOnline = await KoneksiInternetService.cekKoneksi();
         if (isOnline) {
           await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);
@@ -191,7 +187,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
   }
 
-  // diubah: Memperbarui logika untuk menangani opsi tanggal dan menyimpan status.
   Future<void> _urutkanList(OpsiUrutkan pilihan) async {
     final list = await _listaPelangganAktifFuture;
     final pelangganOperasi = PelangganOperasi();
@@ -232,8 +227,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       case OpsiUrutkan.paketAktif:
       case OpsiUrutkan.paketTidakAktif:
         comparator = (a, b) {
-          final isAktifA = a.tanggalBerakhir.isAfter(DateTime.now());
-          final isAktifB = b.tanggalBerakhir.isAfter(DateTime.now());
+          final isAktifA = PerhitunganUtil.sisaHari(a.tanggalBerakhir) >= 0;
+          final isAktifB = PerhitunganUtil.sisaHari(b.tanggalBerakhir) >= 0;
           if (isAktifA == isAktifB) return 0;
           return (pilihan == OpsiUrutkan.paketAktif)
               ? (isAktifA ? -1 : 1)
@@ -250,7 +245,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     });
   }
 
-  // diubah: Mengubah tampilan dialog untuk menunjukkan opsi aktif.
   void _showUrutkanDialog() async {
     final OpsiUrutkan? pilihan = await showDialog<OpsiUrutkan>(
       context: context,
@@ -378,7 +372,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                 .ambilSemuaPelangganAktif();
             for (var pelanggan in semuaPelanggan) {
               if (pelanggan.id != null) {
-                // diubah: Memanggil repositori untuk menghapus dari Firebase.
                 await _pelangganAktifRepositori.hapusPelangganAktif(
                   pelanggan.id!,
                 );
@@ -400,7 +393,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
               .toList();
           for (var pelanggan in pelangganKadaluarsa) {
             if (pelanggan.id != null) {
-              // diubah: Memanggil repositori untuk menghapus dari Firebase.
               await _pelangganAktifRepositori.hapusPelangganAktif(
                 pelanggan.id!,
               );
@@ -461,11 +453,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
               itemBuilder: (context, index) {
                 final pelanggan = snapshot.data![index];
 
-                final sekarang = DateTime.now();
-                final isAktif = pelanggan.tanggalBerakhir.isAfter(sekarang);
-                final statusPaketText = isAktif ? 'Aktif' : 'Tidak Aktif';
-                final statusPaketColor = isAktif ? Colors.green : Colors.red;
-
                 final statusPembayaranText = pelanggan.status.displayName;
                 final statusPembayaranColor =
                     pelanggan.status == StatusPembayaran.lunas
@@ -511,15 +498,17 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Status Paket: $statusPaketText',
+                            'Status: ${PerhitunganUtil.getTeksSisaMasaAktif(pelanggan.tanggalBerakhir)}',
                             style: TextStyle(
-                              color: statusPaketColor,
+                              color: PerhitunganUtil.getWarnaSisaMasaAktif(
+                                pelanggan.tanggalBerakhir,
+                              ),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Berakhir: ${formatTanggal(pelanggan.tanggalBerakhir)} ${FormatJam.formatKeJamMenit(pelanggan.tanggalBerakhir)}',
+                            'Berakhir: ${FormatTanggal.formatTanggalBasic(pelanggan.tanggalBerakhir)} ${FormatJam.formatJamMenit(pelanggan.tanggalBerakhir)}',
                           ),
                         ],
                       ),
