@@ -1,7 +1,3 @@
-Saya akan menambahkan/mengubah aturan tersebut ke file `README.md` tepat di bawah judul `# **Aturan lainnya untuk AI**`. Berikut adalah konten yang akan ditambahkan ke dalam `README.md`:
-
----
-
 # **Aturan lainnya untuk AI**
 
 1. **Penggunaan Bahasa Indonesia**: Selalu gunakan bahasa Indonesia untuk penamaan fungsi, variabel, parameter, nama file, serta saat berkomunikasi dengan saya.

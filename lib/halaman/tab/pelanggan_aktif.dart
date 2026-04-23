@@ -13,12 +13,14 @@ import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/halaman/detail/detail_pelanggan_aktif.dart';
 import 'package:admin_wifi/halaman/form/form_pelanggan_aktif.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
+import 'package:admin_wifi/widget/nama_paket.dart';
 import 'package:admin_wifi/widget/nama_pelanggan.dart';
 
 enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
 
 enum OpsiUrutkan {
   tanggal,
+  tanggalMulai,
   namaAZ,
   namaZA,
   lunas,
@@ -203,6 +205,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       case OpsiUrutkan.tanggal:
         comparator = (a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir);
         break;
+      case OpsiUrutkan.tanggalMulai:
+        comparator = (a, b) => a.tanggalMulai.compareTo(b.tanggalMulai);
+        break;
       case OpsiUrutkan.namaAZ:
       case OpsiUrutkan.namaZA:
         comparator = (a, b) {
@@ -269,6 +274,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           title: const Text('Urutkan Berdasarkan'),
           children: <Widget>[
             buildOption('Tanggal Berakhir', OpsiUrutkan.tanggal),
+            buildOption('Tanggal Mulai', OpsiUrutkan.tanggalMulai),
             buildOption('Nama (A-Z)', OpsiUrutkan.namaAZ),
             buildOption('Nama (Z-A)', OpsiUrutkan.namaZA),
             buildOption('Status Pembayaran (Lunas)', OpsiUrutkan.lunas),
@@ -456,8 +462,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                 final statusPembayaranText = pelanggan.status.displayName;
                 final statusPembayaranColor =
                     pelanggan.status == StatusPembayaran.lunas
-                    ? Colors.green
-                    : Colors.red;
+                        ? Colors.green
+                        : Colors.red;
 
                 return Card(
                   margin: const EdgeInsets.symmetric(
@@ -489,6 +495,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          NamaPaketWidget(idPaket: pelanggan.idPaket),
+                          const SizedBox(height: 4),
                           Text(
                             'Pembayaran: $statusPembayaranText',
                             style: TextStyle(

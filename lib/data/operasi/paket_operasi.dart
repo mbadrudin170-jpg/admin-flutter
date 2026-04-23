@@ -62,8 +62,8 @@ class PaketOperasi {
     });
   }
 
-  // PERBAIKAN: Mengubah parameter 'id' menjadi String
-  Future<Paket?> ambilSatuPaket(String id) async {
+  // ditambahkan: Fungsi untuk mengambil satu paket berdasarkan ID
+  Future<Paket?> getPaketById(String id) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'paket',

@@ -60,6 +60,10 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
       ]);
       setState(() {
         _pelangganList = results[0] as List<Pelanggan>;
+        // diubah: Mengurutkan daftar pelanggan berdasarkan nama A-Z secara case-insensitive
+        _pelangganList.sort(
+          (a, b) => a.nama.toLowerCase().compareTo(b.nama.toLowerCase()),
+        );
         _paketList = results[1] as List<Paket>;
 
         if (_isEditMode) {
@@ -307,7 +311,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                           label: Text(
                             _selectedDate == null
                                 ? 'Pilih Tanggal'
-                                : FormatTanggal.formatTanggalBasic(_selectedDate!),
+                                : FormatTanggal.formatTanggalBasic(
+                                    _selectedDate!,
+                                  ),
                           ),
                         ),
                         TextButton.icon(
@@ -383,12 +389,15 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                               (_selectedDate == null || _selectedTime == null)
                                   ? 'Pilih Tanggal & Jam'
                                   // diubah: Menghapus interpolasi string yang tidak perlu.
-                                  : FormatTanggal.formatTanggalDanJam(DateTime(
-                                      _selectedDate!.year,
-                                      _selectedDate!.month,
-                                      _selectedDate!.day,
-                                      _selectedTime!.hour,
-                                      _selectedTime!.minute)),
+                                  : FormatTanggal.formatTanggalDanJam(
+                                      DateTime(
+                                        _selectedDate!.year,
+                                        _selectedDate!.month,
+                                        _selectedDate!.day,
+                                        _selectedTime!.hour,
+                                        _selectedTime!.minute,
+                                      ),
+                                    ),
                             ),
                           ],
                         ),
@@ -414,7 +423,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                                   startDate,
                                   _selectedPaket!,
                                 );
-                                return FormatTanggal.formatTanggalDanJam(endDate);
+                                return FormatTanggal.formatTanggalDanJam(
+                                  endDate,
+                                );
                               } else {
                                 return 'Pilih paket & tanggal mulai';
                               }

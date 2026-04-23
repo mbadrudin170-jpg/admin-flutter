@@ -50,7 +50,8 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
       final results = await Future.wait([
         pelangganOperasi.ambilSatuPelangganById(_pelangganAktif.idPelanggan),
         if (idPaket.isNotEmpty)
-          paketOperasi.ambilSatuPaket(idPaket)
+          // diubah: Menggunakan getPaketById yang sudah dikonsolidasi.
+          paketOperasi.getPaketById(idPaket)
         else
           Future.value(null),
       ]);
