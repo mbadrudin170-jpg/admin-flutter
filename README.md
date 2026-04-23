@@ -60,49 +60,40 @@ Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegras
 ### **Pemeriksaan Konektivitas & Mode Offline**
 *   **Tujuan:** Memberikan umpan balik langsung kepada pengguna mengenai status koneksi internet mereka untuk mengelola ekspektasi terkait sinkronisasi data.
 *   **File Terkait:** `lib/splash_screen.dart`.
-*   **Paket yang Digunakan:** `connectivity_plus`.
 *   **Mekanisme:**
-    1.  Saat aplikasi dimulai, `SplashScreen` akan memeriksa ketersediaan koneksi internet (WiFi atau data seluler).
-    2.  Terlepas dari hasilnya, aplikasi akan melanjutkan navigasi ke halaman utama setelah beberapa detik.
-    3.  Jika pada saat pemeriksaan awal tidak ada koneksi yang terdeteksi, sebuah `SnackBar` berwarna oranye dengan pesan "Anda dalam mode offline" akan muncul di bagian bawah halaman utama.
+    1.  Saat aplikasi dimulai, `SplashScreen` memeriksa konektivitas dan menavigasi ke halaman utama.
+    2.  Jika tidak ada koneksi, `SnackBar` akan muncul untuk memberitahu pengguna bahwa mereka dalam mode offline.
+    3.  Logika ini juga telah diperkuat dengan pemeriksaan `mounted` untuk mencegah error saat melakukan navigasi atau menampilkan `SnackBar` setelah operasi asinkron, sehingga meningkatkan stabilitas aplikasi.
 
 ### **Manajemen Data (Pelanggan, Paket, Transaksi)**
-*   **Tujuan:** Mengelola data inti bisnis, termasuk informasi pelanggan, layanan yang ditawarkan, dan riwayat pembayaran.
+*   **Tujuan:** Mengelola data inti bisnis secara konsisten di database lokal (SQLite) dan Firebase.
 *   **File Terkait:** `lib/model/`, `lib/data/operasi/`, `lib/halaman/`.
-*   **Fitur Detail Pelanggan:** Halaman `lib/halaman/detail/detail_pelanggan.dart` menyediakan tampilan lengkap informasi pelanggan. Fitur ini mencakup:
-    *   Menampilkan semua detail pelanggan (Nama, Telepon, Alamat, MAC Address).
-    *   Tombol untuk menyalin informasi individu seperti nomor telepon dan MAC Address.
-    *   Kemampuan untuk melihat atau menyembunyikan password.
-    *   **Tombol "Salin Semua Info":** Untuk kemudahan, ditambahkan sebuah tombol yang memungkinkan admin menyalin seluruh informasi pelanggan (Nama, Telepon, Alamat, MAC Address, dan Password) ke clipboard dengan sekali tekan.
+*   **Alur Penghapusan Data:** Proses penghapusan data, seperti pada pelanggan aktif, diatur secara terpusat dari lapisan UI (`lib/halaman/tab/pelanggan_aktif.dart`). Setelah pengguna mengonfirmasi, aplikasi akan memanggil dua fungsi secara berurutan:
+    1.  Fungsi dari kelas `PelangganAktifOperasi` untuk menghapus data dari **database SQLite lokal**.
+    2.  Fungsi dari kelas `FirebaseService` untuk menghapus data dari **Firestore**.
+    *   Pendekatan ini memastikan data terhapus secara konsisten di kedua penyimpanan dan menjaga pemisahan tanggung jawab antar lapisan kode.
 
 ### **Dompet Digital (Manajemen Keuangan)**
 *   **Tujuan:** Melacak saldo, pemasukan, dan pengeluaran untuk memberikan gambaran keuangan yang jelas.
 *   **File Terkait:** `lib/model/dompet_model.dart`, `lib/data/operasi/dompet_operasi.dart`, `lib/halaman/tab/dompet.dart`.
 
 ### **Sinkronisasi Data dengan Firebase**
-*   **Tujuan:** Memastikan konsistensi data antara database lokal (SQLite) dan backend (Firebase). Ini memungkinkan data tetap *up-to-date* dan dapat diakses dari mana saja.
+*   **Tujuan:** Memastikan konsistensi data antara database lokal (SQLite) dan backend (Firebase Firestore).
 *   **File Terkait:** `lib/data/servis/firebase_servis.dart`.
 *   **Proses:** Layanan ini secara periodik melakukan **sinkronisasi inkremental**. Ia mengunggah data lokal yang baru dan mengunduh data terbaru dari Firebase, hanya berdasarkan data yang berubah sejak sinkronisasi terakhir. Proses ini sangat efisien karena menggunakan *timestamp* `diperbarui` pada setiap model data.
+*   **Penghapusan Data:** `FirebaseService` kini juga memiliki metode khusus (`hapusPelangganAktif`) untuk menangani penghapusan data di Firestore, yang dipanggil dari lapisan UI untuk memastikan sinkronisasi penghapusan antara lokal dan server.
 
 ### **Notifikasi & Pengingat Jatuh Tempo**
 *   **Tujuan:** Memberikan pengingat otomatis kepada admin agar dapat menindaklanjuti paket pelanggan yang akan segera berakhir masa aktifnya.
-*   **File Terkait:**
-    *   **`lib/data/servis/notifikasi_servis.dart`**: Layanan inti yang bertanggung jawab untuk menginisialisasi dan menjadwalkan notifikasi lokal menggunakan paket `flutter_local_notifications`.
-    *   **`lib/halaman/tab/pelanggan_aktif.dart`**: Halaman ini memicu penjadwalan notifikasi setiap kali daftar pelanggan aktif dimuat.
+*   **File Terkait:** `lib/data/servis/notifikasi_servis.dart`, `lib/halaman/tab/pelanggan_aktif.dart`.
 *   **Mekanisme:**
-    1.  Saat daftar pelanggan aktif ditampilkan, sistem akan memeriksa setiap pelanggan.
-    2.  Notifikasi akan dijadwalkan untuk dua kondisi:
-        *   **3 hari sebelum** tanggal kadaluarsa.
-        *   **Tepat pada hari** kadaluarsa.
-    3.  Untuk memastikan setiap notifikasi unik, ID notifikasi digenerasi dari `hashCode` ID pelanggan yang berupa string, sehingga menghindari konflik dan error saat runtime.
+    1.  Saat daftar pelanggan aktif dimuat, sistem akan menjadwalkan notifikasi untuk setiap pelanggan yang relevan.
+    2.  Notifikasi dijadwalkan untuk **3 hari sebelum** dan **tepat pada hari** kadaluarsa.
+    3.  ID notifikasi yang unik dihasilkan dari `hashCode` ID pelanggan untuk mencegah konflik.
 
 ### **Kritik dan Saran Pengguna**
-*   **Tujuan:** Menyediakan wadah bagi pengguna untuk memberikan masukan, yang kemudian dapat dilihat oleh administrator. Fitur ini sepenuhnya terintegrasi dengan sistem sinkronisasi data.
-*   **File Terkait:**
-    *   **`lib/model/kritik_saran_model.dart`**: Mendefinisikan struktur data untuk setiap masukan.
-    *   **`lib/data/operasi/kritik_saran_operasi.dart`**: Menangani operasi CRUD di database SQLite lokal.
-    *   **`lib/halaman/lainnya/kritik_saran.dart`**: Antarmuka pengguna untuk menampilkan daftar masukan.
-    *   **`lib/data/servis/firebase_servis.dart`**: Mengintegrasikan sinkronisasi data kritik dan saran.
+*   **Tujuan:** Menyediakan wadah bagi pengguna untuk memberikan masukan, yang kemudian dapat dilihat oleh administrator dan disinkronkan dengan Firebase.
+*   **File Terkait:** `lib/model/kritik_saran_model.dart`, `lib/data/operasi/kritik_saran_operasi.dart`, `lib/halaman/lainnya/kritik_saran.dart`.
 
 ---
 

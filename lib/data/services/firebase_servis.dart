@@ -1,4 +1,4 @@
-// lib/data/servis/firebase_servis.dart
+// Path: lib/data/services/firebase_servis.dart
 // File ini bertanggung jawab untuk sinkronisasi data antara database lokal (SQLite)
 // dan Firestore. Ini termasuk mengunggah perubahan lokal ke Firebase dan
 // mengunduh perubahan dari Firebase ke database lokal.
@@ -29,6 +29,7 @@ class FirebaseService {
   final SyncManager _syncManager = SyncManager();
   Timer? _timer;
 
+  // Fungsi untuk memulai sinkronisasi periodik setiap 5 menit.
   void startSync() {
     _timer = Timer.periodic(const Duration(minutes: 5), (timer) {
       developer.log(
@@ -37,14 +38,37 @@ class FirebaseService {
       );
       sinkronkanSemuaData();
     });
-    // Jalankan sinkronisasi segera saat aplikasi dimulai
+    // Jalankan sinkronisasi segera saat aplikasi dimulai.
     sinkronkanSemuaData();
   }
 
+  // Fungsi untuk menghentikan timer sinkronisasi.
   void dispose() {
     _timer?.cancel();
   }
 
+  // ditambah: Fungsi untuk menghapus pelanggan aktif dari Firebase.
+  // Fungsi ini dipanggil ketika pengguna mengonfirmasi penghapusan.
+  Future<void> hapusPelangganAktif(String id) async {
+    try {
+      await _firestore.collection('pelanggan_aktif').doc(id).delete();
+      developer.log(
+        'Pelanggan aktif dengan ID: $id berhasil dihapus dari Firebase.',
+        name: 'FirebaseService',
+      );
+    } catch (e, s) {
+      developer.log(
+        'Gagal menghapus pelanggan aktif dari Firebase.',
+        error: e,
+        stackTrace: s,
+        name: 'FirebaseService',
+      );
+      // Melempar kembali error agar bisa ditangani di UI.
+      rethrow;
+    }
+  }
+
+  // Fungsi utama untuk sinkronisasi data dua arah.
   Future<void> sinkronkanSemuaData() async {
     developer.log(
       'Memulai sinkronisasi data inkremental...',
@@ -103,6 +127,7 @@ class FirebaseService {
     }
   }
 
+  // Fungsi internal untuk mengunggah perubahan lokal ke Firebase.
   Future<void> _unggahPerubahan(
     DateTime lastSync,
     Map<String, List<dynamic>> dataPerubahan,
@@ -132,6 +157,7 @@ class FirebaseService {
     developer.log('Pengunggahan batch selesai.', name: 'FirebaseService');
   }
 
+  // Fungsi internal untuk mengunduh perubahan dari Firebase ke lokal.
   Future<void> _unduhPerubahan(
     DateTime lastSync,
     Map<String, dynamic> operasiMap,
@@ -206,7 +232,7 @@ class FirebaseService {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Paket>());
         } else if (op is PelangganAktifOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<PelangganAktif>());
-        } 
+        }
         // ditambah: Menambahkan pemanggilan batch untuk KritikSaran.
         else if (op is KritikSaranOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<KritikSaran>());
@@ -214,23 +240,5 @@ class FirebaseService {
       }
     }
     developer.log('Pengunduhan perubahan selesai.', name: 'FirebaseService');
-  }
-
-  Future<void> hapusPelangganAktif(String id) async {
-    try {
-      await _firestore.collection('pelanggan_aktif').doc(id).delete();
-      developer.log(
-        'Pelanggan aktif dengan ID: $id berhasil dihapus dari Firebase.',
-        name: 'FirebaseService',
-      );
-    } catch (e, s) {
-      developer.log(
-        'Gagal menghapus pelanggan aktif dari Firebase.',
-        error: e,
-        stackTrace: s,
-        name: 'FirebaseService',
-      );
-      rethrow;
-    }
   }
 }

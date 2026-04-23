@@ -3,13 +3,13 @@
 // Fungsinya adalah untuk menginisialisasi Firebase, database lokal (SQLite),
 // dan layanan lainnya sebelum menjalankan aplikasi.
 
-import 'package:admin_wifi/data/servis/notifikasi_servis.dart';
+import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 
-import 'package:admin_wifi/data/servis/firebase_servis.dart';
+import 'package:admin_wifi/data/services/firebase_servis.dart';
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/splash_screen.dart';
 
