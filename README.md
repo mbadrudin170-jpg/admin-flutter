@@ -42,64 +42,76 @@
 # **Dokumentasi Proyek Aplikasi Admin WiFi**
 
 Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen ini berfungsi sebagai panduan utama untuk memahami arsitektur, fungsionalitas, dan alur kerja pengembangan aplikasi.
-Analisis File: lib/utils/format/format_jam.dart
-Tujuan Utama: Menjadi penyedia layanan tunggal (Single Source of Truth) untuk semua konformitas format waktu jam di aplikasi agar tampilan konsisten di seluruh halaman (UI).
 
-Dependencies: package:intl/intl.dart (Wajib ada di pubspec.yaml).
+---
 
-1. Fitur & Fungsionalitas
-Standardisasi 24 Jam: Memastikan semua waktu ditampilkan dalam format 24 jam (00:00 - 23:59).
+**File:** `lib/utils/format/format_tanggal.dart`
+**Fitur:** Utilitas Pemformatan Tanggal
+**Daftar Fungsi:**
+*   `formatTanggal(DateTime tanggal)`: Mengubah objek `DateTime` menjadi format tanggal yang mudah dibaca (contoh: "17 Agu 2024").
+**Catatan:** Menggunakan `package:intl` untuk lokalisasi format tanggal ke gaya Indonesia ('id_ID').
 
-Graceful Error Handling: Mencegah aplikasi berhenti tiba-tiba (crash) saat menerima data waktu yang korup atau tidak valid dari database SQLite atau Firestore.
+---
 
-Abstraksi Parsing: Menyederhanakan proses perubahan dari tipe data String (Database) ke String (Display) tanpa perlu melakukan DateTime.parse berulang kali di lapisan UI.
+**File:** `lib/utils/format/format_jam.dart`
+**Fitur:** Utilitas Pemformatan Jam
+**Daftar Fungsi:**
+*   `formatKeJamMenit(DateTime waktu)`: Mengubah `DateTime` menjadi format "HH:mm".
+*   `formatKeJamLengkap(DateTime waktu)`: Mengubah `DateTime` menjadi format "HH:mm:ss".
+*   `formatTeksKeJam(String teksWaktu)`: Mengonversi string waktu (ISO 8601) menjadi format "HH:mm", dengan penanganan error jika format tidak valid.
+**Catatan:** Menggunakan format 24 jam (`HH`) untuk menghindari ambiguitas AM/PM, yang krusial untuk logika transaksi.
 
-2. Dokumentasi Fungsi (API Reference)
-static String formatKeJamMenit(DateTime waktu)
-
-Input: Objek DateTime valid.
-
-Output: String format "HH:mm".
-
-Kegunaan: Digunakan pada kartu pelanggan (pelanggan aktif) untuk menunjukkan jam mulai koneksi.
-
-static String formatKeJamLengkap(DateTime waktu)
-
-Input: Objek DateTime valid.
-
-Output: String format "HH:mm:ss".
-
-Kegunaan: Digunakan pada sistem logging dan riwayat transaksi keuangan yang membutuhkan presisi tinggi hingga satuan detik.
-
-static String formatTeksKeJam(String teksWaktu)
-
-Input: String mentah (ISO 8601).
-
-Logic: Menggunakan blok try-catch untuk membungkus DateTime.parse.
-
-Output: String "HH:mm" atau fallback "--:--" jika gagal.
-
-3. Aturan Ketat & Larangan (Constraint)
-Hindari: Menggunakan DateFormat secara manual di file UI (.dart di folder halaman/). Semua harus memanggil kelas FormatJam.
-
-Hindari: Memberikan nilai null pada parameter teksWaktu. Pastikan ada pengecekan awal atau gunakan fungsi formatTeksKeJam karena sudah memiliki proteksi error.
-
-Peringatan Kode: Penggunaan format 'HH' (kapital) sangat krusial. Jangan diubah menjadi 'hh' (kecil) karena akan merusak logika sistem admin yang berbasis waktu 24 jam (menghindari kerancuan AM/PM pada transaksi malam hari).
-
-4. Alur Kerja Kode (Pseudo-logic)
-Teriman data (DateTime/String).
-
-Lakukan validasi format melalui library intl.
-
-Jika data tidak valid (pada fungsi teks), tangkap exception dan kembalikan nilai aman (--:--).
-
-Kembalikan hasil transformasi ke pemanggil (UI/Model).
+---
 
 **File:** `lib/halaman/detail/detail_pelanggan_aktif.dart`
 **Fitur:** Tampilan Detail Pelanggan Aktif
 **Daftar Fungsi:**
-*   `_loadDetails()`: Mengambil data detail pelanggan (nama, telepon) dan detail paket (nama paket) dari database secara asynchronous berdasarkan ID yang ada pada objek `PelangganAktif`.
-*   `_navigateToEdit()`: Menavigasi pengguna ke halaman `FormPelangganAktif` untuk mengubah data. Setelah data berhasil diubah, fungsi ini akan memuat ulang detail untuk menampilkan informasi terbaru.
-*   `_buildTeleponDisplay()`: Widget internal untuk menampilkan nomor telepon pelanggan. Menangani status `loading` dan kasus jika data tidak ditemukan.
-*   `_buildPaketDisplay()`: Widget internal untuk menampilkan nama paket yang digunakan pelanggan. Menangani status `loading` dan kasus jika data tidak ditemukan.
-**Catatan:** Halaman ini bertanggung jawab untuk menampilkan informasi lengkap dari seorang pelanggan yang sedang aktif berlangganan. Data diambil dari beberapa tabel (Pelanggan, Paket) dan digabungkan untuk ditampilkan.
+*   `_loadDetails()`: Mengambil data detail pelanggan (nama, telepon) dan detail paket (nama paket) dari database secara asynchronous.
+*   `_navigateToEdit()`: Menavigasi pengguna ke halaman `FormPelangganAktif` untuk mengubah data, lalu memuat ulang detail setelah kembali.
+*   `_buildTeleponDisplay()`: Widget internal untuk menampilkan nomor telepon pelanggan, dengan penanganan status loading.
+*   `_buildPaketDisplay()`: Widget internal untuk menampilkan nama paket, dengan penanganan status loading.
+**Catatan:** Halaman ini menggabungkan dan menampilkan informasi dari beberapa tabel (Pelanggan, Paket) untuk satu pelanggan aktif.
+
+---
+
+**File:** `lib/halaman/tab/pelanggan_aktif.dart`
+**Fitur:** Daftar Pelanggan Aktif
+**Daftar Fungsi:**
+*   `_loadPelangganAktif()`: Memuat daftar pelanggan aktif dari database lokal.
+*   `_hapusPelangganAktif(PelangganAktif pelanggan)`: Menghapus satu pelanggan aktif setelah konfirmasi.
+*   `_urutkanList(OpsiUrutkan pilihan)`: Mengurutkan daftar pelanggan berdasarkan kriteria yang dipilih (tanggal, nama, status).
+*   `_showUrutkanDialog()`: Menampilkan dialog untuk memilih opsi pengurutan.
+*   `_tambahPelangganAktif()`: Menavigasi ke halaman form untuk menambah pelanggan baru.
+*   `_opsiHapus()`: Menampilkan dialog untuk opsi hapus massal (semua atau yang sudah kadaluarsa).
+*   `_periksaDanJadwalkanNotifikasi(List<PelangganAktif> pelanggan)`: Menjadwalkan notifikasi lokal untuk paket yang akan berakhir.
+**Catatan:** Halaman utama untuk manajemen pelanggan, termasuk notifikasi, pengurutan, dan penghapusan.
+
+---
+
+**File:** `lib/halaman/tab/transaksi.dart`
+**Fitur:** Daftar dan Ringkasan Transaksi
+**Daftar Fungsi:**
+*   `_loadTransaksi()`: Memuat semua data transaksi dari database.
+*   `_tambahTransaksi()`: Menavigasi ke halaman form untuk menambah transaksi baru.
+*   `_groupTransaksiByDate(List<Transaksi> transaksi)`: Mengelompokkan daftar transaksi berdasarkan tanggal.
+*   `_bangunRingkasan(...)`: Membangun widget ringkasan total pemasukan, pengeluaran, dan transfer.
+*   `_bangunItemTransaksi(Transaksi transaksi)`: Membangun satu item UI untuk setiap transaksi.
+**Catatan:** Menampilkan riwayat keuangan lengkap yang dikelompokkan per hari.
+
+---
+
+**File:** `lib/halaman/tab/dompet.dart`
+**Fitur:** Manajemen Dompet
+**Daftar Fungsi:**
+*   `_loadDompet()`: Mengambil daftar semua dompet dari database.
+*   `_tambahDompet()`: Menavigasi ke halaman form untuk membuat dompet baru.
+**Catatan:** Pusat untuk melihat semua dompet beserta saldonya dan ringkasan keuangan dasar.
+
+---
+
+**File:** `lib/halaman/lainnya/kritik_saran.dart`
+**Fitur:** Menampilkan Kritik dan Saran
+**Daftar Fungsi:**
+*   `_loadKritikSaran()`: Memuat daftar kritik dan saran dari database.
+**Catatan:** Halaman untuk menampilkan semua masukan dari pengguna.
+

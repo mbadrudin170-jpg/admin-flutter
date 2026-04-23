@@ -190,12 +190,12 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
   }
 
   Widget _buildPaketDisplay() {
-    if (_isLoading) {
-      return Text(
-        'Memuat nama paket...',
-        style: Theme.of(context).textTheme.titleMedium,
-      );
-    }
+    // if (_isLoading) {
+    //   return Text(
+    //     'Memuat nama paket...',
+    //     style: Theme.of(context).textTheme.titleMedium,
+    //   );
+    // }
     if (_paket != null) {
       return Text(
         'Paket: ${_paket!.nama}',

@@ -4,11 +4,11 @@
 // tombol floating action.
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:admin_wifi/data/operasi/dompet_operasi.dart';
 import 'package:admin_wifi/halaman/detail/detail_dompet.dart';
 import 'package:admin_wifi/halaman/form/form_dompet.dart';
 import 'package:admin_wifi/model/dompet_model.dart';
-import 'package:admin_wifi/utils/format.dart';
 
 class DompetPage extends StatefulWidget {
   const DompetPage({super.key});
@@ -137,7 +137,11 @@ class RingkasanKeuangan extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Rp ${Format.formatAngka(amount)}',
+          NumberFormat.currency(
+            locale: 'id_ID',
+            symbol: 'Rp ',
+            decimalDigits: 0,
+          ).format(amount),
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -173,7 +177,7 @@ class DompetCard extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         subtitle: Text(
-          'Saldo: Rp ${Format.formatAngka(dompet.saldo)}',
+          'Saldo: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(dompet.saldo)}',
           style: const TextStyle(fontSize: 16, color: Colors.black54),
         ),
         onTap: onTap,

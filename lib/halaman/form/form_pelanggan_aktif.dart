@@ -8,7 +8,8 @@ import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
-import 'package:admin_wifi/utils/format.dart';
+import 'package:admin_wifi/utils/format/format_tanggal.dart';
+import 'package:admin_wifi/utils/format/format_jam.dart';
 import 'package:flutter/material.dart';
 
 class FormPelangganAktif extends StatefulWidget {
@@ -306,7 +307,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                           label: Text(
                             _selectedDate == null
                                 ? 'Pilih Tanggal'
-                                : Format.formatTanggal(_selectedDate!),
+                                : formatTanggal(_selectedDate!),
                           ),
                         ),
                         TextButton.icon(
@@ -381,7 +382,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                             Text(
                               (_selectedDate == null || _selectedTime == null)
                                   ? 'Pilih Tanggal & Jam'
-                                  : '${Format.formatTanggal(_selectedDate!)}, ${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}',
+                                  : '${formatTanggal(_selectedDate!)}, ${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}',
                             ),
                           ],
                         ),
@@ -408,8 +409,8 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
                                   _selectedPaket!,
                                 );
                                 final timePart =
-                                    ', ${endDate.hour.toString().padLeft(2, '0')}:${endDate.minute.toString().padLeft(2, '0')}';
-                                return '${Format.formatTanggal(endDate)}$timePart';
+                                    ', ${FormatJam.formatKeJamMenit(endDate)}';
+                                return '${formatTanggal(endDate)}$timePart';
                               } else {
                                 return 'Pilih paket & tanggal mulai';
                               }

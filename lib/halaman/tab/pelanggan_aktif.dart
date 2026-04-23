@@ -5,7 +5,8 @@
 import 'package:admin_wifi/data/repositori/pelanggan_aktif_repositori.dart';
 import 'package:admin_wifi/services/cek_koneksi_internet.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
-import 'package:admin_wifi/utils/format.dart';
+import 'package:admin_wifi/utils/format/format_tanggal.dart';
+import 'package:admin_wifi/utils/format/format_jam.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
@@ -77,7 +78,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           id: p.id.hashCode.abs() + 1000,
           title: '⏰ Paket Akan Berakhir',
           body:
-              'Paket $namaPelanggan akan berakhir dalam 3 hari (${Format.formatTanggal(p.tanggalBerakhir)})',
+              'Paket $namaPelanggan akan berakhir dalam 3 hari (${formatTanggal(p.tanggalBerakhir)})',
           jadwal: tigaHariSebelumKadaluarsa,
         );
       }
@@ -89,7 +90,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           id: p.id.hashCode.abs() + 2000,
           title: '🔔 Paket Berakhir Sekarang',
           body:
-              'Paket $namaPelanggan telah berakhir hari ini (${Format.formatTanggal(waktuKadaluarsa)}). Harap perbarui paket.',
+              'Paket $namaPelanggan telah berakhir hari ini (${formatTanggal(waktuKadaluarsa)}). Harap perbarui paket.',
           jadwal: waktuKadaluarsa,
         );
       }
@@ -518,7 +519,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Berakhir: ${Format.formatTanggalDanJam(pelanggan.tanggalBerakhir)}',
+                            'Berakhir: ${formatTanggal(pelanggan.tanggalBerakhir)} ${FormatJam.formatKeJamMenit(pelanggan.tanggalBerakhir)}',
                           ),
                         ],
                       ),

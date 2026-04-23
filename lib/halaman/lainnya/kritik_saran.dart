@@ -1,5 +1,6 @@
 // lib/halaman/lainnya/kritik_saran.dart
-import 'package:admin_wifi/utils/format.dart';
+import 'package:admin_wifi/utils/format/format_tanggal.dart';
+import 'package:admin_wifi/utils/format/format_jam.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/kritik_saran_operasi.dart';
 import 'package:admin_wifi/model/kritik_saran_model.dart';
@@ -90,7 +91,7 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: Text(
-                            Format.formatTanggalDanJam(item.tanggal),
+                            '${formatTanggal(item.tanggal)} ${FormatJam.formatKeJamMenit(item.tanggal)}',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[600],

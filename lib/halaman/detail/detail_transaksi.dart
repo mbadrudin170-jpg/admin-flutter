@@ -4,7 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
-import 'package:admin_wifi/utils/format.dart';
+import 'package:admin_wifi/utils/format/format_tanggal.dart';
 
 class DetailTransaksiPage extends StatelessWidget {
   final Transaksi transaksi;
@@ -30,7 +30,7 @@ class DetailTransaksiPage extends StatelessWidget {
           children: [
             _buildDetailRow('ID', transaksi.id),
             _buildDetailRow('Keterangan', transaksi.keterangan),
-            _buildDetailRow('Tanggal', Format.formatTanggal(transaksi.tanggal)),
+            _buildDetailRow('Tanggal', formatTanggal(transaksi.tanggal)),
             _buildDetailRow(
               'Jumlah',
               NumberFormat.currency(

@@ -8,7 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
 import 'package:admin_wifi/halaman/form/form_transaksi.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
-import 'package:admin_wifi/utils/format.dart';
+import 'package:admin_wifi/utils/format/format_tanggal.dart';
+import 'package:admin_wifi/utils/format/format_jam.dart';
 
 import '../detail/detail_transaksi.dart';
 
@@ -135,7 +136,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
       children: [
         Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         Text(
-          NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ').format(jumlah),
+          NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(jumlah),
           style: TextStyle(color: warna, fontWeight: FontWeight.bold),
         ),
       ],
@@ -149,11 +150,11 @@ class _TransaksiPageState extends State<TransaksiPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            Format.formatTanggal(tanggal),
+            formatTanggal(tanggal),
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Text(
-            NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ').format(total),
+            NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(total),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: total >= 0 ? Colors.green : Colors.red,
@@ -201,6 +202,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
             NumberFormat.currency(
               locale: 'id_ID',
               symbol: 'Rp ',
+              decimalDigits: 0,
             ).format(transaksi.jumlah),
             style: TextStyle(
               color: transaksi.tipe == TipeTransaksi.pemasukan
@@ -210,7 +212,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                         : Colors.blue),
             ),
           ),
-          Text(Format.formatJam(transaksi.tanggal)),
+          Text(FormatJam.formatKeJamMenit(transaksi.tanggal)),
         ],
       ),
     );
