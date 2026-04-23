@@ -24,7 +24,7 @@ Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan ska
 
 *   **`lib/`**: Direktori utama kode sumber aplikasi.
     *   **`main.dart`**: Titik masuk utama aplikasi.
-    *   **`splash_screen.dart`**: Layar pembuka yang juga menangani pemeriksaan konektivitas awal.
+    *   **`splash_screen.dart`**: Layar pembuka yang juga menangani pemeriksaan konektivktivitas awal.
     *   **`data/`**: Logika pengelolaan data (operasi SQLite, servis sinkronisasi Firebase, servis notifikasi).
     *   **`model/`**: Definisi kelas model data.
     *   **`halaman/`**: Komponen antarmuka pengguna (UI), diatur per fitur.
@@ -68,10 +68,14 @@ Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegras
 ### **Manajemen Data (Pelanggan, Paket, Transaksi)**
 *   **Tujuan:** Mengelola data inti bisnis secara konsisten di database lokal (SQLite) dan Firebase.
 *   **File Terkait:** `lib/model/`, `lib/data/operasi/`, `lib/halaman/`.
-*   **Alur Penghapusan Data:** Proses penghapusan data, seperti pada pelanggan aktif, diatur secara terpusat dari lapisan UI (`lib/halaman/tab/pelanggan_aktif.dart`). Setelah pengguna mengonfirmasi, aplikasi akan memanggil dua fungsi secara berurutan:
-    1.  Fungsi dari kelas `PelangganAktifOperasi` untuk menghapus data dari **database SQLite lokal**.
-    2.  Fungsi dari kelas `SinkronisasiService` untuk menghapus data dari **Firestore**.
-    *   Pendekatan ini memastikan data terhapus secara konsisten di kedua penyimpanan dan menjaga pemisahan tanggung jawab antar lapisan kode.
+*   **Alur Penghapusan Data:** Proses penghapusan data, seperti pada pelanggan aktif, diatur secara terpusat dari lapisan UI (`lib/halaman/tab/pelanggan_aktif.dart`).
+    *   **Penghapusan Individual:** Saat satu pelanggan dihapus (melalui `onLongPress`), aplikasi akan menghapus data dari database **SQLite lokal** dan juga dari **Firestore** jika terhubung ke internet.
+    *   **Penghapusan Massal ('Hapus Semua' & 'Hapus Kadaluarsa'):** Logika ini telah disempurnakan untuk memastikan konsistensi data dengan server. Sebelum menghapus data dari database lokal, aplikasi akan:
+        1.  Memeriksa koneksi internet.
+        2.  Jika online, aplikasi akan mengambil daftar pelanggan yang akan dihapus (semua atau yang kadaluarsa).
+        3.  Melakukan iterasi pada daftar tersebut untuk menghapus setiap entri dari **Firestore**.
+        4.  Setelah itu, barulah data yang relevan dihapus dari **database SQLite lokal**.
+    *   Pendekatan ini memastikan bahwa operasi penghapusan massal juga tercermin di server, menjaga sinkronisasi dan integritas data di seluruh platform.
 
 ### **Dompet Digital (Manajemen Keuangan)**
 *   **Tujuan:** Melacak saldo, pemasukan, dan pengeluaran untuk memberikan gambaran keuangan yang jelas.

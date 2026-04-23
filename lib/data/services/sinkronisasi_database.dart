@@ -23,8 +23,7 @@ import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
 import 'package:admin_wifi/utils/sync_manager.dart';
 
-// diubah: Nama kelas diubah dari FirebaseService menjadi SinkronisasiService.
-class SinkronisasiService {
+class SinkronisasiDatabase {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final SyncManager _syncManager = SyncManager();
   Timer? _timer;

@@ -4,12 +4,12 @@
 // dan layanan lainnya sebelum menjalankan aplikasi.
 
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
+import 'package:admin_wifi/data/services/sinkronisasi_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 
-import 'package:admin_wifi/data/services/firebase_servis.dart';
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/splash_screen.dart';
 
@@ -19,7 +19,9 @@ void main() async {
 
   try {
     // Inisialisasi Firebase.
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
     // ditambah: Inisialisasi layanan notifikasi.
     final notifikasiServis = NotifikasiServis();
@@ -34,7 +36,7 @@ void main() async {
 
     // Menjalankan proses sinkronisasi di latar belakang tanpa menunggu (await)
     // agar runApp() dapat segera dipanggil dan menghindari timeout dari sistem operasi.
-    FirebaseService().sinkronkanSemuaData().catchError((error) {
+    SinkronisasiDatabase().sinkronkanSemuaData().catchError((error) {
       debugPrint("Gagal melakukan sinkronisasi otomatis: $error");
     });
   } catch (e) {
@@ -59,8 +61,11 @@ class MyApp extends StatelessWidget {
         fontSize: 57,
         fontWeight: FontWeight.bold,
       ),
-      titleLarge:
-          TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w500),
+      titleLarge: TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+      ),
       bodyMedium: TextStyle(fontFamily: 'Open Sans', fontSize: 14),
     );
 

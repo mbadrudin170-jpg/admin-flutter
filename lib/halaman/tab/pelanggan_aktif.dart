@@ -1,10 +1,10 @@
 // path: lib/halaman/tab/pelanggan_aktif.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 
-// diubah: Impor layanan koneksi internet yang baru.
+// diubah: Impor layanan koneksi internet dan repositori yang baru.
+import 'package:admin_wifi/data/repositori/pelanggan_aktif_repositori.dart';
 import 'package:admin_wifi/services/cek_koneksi_internet.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
-import 'package:admin_wifi/data/services/firebase_servis.dart';
 import 'package:admin_wifi/utils/format.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
@@ -34,8 +34,11 @@ class PelangganAktifPage extends StatefulWidget {
 
 class _PelangganAktifPageState extends State<PelangganAktifPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
-  final FirebaseService _firebaseService = FirebaseService();
-  late Future<List<PelangganAktif>> _listaPelangganAktifFuture = Future.value([]);
+  // diubah: Menggunakan repositori untuk interaksi dengan Firebase.
+  final PelangganAktifRepositori _pelangganAktifRepositori = PelangganAktifRepositori();
+  late Future<List<PelangganAktif>> _listaPelangganAktifFuture = Future.value(
+    [],
+  );
   final NotifikasiServis _notifikasiServis = NotifikasiServis();
 
   @override
@@ -56,16 +59,21 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       if (p.id == null) continue;
 
       final pelangganOperasi = PelangganOperasi();
-      final dataPelanggan = await pelangganOperasi.ambilSatuPelangganById(p.idPelanggan);
+      final dataPelanggan = await pelangganOperasi.ambilSatuPelangganById(
+        p.idPelanggan,
+      );
       final namaPelanggan = dataPelanggan?.nama ?? 'Pelanggan';
 
-      final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(const Duration(days: 3));
+      final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(
+        const Duration(days: 3),
+      );
 
       if (tigaHariSebelumKadaluarsa.isAfter(sekarang)) {
         await _notifikasiServis.jadwalNotifikasi(
           id: p.id.hashCode.abs() + 1000,
           title: '⏰ Paket Akan Berakhir',
-          body: 'Paket $namaPelanggan akan berakhir dalam 3 hari (${Format.formatTanggal(p.tanggalBerakhir)})',
+          body:
+              'Paket $namaPelanggan akan berakhir dalam 3 hari (${Format.formatTanggal(p.tanggalBerakhir)})',
           jadwal: tigaHariSebelumKadaluarsa,
         );
       }
@@ -76,7 +84,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         await _notifikasiServis.jadwalNotifikasi(
           id: p.id.hashCode.abs() + 2000,
           title: '🔔 Paket Berakhir Sekarang',
-          body: 'Paket $namaPelanggan telah berakhir hari ini (${Format.formatTanggal(waktuKadaluarsa)}). Harap perbarui paket.',
+          body:
+              'Paket $namaPelanggan telah berakhir hari ini (${Format.formatTanggal(waktuKadaluarsa)}). Harap perbarui paket.',
           jadwal: waktuKadaluarsa,
         );
       }
@@ -92,14 +101,16 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
 
     setState(() {
-      _listaPelangganAktifFuture = _pelangganAktifOperasi.ambilSemuaPelangganAktif().then((list) {
-        list.sort((a, b) {
-          final namaA = namaMap[a.idPelanggan] ?? '';
-          final namaB = namaMap[b.idPelanggan] ?? '';
-          return namaA.compareTo(namaB);
-        });
-        return list;
-      });
+      _listaPelangganAktifFuture = _pelangganAktifOperasi
+          .ambilSemuaPelangganAktif()
+          .then((list) {
+            list.sort((a, b) {
+              final namaA = namaMap[a.idPelanggan] ?? '';
+              final namaB = namaMap[b.idPelanggan] ?? '';
+              return namaA.compareTo(namaB);
+            });
+            return list;
+          });
     });
 
     _listaPelangganAktifFuture.then((pelanggan) {
@@ -146,28 +157,29 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
     if (konfirmasi == true) {
       try {
-        await _pelangganAktifOperasi.hapusPelangganAktif(pelanggan.id!);
-
-        // diubah: Menggunakan layanan terpusat untuk memeriksa koneksi.
+        // diubah: Memanggil repositori untuk menghapus dari Firebase.
         final isOnline = await KoneksiInternetService.cekKoneksi();
-
         if (isOnline) {
-          await _firebaseService.hapusPelangganAktif(pelanggan.id!);
+          await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Mode offline: Data akan dihapus dari server saat online.'),
+                content: Text(
+                  'Mode offline: Data akan dihapus dari server saat online.',
+                ),
                 backgroundColor: Colors.orange,
               ),
             );
           }
         }
 
+        await _pelangganAktifOperasi.hapusPelangganAktif(pelanggan.id!);
+
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Pelanggan aktif berhasil dihapus dari lokal.'),
+            content: Text('Pelanggan aktif berhasil dihapus.'),
             backgroundColor: Colors.green,
           ),
         );
@@ -202,7 +214,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         comparator = (a, b) {
           final namaA = namaMap[a.idPelanggan] ?? '';
           final namaB = namaMap[b.idPelanggan] ?? '';
-          return pilihan == OpsiUrutkan.namaAZ ? namaA.compareTo(namaB) : namaB.compareTo(namaA);
+          return pilihan == OpsiUrutkan.namaAZ
+              ? namaA.compareTo(namaB)
+              : namaB.compareTo(namaA);
         };
         break;
       case OpsiUrutkan.lunas:
@@ -211,7 +225,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           final isLunasA = a.status == StatusPembayaran.lunas;
           final isLunasB = b.status == StatusPembayaran.lunas;
           if (isLunasA == isLunasB) return 0;
-          return (pilihan == OpsiUrutkan.lunas) ? (isLunasA ? -1 : 1) : (isLunasA ? 1 : -1);
+          return (pilihan == OpsiUrutkan.lunas)
+              ? (isLunasA ? -1 : 1)
+              : (isLunasA ? 1 : -1);
         };
         break;
       case OpsiUrutkan.paketAktif:
@@ -220,7 +236,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           final isAktifA = a.tanggalBerakhir.isAfter(DateTime.now());
           final isAktifB = b.tanggalBerakhir.isAfter(DateTime.now());
           if (isAktifA == isAktifB) return 0;
-          return (pilihan == OpsiUrutkan.paketAktif) ? (isAktifA ? -1 : 1) : (isAktifA ? 1 : -1);
+          return (pilihan == OpsiUrutkan.paketAktif)
+              ? (isAktifA ? -1 : 1)
+              : (isAktifA ? 1 : -1);
         };
         break;
     }
@@ -261,7 +279,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
             ),
             SimpleDialogOption(
               child: const Text('Status Paket (Tidak Aktif)'),
-              onPressed: () => Navigator.pop(context, OpsiUrutkan.paketTidakAktif),
+              onPressed: () =>
+                  Navigator.pop(context, OpsiUrutkan.paketTidakAktif),
             ),
             SimpleDialogOption(
               child: const Text('Batal'),
@@ -331,7 +350,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
             return AlertDialog(
               title: const Text('Konfirmasi Hapus Semua'),
               content: const Text(
-                  'Apakah Anda yakin ingin menghapus semua data pelanggan aktif? Tindakan ini tidak dapat dibatalkan.'),
+                'Apakah Anda yakin ingin menghapus semua data pelanggan aktif? Tindakan ini tidak dapat dibatalkan.',
+              ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
@@ -347,16 +367,41 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         );
 
         if (konfirmasi == true) {
+          final isOnline = await KoneksiInternetService.cekKoneksi();
+          if (isOnline) {
+            final semuaPelanggan = await _pelangganAktifOperasi.ambilSemuaPelangganAktif();
+            for (var pelanggan in semuaPelanggan) {
+              if (pelanggan.id != null) {
+                // diubah: Memanggil repositori untuk menghapus dari Firebase.
+                await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);
+              }
+            }
+          }
           await _pelangganAktifOperasi.hapusSemuaPelangganAktif();
           _loadPelangganAktif();
         }
         break;
       case OpsiHapusPilihan.hapusKadaluarsa:
-        final int jumlahDihapus = await _pelangganAktifOperasi.hapusPelangganKadaluarsa();
+        final isOnline = await KoneksiInternetService.cekKoneksi();
+        if (isOnline) {
+          final semuaPelanggan = await _pelangganAktifOperasi.ambilSemuaPelangganAktif();
+          final sekarang = DateTime.now();
+          final pelangganKadaluarsa = semuaPelanggan.where((p) => p.tanggalBerakhir.isBefore(sekarang)).toList();
+          for (var pelanggan in pelangganKadaluarsa) {
+            if (pelanggan.id != null) {
+              // diubah: Memanggil repositori untuk menghapus dari Firebase.
+              await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);
+            }
+          }
+        }
+        final int jumlahDihapus = await _pelangganAktifOperasi
+            .hapusPelangganKadaluarsa();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('$jumlahDihapus pelanggan kadaluarsa berhasil dihapus.'),
+            content: Text(
+              '$jumlahDihapus pelanggan kadaluarsa berhasil dihapus.',
+            ),
             duration: const Duration(seconds: 3),
           ),
         );
@@ -409,10 +454,16 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                 final statusPaketColor = isAktif ? Colors.green : Colors.red;
 
                 final statusPembayaranText = pelanggan.status.displayName;
-                final statusPembayaranColor = pelanggan.status == StatusPembayaran.lunas ? Colors.green : Colors.red;
+                final statusPembayaranColor =
+                    pelanggan.status == StatusPembayaran.lunas
+                    ? Colors.green
+                    : Colors.red;
 
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 7,
+                  ),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     onLongPress: () {
@@ -422,7 +473,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DetailPelangganAktif(pelanggan: pelanggan),
+                          builder: (context) =>
+                              DetailPelangganAktif(pelanggan: pelanggan),
                         ),
                       );
                       if (result == true) {
@@ -439,12 +491,18 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                         children: [
                           Text(
                             'Pembayaran: $statusPembayaranText',
-                            style: TextStyle(color: statusPembayaranColor, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: statusPembayaranColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Status Paket: $statusPaketText',
-                            style: TextStyle(color: statusPaketColor, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              color: statusPaketColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 4),
                           Text(
