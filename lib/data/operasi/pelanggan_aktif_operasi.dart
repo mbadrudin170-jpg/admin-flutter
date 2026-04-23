@@ -4,9 +4,13 @@
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:admin_wifi/data/services/notifikasi_servis.dart';
+import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 
 class PelangganAktifOperasi {
   final dbHelper = DatabaseHelper.instance;
+  final NotifikasiServis _notifikasiServis = NotifikasiServis();
+  final PelangganOperasi _pelangganOperasi = PelangganOperasi();
 
   // Fungsi untuk menambahkan pelanggan aktif baru ke database lokal.
   Future<int> createPelangganAktif(PelangganAktif pelangganAktif) async {
@@ -14,11 +18,13 @@ class PelangganAktifOperasi {
     final now = DateTime.now();
     // ditambah: Menyertakan timestamp 'diperbarui' untuk sinkronisasi.
     final data = pelangganAktif.toMap()..['diperbarui'] = now.toIso8601String();
-    return await db.insert(
+    final result = await db.insert(
       'pelanggan_aktif',
       data,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    await _jadwalkanNotifikasi(pelangganAktif);
+    return result;
   }
 
   // Fungsi untuk mengambil semua data pelanggan aktif dari database lokal.
@@ -57,6 +63,26 @@ class PelangganAktifOperasi {
       where: 'id = ?',
       whereArgs: [pelangganAktif.id],
     );
+    await _jadwalkanNotifikasi(pelangganAktif);
+  }
+
+  Future<void> _jadwalkanNotifikasi(PelangganAktif pelangganAktif) async {
+    final pelanggan = await _pelangganOperasi.getPelangganById(
+      pelangganAktif.idPelanggan,
+    );
+    final namaPelanggan = pelanggan?.nama ?? 'Tanpa Nama';
+    final jadwalNotifikasi = pelangganAktif.tanggalBerakhir.subtract(
+      const Duration(days: 1),
+    );
+
+    if (jadwalNotifikasi.isAfter(DateTime.now())) {
+      await _notifikasiServis.jadwalNotifikasi(
+        id: pelangganAktif.id.hashCode,
+        title: 'Paket Akan Segera Berakhir',
+        body: 'Paket untuk pelanggan $namaPelanggan akan berakhir besok.',
+        jadwal: jadwalNotifikasi,
+      );
+    }
   }
 
   // diubah: Mengganti implementasi Firebase yang salah dengan logika penghapusan SQLite yang benar.
@@ -64,6 +90,7 @@ class PelangganAktifOperasi {
   Future<void> hapusPelangganAktif(String id) async {
     final db = await dbHelper.database;
     await db.delete('pelanggan_aktif', where: 'id = ?', whereArgs: [id]);
+    await _notifikasiServis.batalNotifikasi(id.hashCode);
   }
 
   // Fungsi untuk menghapus semua data pelanggan aktif dari database lokal.

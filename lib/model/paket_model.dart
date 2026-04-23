@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 
 // Enum untuk tipe durasi paket
 enum TipeDurasi {
+  menit,
   jam,
   hari,
   bulan;
@@ -14,6 +15,8 @@ enum TipeDurasi {
   // Getter untuk mendapatkan nama yang ramah pengguna
   String get displayName {
     switch (this) {
+      case TipeDurasi.menit:
+        return 'Menit';
       case TipeDurasi.jam:
         return 'Jam';
       case TipeDurasi.hari:

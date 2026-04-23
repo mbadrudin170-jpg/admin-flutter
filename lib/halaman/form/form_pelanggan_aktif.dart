@@ -159,6 +159,8 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
           startDate.hour,
           startDate.minute,
         );
+      case TipeDurasi.menit:
+        return startDate.add(Duration(minutes: paket.durasi));
     }
   }
 

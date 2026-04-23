@@ -30,7 +30,7 @@ class NotifikasiServis {
           );
 
       await _flutterLocalNotificationsPlugin.initialize(
-        settings: initializationSettings,
+        settings: initializationSettings, // Corrected: pass as named argument
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
         onDidReceiveBackgroundNotificationResponse:
             onDidReceiveNotificationResponse,
@@ -81,6 +81,15 @@ class NotifikasiServis {
       );
     } catch (e) {
       debugPrint('NotifikasiServis: Error jadwal notifikasi - $e');
+    }
+  }
+
+  Future<void> batalNotifikasi(int id) async {
+    try {
+      await _flutterLocalNotificationsPlugin.cancel(id: id); // Corrected: pass as named argument
+      debugPrint('NotifikasiServis: Notifikasi dibatalkan - ID: $id');
+    } catch (e) {
+      debugPrint('NotifikasiServis: Error membatalkan notifikasi - $e');
     }
   }
 }
