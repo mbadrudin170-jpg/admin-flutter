@@ -14,6 +14,7 @@ Aplikasi Admin WiFi adalah sebuah sistem manajemen lengkap yang dirancang untuk 
 *   **Manajemen Keuangan:** Melacak pemasukan dan pengeluaran melalui fitur dompet digital.
 *   **Interaksi Pengguna:** Menyediakan platform bagi pengguna untuk memberikan kritik dan saran.
 *   **Notifikasi Otomatis:** Memberikan pengingat proaktif mengenai paket pelanggan yang akan berakhir.
+*   **Mode Offline:** Memberi tahu pengguna ketika aplikasi tidak terhubung ke internet.
 
 ---
 
@@ -23,6 +24,7 @@ Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan ska
 
 *   **`lib/`**: Direktori utama kode sumber aplikasi.
     *   **`main.dart`**: Titik masuk utama aplikasi.
+    *   **`splash_screen.dart`**: Layar pembuka yang juga menangani pemeriksaan konektivitas awal.
     *   **`data/`**: Logika pengelolaan data (operasi SQLite, servis sinkronisasi Firebase, servis notifikasi).
     *   **`model/`**: Definisi kelas model data.
     *   **`halaman/`**: Komponen antarmuka pengguna (UI), diatur per fitur.
@@ -54,6 +56,15 @@ Navigasi utama menggunakan `BottomNavigationBar` di `lib/halaman_utama.dart`. Na
 ## **4. Fungsionalitas Inti**
 
 Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegrasi.
+
+### **Pemeriksaan Konektivitas & Mode Offline**
+*   **Tujuan:** Memberikan umpan balik langsung kepada pengguna mengenai status koneksi internet mereka untuk mengelola ekspektasi terkait sinkronisasi data.
+*   **File Terkait:** `lib/splash_screen.dart`.
+*   **Paket yang Digunakan:** `connectivity_plus`.
+*   **Mekanisme:**
+    1.  Saat aplikasi dimulai, `SplashScreen` akan memeriksa ketersediaan koneksi internet (WiFi atau data seluler).
+    2.  Terlepas dari hasilnya, aplikasi akan melanjutkan navigasi ke halaman utama setelah beberapa detik.
+    3.  Jika pada saat pemeriksaan awal tidak ada koneksi yang terdeteksi, sebuah `SnackBar` berwarna oranye dengan pesan "Anda dalam mode offline" akan muncul di bagian bawah halaman utama.
 
 ### **Manajemen Data (Pelanggan, Paket, Transaksi)**
 *   **Tujuan:** Mengelola data inti bisnis, termasuk informasi pelanggan, layanan yang ditawarkan, dan riwayat pembayaran.

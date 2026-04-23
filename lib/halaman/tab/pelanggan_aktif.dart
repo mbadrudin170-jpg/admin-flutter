@@ -443,7 +443,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                 return Card(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 10,
-                    vertical: 5,
+                    vertical: 7,
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
