@@ -1,9 +1,10 @@
 // path: lib/halaman/tab/lainnya.dart
-// diubah: File ini menampilkan halaman "Lainnya" dengan berbagai menu navigasi, termasuk menu baru "Tentang Aplikasi".
+// diubah: File ini menampilkan halaman "Lainnya" dengan berbagai menu navigasi, termasuk menu baru "Tentang Aplikasi" dan "Riwayat Aktivasi".
 
 import 'package:flutter/material.dart';
-// ditambah: Impor halaman "Tentang Aplikasi".
+// ditambah: Impor halaman "Tentang Aplikasi" dan "Riwayat Aktivasi".
 import 'package:admin_wifi/halaman/lainnya/tentang_aplikasi.dart';
+import 'package:admin_wifi/halaman/lainnya/riwayat_aktivasi_paket.dart';
 import 'package:admin_wifi/halaman/lainnya/kategori.dart';
 import 'package:admin_wifi/halaman/lainnya/kritik_saran.dart';
 import 'package:admin_wifi/halaman/lainnya/paket.dart';
@@ -38,6 +39,13 @@ class LainnyaPage extends StatelessWidget {
             icon: Icons.people,
             title: 'Pelanggan',
             page: const PelangganPage(),
+          ),
+          // ditambah: Menambahkan item menu baru untuk halaman "Riwayat Aktivasi".
+          _buildMenuItem(
+            context,
+            icon: Icons.history,
+            title: 'Riwayat Aktivasi',
+            page: const RiwayatAktivasiPaketPage(),
           ),
           _buildMenuItem(
             context,

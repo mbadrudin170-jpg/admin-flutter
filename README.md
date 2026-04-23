@@ -162,3 +162,17 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 - Navigasi ke halaman pembuatan atau edit (`FormPaket`) harus memanggil `_refreshPaketList` setelah kembali untuk menampilkan data yang diperbarui.
 - Penghapusan paket, baik tunggal maupun semua, harus selalu didahului oleh dialog konfirmasi untuk mencegah kehilangan data.
 - Tampilan harga paket direkomendasikan untuk menggunakan `FormatUang.formatMataUang()` untuk konsistensi di seluruh aplikasi.
+
+---
+
+**File:** `lib/halaman/lainnya/riwayat_aktivasi_paket.dart`
+**Fitur:** Manajemen Riwayat Aktivasi
+**Daftar Fungsi:**
+*   `_loadPelangganAktif()`: Memuat, mengurutkan, dan menampilkan semua data pelanggan yang pernah diaktifkan.
+*   `_urutkanList(OpsiUrutkan pilihan)`: Menyediakan berbagai opsi untuk mengurutkan daftar riwayat (berdasarkan tanggal, nama, status, dll.).
+*   `_hapusPelangganAktif(PelangganAktif pelanggan)`: Menangani logika untuk menghapus satu entri riwayat.
+*   `_opsiHapus()`: Menampilkan dialog untuk menghapus data secara massal (semua atau yang sudah kadaluarsa).
+*   `_tambahPelangganAktif()`: Menyediakan tombol navigasi untuk menambah data aktivasi baru.
+*   `_periksaDanJadwalkanNotifikasi(...)`: Menangani penjadwalan notifikasi untuk paket yang akan berakhir (fungsionalitas bawaan dari "Pelanggan Aktif").
+**Catatan:** Halaman ini merupakan duplikat fungsional dari "Pelanggan Aktif" dan ditempatkan di menu "Lainnya" untuk menyediakan akses penuh terhadap data riwayat, termasuk kemampuan untuk menambah, mengubah, dan menghapus data.
+**Rules:** Karena merupakan salinan, semua aturan yang berlaku di `lib/halaman/tab/pelanggan_aktif.dart` juga berlaku di sini, terutama penggunaan `PerhitunganUtil` dan `FormatUtil` untuk konsistensi tampilan data. Setiap perubahan data harus diikuti dengan pemuatan ulang daftar.

@@ -1,4 +1,4 @@
-// path: lib/halaman/tab/pelanggan_aktif.dart
+// path: lib/halaman/lainnya/riwayat_aktivasi_paket.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 
 // diubah: Mengimpor utilitas terpusat.
@@ -29,14 +29,15 @@ enum OpsiUrutkan {
   paketTidakAktif,
 }
 
-class PelangganAktifPage extends StatefulWidget {
-  const PelangganAktifPage({super.key});
+class RiwayatAktivasiPaketPage extends StatefulWidget {
+  const RiwayatAktivasiPaketPage({super.key});
 
   @override
-  State<PelangganAktifPage> createState() => _PelangganAktifPageState();
+  State<RiwayatAktivasiPaketPage> createState() =>
+      _RiwayatAktivasiPaketPageState();
 }
 
-class _PelangganAktifPageState extends State<PelangganAktifPage> {
+class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
   final PelangganAktifRepositori _pelangganAktifRepositori =
       PelangganAktifRepositori();
@@ -428,7 +429,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pelanggan Aktif'),
+        title: const Text('Riwayat Aktivasi'),
         actions: [
           IconButton(
             icon: const Icon(Icons.sort),

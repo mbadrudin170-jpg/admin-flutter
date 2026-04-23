@@ -20,7 +20,12 @@ class NamaPaketWidget extends StatelessWidget {
       future: paketOperasi.getPaketById(idPaket),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Text('Memuat paket...', style: style);
+          // diubah: Menampilkan indikator loading yang lebih halus.
+          return const SizedBox(
+            width: 12,
+            height: 12,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          );
         } else if (snapshot.hasError ||
             !snapshot.hasData ||
             snapshot.data == null) {
