@@ -1,5 +1,5 @@
-// Path: lib/halaman/lainnya/paket.dart
-// Halaman ini menampilkan daftar semua paket yang tersedia.
+// path: lib/halaman/lainnya/paket.dart
+// Halaman ini menampilkan daftar semua paket yang tersedia dan memungkinkan manajemen (CRUD) paket.
 
 import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/halaman/detail/detail_paket.dart';
@@ -21,47 +21,83 @@ class _PaketPageState extends State<PaketPage> {
   @override
   void initState() {
     super.initState();
-    _paketFuture = _paketOperasi.getPaket();
+    _refreshPaketList();
   }
 
+  // untuk memuat ulang daftar paket dari database dan memperbarui UI.
   void _refreshPaketList() {
     setState(() {
       _paketFuture = _paketOperasi.getPaket();
     });
   }
 
-  void _hapusSemuaPaket() {
+  // untuk menampilkan dialog yang memberikan opsi edit atau hapus pada paket yang dipilih.
+  void _showEditDeleteDialog(Paket paket) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(paket.nama),
+          content: const Text('Pilih aksi yang ingin Anda lakukan.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FormPaket(paket: paket),
+                  ),
+                ).then((_) => _refreshPaketList());
+              },
+              child: const Text('Edit'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _showDeleteConfirmationDialog(paket);
+              },
+              child: const Text('Hapus'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // untuk menampilkan dialog konfirmasi sebelum menghapus paket secara permanen.
+  void _showDeleteConfirmationDialog(Paket paket) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
-        // Menggunakan context yang berbeda untuk dialog
         return AlertDialog(
           title: const Text('Konfirmasi Hapus'),
-          content: const Text(
-            'Apakah Anda yakin ingin menghapus semua paket? Tindakan ini tidak dapat dibatalkan.',
+          content: Text(
+            'Apakah Anda yakin ingin menghapus paket ${paket.nama}?',
           ),
           actions: <Widget>[
             TextButton(
               child: const Text('Batal'),
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Tutup dialog
+                Navigator.of(dialogContext).pop();
               },
             ),
             TextButton(
               style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: const Text('Hapus'),
               onPressed: () async {
-                // Ambil ScaffoldMessenger SEBELUM async gap
                 final messenger = ScaffoldMessenger.of(context);
-                Navigator.of(dialogContext).pop(); // Tutup dialog dulu
+                Navigator.of(dialogContext).pop();
 
                 try {
-                  await _paketOperasi.hapusSemuaPaket();
-                  _refreshPaketList(); // Refresh list setelah hapus
+                  // diubah: Pemeriksaan null dan operator '!' dihapus karena
+                  // analyzer dapat memastikan `paket.id` tidak pernah null di sini.
+                  await _paketOperasi.hapusPaket(paket.id);
+                  _refreshPaketList();
 
                   messenger.showSnackBar(
                     const SnackBar(
-                      content: Text('Semua paket berhasil dihapus.'),
+                      content: Text('Paket berhasil dihapus.'),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -81,16 +117,64 @@ class _PaketPageState extends State<PaketPage> {
     );
   }
 
+  // untuk menampilkan dialog konfirmasi sebelum menghapus semua paket.
+  void _hapusSemuaPaket() {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Konfirmasi Hapus'),
+          content: const Text(
+            'Apakah Anda yakin ingin menghapus semua paket? Tindakan ini tidak dapat dibatalkan.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Batal'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Hapus'),
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                Navigator.of(dialogContext).pop();
+
+                try {
+                  await _paketOperasi.hapusSemuaPaket();
+                  _refreshPaketList();
+
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text('Semua paket berhasil dihapus.'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } catch (e) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text('Gagal menghapus semua paket: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Paket'),
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
         actions: [
           IconButton(
-            onPressed: _hapusSemuaPaket, // Panggil fungsi hapus di sini
+            onPressed: _hapusSemuaPaket,
             icon: const Icon(Icons.delete_sweep),
             tooltip: 'Hapus Semua',
           ),
@@ -122,6 +206,9 @@ class _PaketPageState extends State<PaketPage> {
                     ),
                   ).then((_) => _refreshPaketList());
                 },
+                onLongPress: () {
+                  _showEditDeleteDialog(paket);
+                },
                 child: Card(
                   margin: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -149,7 +236,6 @@ class _PaketPageState extends State<PaketPage> {
             MaterialPageRoute(builder: (context) => const FormPaket()),
           ).then((_) => _refreshPaketList());
         },
-        backgroundColor: Colors.blueAccent,
         child: const Icon(Icons.add),
       ),
     );

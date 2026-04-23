@@ -85,6 +85,11 @@ class PaketOperasi {
     await db.update('paket', data, where: 'id = ?', whereArgs: [paket.id]);
   }
 
+  Future<void> hapusPaket(String id) async {
+    final db = await dbHelper.database;
+    await db.delete('paket', where: 'id = ?', whereArgs: [id]);
+  }
+
   Future<void> hapusSemuaPaket() async {
     final db = await dbHelper.database;
     await db.delete('paket');

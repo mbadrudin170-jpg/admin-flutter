@@ -1,50 +1,54 @@
-# **Panduan Kontribusi dan Aturan Pengembangan**
+# **Aturan lainnya untuk AI**
 
-Dokumen ini berisi serangkaian aturan dan panduan yang **wajib ditaati** oleh semua kontributor proyek untuk menjaga kualitas, konsistensi, dan kejelasan kode.
+1.  **Konsistensi Bahasa**: Seluruh penamaan dalam proyek, termasuk fungsi, variabel, parameter, dan nama file, wajib menggunakan Bahasa Indonesia. Komunikasi antara AI dan pengembang juga harus dilakukan dalam Bahasa Indonesia.
 
-### **1. Prinsip Utama: Bahasa dan Alur Kerja**
+2.  **Pemberian Komentar Path File**: Pada bagian paling atas dari setiap file kode, wajib ditambahkan komentar yang menunjukkan path atau lokasi file tersebut. Format komentar: `// path : lib/contoh/nama_file.dart`.
 
-*   **1.1. Alur Kerja Terstruktur:** Sebelum mengimplementasikan fitur atau perubahan besar, diskusikan rencana kerja terlebih dahulu dengan tim untuk memastikan keselarasan.
-*   **1.2. Standar Bahasa Indonesia:** Gunakan Bahasa Indonesia yang baku, formal, dan jelas untuk seluruh penamaan di dalam proyek, termasuk **nama file, variabel, fungsi, dan parameter**, serta dalam semua dokumentasi dan komentar.
+3.  **Kewajiban Membaca Dokumentasi Proyek**: Sebelum memulai pekerjaan apa pun, AI diharuskan membaca keseluruhan file `README.md` untuk memahami alur kerja, struktur proyek, dan konteks pengembangan secara komprehensif.
 
-### **2. Standar Dokumentasi Kode**
+4.  **Pembaruan Dokumentasi Per File**: Setelah menyelesaikan modifikasi pada suatu file, AI wajib memperbarui atau menambahkan bagian dokumentasi untuk file tersebut di dalam `README.md`. Dokumentasi ini harus mencakup keterangan tentang fitur dan fungsi yang ada di dalam file yang bersangkutan, dikelompokkan berdasarkan direktori.
 
-*   **2.1. Wajib Baca `README.md`:** Sebelum memulai pekerjaan, setiap pengembang wajib membaca dan memahami isi dari file `README.md` ini untuk mengetahui status terbaru, arsitektur, dan aturan yang berlaku.
-*   **2.2. Komentar Kode Informatif:**
-    *   **Path File:** Setiap file **wajib** diawali dengan komentar yang menunjukkan path lengkapnya. *Contoh:* `// path: lib/main.dart`.
-    *   **Deskripsi Fungsi:** Setiap fungsi **wajib** memiliki komentar di atasnya yang menjelaskan tujuannya secara singkat dan jelas. *Contoh:* `// untuk mengambil data pengguna dari server.`
-    *   **Log Perubahan:** Setiap baris kode yang mengalami perubahan signifikan (ditambah, diubah, atau dihapus) harus disertai komentar di atasnya dengan struktur: `// ditambah: [alasan]`, `// diubah: [alasan]`, atau `// dihapus: [alasan]`.
-    *   **Penjelasan Logika:** Untuk alur kode yang kompleks, tambahkan komentar secukupnya untuk membantu pengembang lain memahami logika tersebut.
+5.  **Prosedur Pra-Build**: Sebelum melakukan proses *build*, AI wajib membaca `README.md` untuk mengidentifikasi jenis perubahan yang telah dilakukan. Klasifikasi perubahan adalah sebagai berikut:
+    *   **Perbaikan Bug**: Modifikasi yang bertujuan memperbaiki kesalahan atau cacat pada aplikasi.
+    *   **Penambahan Fitur Baru**: Modifikasi yang menambahkan fungsionalitas yang sebelumnya tidak ada.
+    *   Jika hanya dilakukan perbaikan bug, hanya nomor *build* (contoh: `+1`) pada file `pubspec.yaml` yang dinaikkan. Nomor versi (contoh: `1.0.0`) **tidak boleh** diubah.
+    *   Proses *build* **hanya boleh dijalankan atas instruksi eksplisit dari pengembang** dengan perintah spesifik, misalnya "build", "tolong build", dll. Jika diperintah, jalankan perintah berikut: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
 
-### **3. Pembaruan Dokumentasi Proyek (`README.md`)**
+6.  **Konsistensi dan Kejelasan Kode**: AI wajib menjaga konsistensi gaya penulisan kode dan memastikan setiap kode yang ditulis memiliki struktur yang jelas, mudah dibaca, dan dapat dipahami oleh pengembang.
 
-*   **3.1. Tanggung Jawab Pembaruan:** Setelah menyelesaikan pekerjaan pada sebuah file, pengembang **wajib** memperbarui atau menambahkan dokumentasi file tersebut di bagian **"Dokumentasi Proyek Aplikasi Admin WiFi"** pada file `README.md` ini.
-*   **3.2. Format Pembaruan (Wajib Diikuti):**
-    ```
-    **File:** `lib/path/lengkap/nama_file.dart`
-    **Fitur:** [Jelaskan fitur utama yang dikelola oleh file ini, mis: Autentikasi Pengguna]
+7.  **Format Dokumentasi File di README.md**: Pembaruan dokumentasi file di `README.md` harus mengikuti format yang ketat dan dikelompokkan berdasarkan folder. Format ini bertujuan agar dokumentasi rapi, terstruktur, dan informatif. Contoh format yang harus diikuti:
+    ```markdown
+    ### File: `lib/path/nama_file.dart`
+    **Fitur:** [Deskripsi singkat fitur utama yang diimplementasikan dalam file ini]
     **Daftar Fungsi:**
-    *   `namaFungsiA()`: Penjelasan singkat dan jelas mengenai kegunaan fungsi ini.
-    *   `namaFungsiB()`: Penjelasan singkat dan jelas mengenai kegunaan fungsi ini.
-    **Catatan:** [Informasi tambahan yang relevan, seperti ketergantungan atau cara penggunaan khusus.]
-    **Rules:** [Jelaskan aturan spesifik yang harus ditaati saat menggunakan file ini. Buat serinci mungkin. Contoh: "Untuk semua operasi tanggal dan waktu dalam file ini, wajib menggunakan format dari kelas `FormatTanggal` dan `FormatJam`. Dilarang melakukan format manual untuk menjaga konsistensi UI."]
+    - `namaFungsiA()`: Penjelasan mendetail tentang tujuan dan cara kerja fungsi A.
+    - `namaFungsiB()`: Penjelasan mendetail tentang tujuan dan cara kerja fungsi B.
+    **Catatan:** [Informasi penting atau relevan lainnya, misalnya dependensi khusus, state management yang digunakan, atau potensi masalah]
+    **Rules:** [Aturan spesifik yang diterapkan dalam file ini, misalnya: "Semua format tanggal wajib mengacu pada konfigurasi di file `lib/utils/format_tanggal.dart`."]
     ```
+    *   **Hindari dokumentasi yang terlalu generik**, seperti "tombol untuk menambah". Gunakan deskripsi yang lebih informatif, misalnya "Tombol untuk menyimpan data formulir ke database lokal.".
+    *   **Hindari penyebutan teknis yang ambigu**, seperti "menambahkan kode value pada kode anu karena akan menyebabkan error". Gunakan penjelasan teknis yang jelas dan spesifik.
 
-### **4. Kualitas dan Pola Kode**
+8.  **Pemberian Keterangan pada Modifikasi Kode**: Setiap baris atau blok kode yang dimodifikasi wajib diberi komentar penjelasan. Format komentar yang digunakan adalah:
+    *   `// dihapus: [Alasan mengapa kode ini dihapus]`
+    *   `// diubah/ditambah: [Alasan mengapa kode ini diubah atau ditambahkan]`
 
-*   **4.1. Analisis Kode:** Sebelum menyelesaikan tugas (misalnya, *commit* atau *merge*), pastikan perintah `flutter analyze` berjalan tanpa menghasilkan **error** atau **warning**.
-*   **4.2. Pola Asynchronous (`async`/`await`):** Untuk semua operasi yang bersifat I/O (seperti request HTTP, query database, atau akses file), **wajib** menggunakan pola `async`/`await` dan membungkus hasilnya dalam objek `Future`. Hindari penggunaan `.then()` yang berantai untuk menjaga keterbacaan kode.
-*   **4.3. Konsistensi:** Jaga konsistensi gaya penulisan kode, penamaan, dan struktur folder. Hindari membuat asumsi yang dapat menyebabkan inkonsistensi pada proyek.
+9.  **Verifikasi Kode dengan Flutter Analyze**: Setelah menyelesaikan seluruh pekerjaan pada suatu file atau fitur, AI wajib menjalankan perintah `flutter analyze` di terminal untuk memverifikasi bahwa kode bebas dari kesalahan (*error*) dan peringatan (*warning*).
 
-### **5. Manajemen Build dan Perintah Terminal**
+10. **Prosedur Konfirmasi Pekerjaan**: Sebelum mengeksekusi pekerjaan apa pun, AI wajib memberikan penjelasan singkat dan jelas mengenai rencana tindakan yang akan dilakukan. AI hanya boleh memulai pekerjaan setelah mendapatkan konfirmasi eksplisit dari pengembang.
+    *   Kata kunci persetujuan: `setuju`, `oke`, `ok`, `ya`, `yes`.
+    *   Kata kunci penolakan: `jangan`, `tidak`, `nggk`, `nggak`.
 
-*   **5.1. Alur Perintah Build:**
-    *   Proses build rilis (`apk --release`) hanya boleh dijalankan atas arahan yang jelas, bukan untuk pengembangan sehari-hari.
-    *   **Aturan Versioning:** Sebelum melakukan build rilis, periksa perubahan yang ada:
-        *   Jika hanya berisi **perbaikan bug**, yang dinaikkan hanyalah nomor *build* di `pubspec.yaml` (misalnya, dari `1.0.0+1` menjadi `1.0.0+2`).
-        *   Jika ada **fitur baru**, diskusikan dengan tim untuk menaikkan versi minor (misal, `1.1.0+3`).
-    *   **Perintah Build Standar:** `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
-*   **5.2. Perintah `clean`:** Jika diminta untuk membersihkan proyek, jalankan `flutter clean && flutter pub get` di terminal.
+11. **Pemberian Komentar pada Setiap Fungsi**: Di atas setiap deklarasi fungsi (kecuali fungsi bawaan widget seperti `build`), wajib diberikan komentar yang menjelaskan tujuan spesifik dari pembuatan fungsi tersebut. Format: `// [Penjelasan tujuan fungsi, contoh: untuk menavigasi ke halaman pengaturan]`.
+
+12. **Penambahan Komentar di Dalam Kode**: AI dianjurkan untuk sesering mungkin menambahkan komentar penjelas pada blok-blok kode penting di dalam isi file. Tujuannya adalah untuk memperjelas alasan dan logika di balik implementasi kode, sehingga memudahkan pengembang untuk membaca dan memahami.
+
+13. **Perintah Clean Projek**: Apabila pengembang memberikan perintah "clean", AI wajib menjalankan perintah `flutter clean && flutter pub get` di terminal untuk membersihkan *cache* build dan mengunduh ulang dependensi.
+
+14. **Larangan Asumsi Liar**: AI dilarang keras membuat asumsi sepihak yang tidak didasari oleh instruksi eksplisit dari pengembang atau konteks yang sudah ada. Setiap tindakan harus dipastikan akan menjaga seluruh file dan modul dalam proyek tetap sinkron dan kompatibel satu sama lain.
+
+15. **Pola Asynchronous**: Setiap kali membuat fungsi yang melibatkan operasi I/O, *network request*, interaksi dengan database, atau operasi yang memerlukan waktu tunggu, wajib menggunakan pola asynchronous (`async`/`await`) dan membungkus hasilnya dalam objek `Future`. Penggunaan `.then()` berantai harus dihindari demi keterbacaan kode.
+
 
 # **Dokumentasi Proyek Aplikasi Admin WiFi**
 
@@ -56,7 +60,7 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 **Fitur:** Utilitas Perhitungan Umum
 **Daftar Fungsi:**
 *   `sisaHari(DateTime tanggalBerakhir)`: Menghitung selisih hari (bulat ke bawah) antara tanggal sekarang dan tanggal berakhir.
-*   `getTeksSisaMasaAktif(DateTime tanggalBerakhir)`: Menghasilkan teks deskriptif yang dinamis mengenai sisa masa aktif. Logika ini memberikan detail hingga level jam dan menit jika sisa waktu kurang dari satu hari (misalnya, "Sisa 18 jam", "Kadaluarsa 5 menit yang lalu").
+*   `getTeksSisaMasaAktif(DateTime tanggalBerakhir)`: Menghasilkan teks status masa aktif. Jika sudah lewat, menampilkan "Berakhir". Jika masih aktif, menampilkan sisa waktu dalam format hari, jam, atau menit (mis: "Sisa 5 hari", "Sisa 12 jam").
 *   `getWarnaSisaMasaAktif(DateTime tanggalBerakhir)`: Memberikan `Color` yang sesuai dengan status masa aktif untuk isyarat visual di UI (hijau, kuning, merah).
 **Catatan:** Kelas ini mengelompokkan fungsi kalkulasi terkait durasi dan status untuk digunakan di seluruh aplikasi.
 **Rules:** Setiap kali perlu melakukan perhitungan atau mendapatkan representasi (teks/warna) dari sisa masa aktif, **wajib** menggunakan fungsi dari kelas ini. Jangan membuat logika perhitungan serupa di tempat lain untuk menghindari inkonsistensi.
@@ -123,3 +127,18 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 *   `_loadKritikSaran()`: Memuat daftar semua kritik dan saran dari database.
 **Catatan:** Halaman ini berfungsi untuk menampilkan masukan dari pengguna aplikasi.
 **Rules:** Format tanggal dan waktu pengiriman kritik dan saran **wajib** menggunakan `FormatTanggal.formatTanggalDanJam()` dari `format_util.dart`.
+
+---
+
+### File: `lib/halaman/lainnya/paket.dart`
+**Fitur:** Manajemen Paket WiFi. Halaman ini bertanggung jawab untuk menampilkan daftar paket, serta menyediakan fungsionalitas untuk menambah, mengedit, dan menghapus paket.
+**Daftar Fungsi:**
+- `_refreshPaketList()`: Memuat ulang daftar paket dari database untuk memastikan data yang ditampilkan di UI selalu yang terbaru.
+- `_showEditDeleteDialog(Paket paket)`: Menampilkan dialog kontekstual saat item paket ditekan lama, memberikan opsi untuk "Edit" atau "Hapus".
+- `_showDeleteConfirmationDialog(Paket paket)`: Menampilkan dialog konfirmasi untuk mencegah penghapusan paket yang tidak disengaja.
+- `_hapusSemuaPaket()`: Menangani logika untuk menghapus semua data paket dari database, dengan dialog konfirmasi sebelumnya.
+**Catatan:** Halaman ini menggunakan `FutureBuilder` untuk menangani pemuatan data secara asinkron. Setiap operasi yang mengubah data (tambah, edit, hapus) akan memicu `_refreshPaketList()` untuk konsistensi data.
+**Rules:** 
+- Navigasi ke halaman pembuatan atau edit (`FormPaket`) harus memanggil `_refreshPaketList` setelah kembali untuk menampilkan data yang diperbarui.
+- Penghapusan paket, baik tunggal maupun semua, harus selalu didahului oleh dialog konfirmasi untuk mencegah kehilangan data.
+- Tampilan harga paket direkomendasikan untuk menggunakan `FormatUang.formatMataUang()` untuk konsistensi di seluruh aplikasi.
