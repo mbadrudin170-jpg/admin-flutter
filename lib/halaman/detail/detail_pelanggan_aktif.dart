@@ -1,4 +1,4 @@
-// lib/halaman/detail/detail_pelanggan_aktif.dart
+// path: lib/halaman/detail/detail_pelanggan_aktif.dart
 import 'dart:developer' as developer;
 import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
@@ -8,6 +8,10 @@ import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
+// ditambah: Mengimpor fungsi formatTanggal untuk memformat tanggal.
+import 'package:admin_wifi/utils/format/format_tanggal.dart';
+// ditambah: Mengimpor kelas FormatJam untuk memformat waktu.
+import 'package:admin_wifi/utils/format/format_jam.dart';
 
 class DetailPelangganAktif extends StatefulWidget {
   final PelangganAktif pelanggan;
@@ -145,13 +149,15 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                     const SizedBox(height: 8),
                     _buildPaketDisplay(),
                     const SizedBox(height: 8),
+                    // diubah: Menggunakan formatTanggal dan FormatJam untuk menampilkan tanggal dan waktu mulai.
                     Text(
-                      'Mulai: ${_pelangganAktif.tanggalMulai}',
+                      'Mulai: ${formatTanggalAngka(_pelangganAktif.tanggalMulai)} - ${FormatJam.formatKeJamMenit(_pelangganAktif.tanggalMulai)}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
+                    // diubah: Menggunakan formatTanggal dan FormatJam untuk menampilkan tanggal dan waktu berakhir.
                     Text(
-                      'Berakhir: ${_pelangganAktif.tanggalBerakhir}',
+                      'Berakhir: ${formatTanggalAngka(_pelangganAktif.tanggalBerakhir)} - ${FormatJam.formatKeJamMenit(_pelangganAktif.tanggalBerakhir)}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ],

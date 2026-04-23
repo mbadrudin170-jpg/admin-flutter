@@ -1,31 +1,3 @@
-# **Aturan lainnya untuk AI**
-
-### **1. Prinsip Utama: Interaksi dan Bahasa**
-
-*   **1.1. Alur Kerja Berbasis Konfirmasi:** Sebelum melakukan tindakan modifikasi apa pun, AI **wajib** menyajikan rencana kerja yang terperinci kepada pengguna. Pekerjaan hanya dapat dilanjutkan setelah mendapatkan persetujuan eksplisit (misalnya, "setuju", "oke", "ok", "ya", "yes"). Jika pengguna menolak (misalnya, "jangan", "tidak", "nggk", "nggak"), AI harus membatalkan rencana tersebut dan menunggu arahan selanjutnya.
-*   **1.2. Standar Bahasa Indonesia:** Seluruh komunikasi dengan pengguna, serta semua penamaan dalam kode (nama file, variabel, fungsi, parameter), harus konsisten menggunakan Bahasa Indonesia yang formal, baku, dan jelas.
-
-### **2. Dokumentasi dan Manajemen Kode**
-
-*   **2.1. Baca `README.md`:** Sebelum memulai tugas baru, AI wajib membaca file `README.md` terlebih dahulu untuk memahami konteks, alur kerja, dan status terakhir proyek.
-*   **2.2. Komentar Kode Wajib:**
-    *   **Path File:** Setiap file yang dimodifikasi harus mencantumkan path lengkapnya dalam bentuk komentar di baris paling atas. *Contoh:* `// path: lib/main.dart`.
-    *   **Deskripsi Fungsi:** Setiap fungsi harus memiliki komentar deskriptif di atasnya yang menjelaskan tujuan dan cara kerjanya. *Contoh:* `// Fungsi untuk menavigasi pengguna ke halaman profil.`.
-    *   **Logika Perubahan:** Setiap baris kode yang ditambah, diubah, atau dihapus harus disertai komentar di atas atau di sampingnya dengan struktur yang jelas: `// ditambah: [alasan penambahan]`, `// diubah: [alasan perubahan]`, atau `// dihapus: [alasan penghapusan]`.
-    *   **Keterangan Tambahan:** Untuk logika atau alur kode yang kompleks, tambahkan komentar secukupnya untuk memastikan kode mudah dipahami oleh manusia.
-*   **2.3. Pembaruan `README.md`:** Setelah menyelesaikan sebuah tugas, AI **wajib** memperbarui file `README.md`. Pembaruan harus mendokumentasikan tujuan, fitur, dan fungsi utama dari file-file yang telah dimodifikasi. Hindari penjelasan teknis yang tidak relevan, detail implementasi yang berlebihan, atau catatan negatif (misalnya, "kode lama dihapus karena error").
-
-### **3. Kualitas, Build, dan Konsistensi**
-
-*   **3.1. Analisis Kode:** Setelah semua modifikasi kode selesai, jalankan perintah `flutter analyze` untuk memastikan tidak ada error atau *warning* yang tersisa.
-*   **3.2. Proses Build Aplikasi:**
-    *   Proses build **hanya** boleh dieksekusi atas perintah eksplisit dari pengguna.
-    *   Sebelum memulai build, periksa `README.md` untuk mengidentifikasi apakah perubahan terakhir merupakan **fitur baru** atau hanya **perbaikan bug**.
-    *   Jika hanya **perbaikan bug**, yang dinaikkan hanyalah nomor *build* di `pubspec.yaml` (misalnya, dari `1.0.0+1` menjadi `1.0.0+2`). Versi utama (`1.0.0`) tidak boleh diubah.
-    *   Gunakan perintah berikut untuk proses build: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
-*   **3.3. Perintah `clean`:** Jika pengguna memberikan perintah `clean`, jalankan `flutter clean && flutter pub get` di terminal.
-*   **3.4. Hindari Asumsi:** AI tidak boleh membuat asumsi yang tidak berdasar atau "liar" yang dapat mengganggu sinkronisasi dan konsistensi antar file dalam proyek.
-*   **3.5. Jaga Konsistensi:** AI harus selalu menjaga konsistensi dan kejelasan dalam struktur kode, penamaan, dan alur dokumentasi di seluruh proyek.
 
 # **Panduan Pengembangan AI untuk Flutter di Firebase Studio**
 

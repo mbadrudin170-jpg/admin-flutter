@@ -1,24 +1,20 @@
+# **Dokumentasi Proyek Aplikasi Admin WiFi**
 
-# Blueprint Aplikasi Flutter
-admin_wifi_v1.0.6
+Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen ini berfungsi sebagai panduan utama untuk memahami arsitektur, fungsionalitas, dan alur kerja pengembangan aplikasi.
 
-## Gambaran Umum
+---
 
-Aplikasi ini adalah aplikasi Flutter yang berfungsi sebagai dasbor admin untuk mengelola berbagai aspek bisnis, termasuk pelanggan, paket, transaksi keuangan, dan banyak lagi.
+## **1. Tujuan Aplikasi**
 
-## Fitur yang Diterapkan
+Aplikasi Admin WiFi adalah sebuah sistem manajemen lengkap yang dirancang untuk membantu administrator dalam mengelola layanan jaringan WiFi. Fungsi utamanya meliputi:
 
-### Manajemen Data
-- **Pelanggan:** Menambah, melihat, memperbarui, dan menghapus data pelanggan.
-- **Paket:** Mengelola paket layanan yang ditawarkan.
-- **Dompet:** Melacak beberapa sumber dana.
-- **Kategori:** Mengklasifikasikan transaksi (pemasukan dan pengeluaran).
-- **Transaksi:** Mencatat semua aktivitas keuangan.
+*   **Manajemen Pelanggan:** Mengelola data pelanggan, baik yang aktif maupun yang sudah tidak berlangganan.
+*   **Manajemen Transaksi:** Mencatat semua transaksi pembayaran dari pelanggan.
+*   **Manajemen Paket:** Mengatur berbagai paket layanan WiFi yang ditawarkan.
+*   **Manajemen Keuangan:** Melacak pemasukan dan pengeluaran melalui fitur dompet digital.
+*   **Interaksi Pengguna:** Menyediakan platform bagi pengguna untuk memberikan kritik dan saran.
+*   **Notifikasi Otomatis:** Memberikan pengingat proaktif mengenai paket pelanggan yang akan berakhir.
+*   **Mode Offline:** Memberi tahu pengguna ketika aplikasi tidak terhubung ke internet.
+*   **Informasi Aplikasi:** Menyediakan halaman khusus "Tentang Aplikasi" yang menampilkan versi dan deskripsi.
 
-### Interaksi Pengguna
-- **Formulir Input:** Formulir terstruktur untuk menambahkan dan mengedit data.
-- **Navigasi:** Antarmuka tab untuk beralih di antara berbagai bagian.
-- **Umpan Balik:** Dialog konfirmasi dan pesan umpan balik.
-
-### Fitur Tambahan
-- **Kritik dan Saran:** Memungkinkan pengguna untuk memberikan umpan balik.
+---
