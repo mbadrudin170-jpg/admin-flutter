@@ -15,6 +15,7 @@ Aplikasi Admin WiFi adalah sebuah sistem manajemen lengkap yang dirancang untuk 
 *   **Interaksi Pengguna:** Menyediakan platform bagi pengguna untuk memberikan kritik dan saran.
 *   **Notifikasi Otomatis:** Memberikan pengingat proaktif mengenai paket pelanggan yang akan berakhir.
 *   **Mode Offline:** Memberi tahu pengguna ketika aplikasi tidak terhubung ke internet.
+*   **Informasi Aplikasi:** Menyediakan halaman khusus "Tentang Aplikasi" yang menampilkan versi dan deskripsi.
 
 ---
 
@@ -24,8 +25,11 @@ Struktur direktori di dalam `lib/` diatur berdasarkan fitur untuk memastikan ska
 
 *   **`lib/`**: Direktori utama kode sumber aplikasi.
     *   **`main.dart`**: Titik masuk utama aplikasi.
-    *   **`splash_screen.dart`**: Layar pembuka yang juga menangani pemeriksaan konektivktivitas awal.
-    *   **`data/`**: Logika pengelolaan data (operasi SQLite, servis sinkronisasi Firebase, servis notifikasi).
+    *   **`splash_screen.dart`**: Layar pembuka yang juga menangani pemeriksaan konektivitas awal.
+    *   **`data/`**: Logika pengelolaan data.
+        *   **`operasi/`**: Kelas-kelas yang bertanggung jawab untuk operasi CRUD pada database lokal (SQLite).
+        *   **`repositori/`**: Lapisan yang bertanggung jawab untuk operasi data (CRUD) langsung dengan sumber data eksternal seperti Firestore.
+        *   **`services/`**: Layanan latar belakang seperti sinkronisasi data dan notifikasi.
     *   **`model/`**: Definisi kelas model data.
     *   **`halaman/`**: Komponen antarmuka pengguna (UI), diatur per fitur.
     *   **`utils/`**: Kode utilitas yang dapat digunakan kembali.
@@ -59,23 +63,16 @@ Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegras
 
 ### **Pemeriksaan Konektivitas & Mode Offline**
 *   **Tujuan:** Memberikan umpan balik langsung kepada pengguna mengenai status koneksi internet mereka untuk mengelola ekspektasi terkait sinkronisasi data.
-*   **File Terkait:** `lib/splash_screen.dart`.
-*   **Mekanisme:**
-    1.  Saat aplikasi dimulai, `SplashScreen` memeriksa konektivitas dan menavigasi ke halaman utama.
-    2.  Jika tidak ada koneksi, `SnackBar` akan muncul untuk memberitahu pengguna bahwa mereka dalam mode offline.
-    3.  Logika ini juga telah diperkuat dengan pemeriksaan `mounted` untuk mencegah error saat melakukan navigasi atau menampilkan `SnackBar` setelah operasi asinkron, sehingga meningkatkan stabilitas aplikasi.
+*   **File Terkait:** `lib/splash_screen.dart`, `lib/services/cek_koneksi_internet.dart`.
 
-### **Manajemen Data (Pelanggan, Paket, Transaksi)**
-*   **Tujuan:** Mengelola data inti bisnis secara konsisten di database lokal (SQLite) dan Firebase.
-*   **File Terkait:** `lib/model/`, `lib/data/operasi/`, `lib/halaman/`.
-*   **Alur Penghapusan Data:** Proses penghapusan data, seperti pada pelanggan aktif, diatur secara terpusat dari lapisan UI (`lib/halaman/tab/pelanggan_aktif.dart`).
-    *   **Penghapusan Individual:** Saat satu pelanggan dihapus (melalui `onLongPress`), aplikasi akan menghapus data dari database **SQLite lokal** dan juga dari **Firestore** jika terhubung ke internet.
-    *   **Penghapusan Massal ('Hapus Semua' & 'Hapus Kadaluarsa'):** Logika ini telah disempurnakan untuk memastikan konsistensi data dengan server. Sebelum menghapus data dari database lokal, aplikasi akan:
-        1.  Memeriksa koneksi internet.
-        2.  Jika online, aplikasi akan mengambil daftar pelanggan yang akan dihapus (semua atau yang kadaluarsa).
-        3.  Melakukan iterasi pada daftar tersebut untuk menghapus setiap entri dari **Firestore**.
-        4.  Setelah itu, barulah data yang relevan dihapus dari **database SQLite lokal**.
-    *   Pendekatan ini memastikan bahwa operasi penghapusan massal juga tercermin di server, menjaga sinkronisasi dan integritas data di seluruh platform.
+### **Manajemen Data & Arsitektur Penghapusan**
+*   **Tujuan:** Mengelola data inti bisnis secara konsisten dengan pemisahan tanggung jawab yang jelas.
+*   **File Terkait:** `lib/data/operasi/`, `lib/data/repositori/`, `lib/halaman/tab/pelanggan_aktif.dart`.
+*   **Alur Penghapusan Data:** Proses penghapusan data diinisiasi dari lapisan UI, namun logikanya dienkapsulasi pada lapisan yang sesuai untuk memastikan pemisahan tanggung jawab (Separation of Concerns).
+    1.  **Pengecekan Koneksi:** UI (`pelanggan_aktif.dart`) memeriksa status koneksi internet.
+    2.  **Operasi Jarak Jauh (Online):** Jika aplikasi online, UI memanggil `PelangganAktifRepositori` (`lib/data/repositori/pelanggan_aktif_repositori.dart`) untuk menghapus dokumen yang relevan dari **Firestore**.
+    3.  **Operasi Lokal:** Setelah operasi jarak jauh (jika ada) selesai, UI memanggil `PelangganAktifOperasi` (`lib/data/operasi/pelanggan_aktif_operasi.dart`) untuk menghapus data dari **database SQLite lokal**.
+    *   Pendekatan ini memastikan bahwa logika interaksi dengan Firebase terisolasi di dalam **lapisan repositori**, sementara logika interaksi dengan database lokal berada di dalam **lapisan operasi**, sesuai dengan arsitektur yang bersih.
 
 ### **Dompet Digital (Manajemen Keuangan)**
 *   **Tujuan:** Melacak saldo, pemasukan, dan pengeluaran untuk memberikan gambaran keuangan yang jelas.
@@ -84,24 +81,23 @@ Aplikasi ini memiliki beberapa modul fitur utama yang bekerja secara terintegras
 ### **Sinkronisasi Data dengan Firebase**
 *   **Tujuan:** Memastikan konsistensi data antara database lokal (SQLite) dan backend (Firebase Firestore) secara efisien.
 *   **File Terkait:** `lib/data/services/sinkronisasi_database.dart`.
-*   **Mekanisme:**
-    1.  Layanan ini, yang diimplementasikan dalam kelas `SinkronisasiService`, berjalan secara periodik di latar belakang.
-    2.  Proses sinkronisasi bersifat **dua arah dan inkremental**:
-        *   **Unggah:** Perubahan yang terjadi di database lokal (data baru atau yang diperbarui) akan diunggah ke Firestore.
-        *   **Unduh:** Perubahan yang terjadi di Firestore akan diunduh dan disimpan ke database SQLite lokal.
-    3.  Sinkronisasi ini efisien karena hanya memproses data yang berubah sejak waktu sinkronisasi terakhir, menggunakan *timestamp* `diperbarui`.
+*   **Mekanisme:** Proses sinkronisasi periodik yang berjalan di latar belakang untuk mengunggah dan mengunduh perubahan data secara inkremental.
 
 ### **Notifikasi & Pengingat Jatuh Tempo**
-*   **Tujuan:** Memberikan pengingat otomatis kepada admin agar dapat menindaklanjuti paket pelanggan yang akan segera berakhir masa aktifnya.
+*   **Tujuan:** Memberikan pengingat otomatis kepada admin mengenai paket pelanggan yang akan segera berakhir.
 *   **File Terkait:** `lib/data/services/notifikasi_servis.dart`, `lib/halaman/tab/pelanggan_aktif.dart`.
-*   **Mekanisme:**
-    1.  Saat daftar pelanggan aktif dimuat, sistem akan menjadwalkan notifikasi untuk setiap pelanggan yang relevan.
-    2.  Notifikasi dijadwalkan untuk **3 hari sebelum** dan **tepat pada hari** kadaluarsa.
-    3.  ID notifikasi yang unik dihasilkan dari `hashCode` ID pelanggan untuk mencegah konflik.
 
 ### **Kritik dan Saran Pengguna**
-*   **Tujuan:** Menyediakan wadah bagi pengguna untuk memberikan masukan, yang kemudian dapat dilihat oleh administrator dan disinkronkan dengan Firebase.
+*   **Tujuan:** Menyediakan wadah bagi pengguna untuk memberikan masukan, yang kemudian dapat dilihat oleh administrator.
 *   **File Terkait:** `lib/model/kritik_saran_model.dart`, `lib/data/operasi/kritik_saran_operasi.dart`, `lib/halaman/lainnya/kritik_saran.dart`.
+
+### **Halaman Tentang Aplikasi**
+*   **Tujuan:** Memberikan informasi penting kepada pengguna mengenai aplikasi, termasuk versi saat ini dan deskripsi singkat.
+*   **File Terkait:** `lib/halaman/lainnya/tentang_aplikasi.dart`, `lib/halaman/tab/lainnya.dart`.
+*   **Mekanisme:**
+    1.  Halaman ini dapat diakses melalui menu "Lainnya".
+    2.  Secara dinamis mengambil informasi versi aplikasi menggunakan paket `package_info_plus`.
+    3.  Menampilkan logo, nama aplikasi, versi, dan deskripsi dengan tata letak yang bersih.
 
 ---
 
