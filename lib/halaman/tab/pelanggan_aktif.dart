@@ -94,22 +94,12 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   }
 
   Future<void> _loadPelangganAktif() async {
-    final pelangganOperasi = PelangganOperasi();
-    final semuaPelanggan = await pelangganOperasi.getPelanggan();
-    final namaMap = <String, String>{};
-    for (var p in semuaPelanggan) {
-      namaMap[p.id] = p.nama;
-    }
-
     setState(() {
       _listaPelangganAktifFuture = _pelangganAktifOperasi
           .ambilSemuaPelangganAktif()
           .then((list) {
-            list.sort((a, b) {
-              final namaA = namaMap[a.idPelanggan] ?? '';
-              final namaB = namaMap[b.idPelanggan] ?? '';
-              return namaA.compareTo(namaB);
-            });
+            // diubah: Mengubah urutan default menjadi berdasarkan tanggal berakhir.
+            list.sort((a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir));
             return list;
           });
     });
