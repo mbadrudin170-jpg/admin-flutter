@@ -3,10 +3,10 @@
 // untuk navigasi antar halaman utama seperti Pelanggan Aktif, Dompet,
 // Transaksi, dan Lainnya.
 
+import 'package:admin_wifi/halaman/tab/lainnya.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/halaman/tab/pelanggan_aktif.dart';
 import 'package:admin_wifi/halaman/tab/dompet.dart';
-import 'package:admin_wifi/halaman/tab/lainnya.dart';
 import 'package:admin_wifi/halaman/tab/transaksi.dart';
 
 class HalamanUtama extends StatefulWidget {
@@ -19,11 +19,11 @@ class HalamanUtama extends StatefulWidget {
 class _HalamanUtamaState extends State<HalamanUtama> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    PelangganAktifPage(),
-    DompetPage(),
-    TransaksiPage(),
-    LainnyaPage(),
+  final List<Widget> _widgetOptions = <Widget>[
+    const PelangganAktifPage(),
+    const DompetPage(),
+    const TransaksiPage(),
+    const LainnyaPage(),
   ];
 
   void _onItemTapped(int index) {
