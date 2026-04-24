@@ -3,6 +3,9 @@
 // Fungsinya adalah untuk menginisialisasi Firebase, database lokal (SQLite),
 // dan layanan lainnya sebelum menjalankan aplikasi.
 
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:admin_wifi/data/services/navigasi_servis.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:admin_wifi/data/services/sinkronisasi_database.dart';
 import 'package:flutter/material.dart';
@@ -21,10 +24,13 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-
+    tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
     // ditambah: Inisialisasi layanan notifikasi.
     final notifikasiServis = NotifikasiServis();
     await notifikasiServis.inisialisasi();
+    await notifikasiServis
+        .requestPermissions(); // ditambah: Meminta izin notifikasi setelah inisialisasi.
 
     // Inisialisasi data lokalisasi untuk format tanggal.
     await initializeDateFormatting('id_ID', null);
@@ -104,6 +110,8 @@ class MyApp extends StatelessWidget {
       theme: lightTheme,
       themeMode: ThemeMode.light, // Selalu gunakan tema terang
       home: const SplashScreen(),
+      navigatorKey:
+          NavigasiServis.navigatorKey, // diubah: Menambahkan navigatorKey
     );
   }
 }

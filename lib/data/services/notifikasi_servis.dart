@@ -2,7 +2,8 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
+// diubah: Menggunakan latest_all.dart untuk memastikan semua data timezone tersedia.
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 void onDidReceiveNotificationResponse(
@@ -30,18 +31,49 @@ class NotifikasiServis {
           );
 
       await _flutterLocalNotificationsPlugin.initialize(
-        settings: initializationSettings, // Corrected: pass as named argument
+        settings: initializationSettings,
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
         onDidReceiveBackgroundNotificationResponse:
             onDidReceiveNotificationResponse,
       );
 
+      // diperbaiki: Inisialisasi database timezone dan mengatur lokasi lokal.
       tz.initializeTimeZones();
+      tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
+      debugPrint('NotifikasiServis: Timezone lokal diatur ke Asia/Jakarta.');
 
-      // Untuk debugging
       debugPrint('NotifikasiServis: Inisialisasi berhasil');
     } catch (e) {
       debugPrint('NotifikasiServis: Error inisialisasi - $e');
+    }
+  }
+
+  Future<void> requestPermissions() async {
+    try {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
+      if (androidImplementation != null) {
+        await androidImplementation.requestNotificationsPermission();
+      }
+
+      final IOSFlutterLocalNotificationsPlugin? iOSImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                IOSFlutterLocalNotificationsPlugin
+              >();
+      if (iOSImplementation != null) {
+        await iOSImplementation.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      }
+      debugPrint('NotifikasiServis: Permintaan izin selesai.');
+    } catch (e) {
+      debugPrint('NotifikasiServis: Gagal meminta izin notifikasi - $e');
     }
   }
 
@@ -86,7 +118,7 @@ class NotifikasiServis {
 
   Future<void> batalNotifikasi(int id) async {
     try {
-      await _flutterLocalNotificationsPlugin.cancel(id: id); // Corrected: pass as named argument
+      await _flutterLocalNotificationsPlugin.cancel(id: id);
       debugPrint('NotifikasiServis: Notifikasi dibatalkan - ID: $id');
     } catch (e) {
       debugPrint('NotifikasiServis: Error membatalkan notifikasi - $e');

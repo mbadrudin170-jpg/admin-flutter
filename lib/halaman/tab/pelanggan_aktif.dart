@@ -49,12 +49,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   @override
   void initState() {
     super.initState();
-    _inisialisasiNotifikasi();
     _loadPelangganAktif();
-  }
-
-  Future<void> _inisialisasiNotifikasi() async {
-    await _notifikasiServis.inisialisasi();
   }
 
   void _periksaDanJadwalkanNotifikasi(List<PelangganAktif> pelanggan) async {
@@ -74,8 +69,10 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       );
 
       if (tigaHariSebelumKadaluarsa.isAfter(sekarang)) {
+        // diperbaiki: Menggunakan .abs() untuk memastikan ID notifikasi positif.
+        // Juga menambahkan nilai unik (1) untuk notifikasi H-3.
         await _notifikasiServis.jadwalNotifikasi(
-          id: p.id.hashCode.abs() + 1000,
+          id: (p.id.hashCode.abs() + 1),
           title: '⏰ Paket Akan Berakhir',
           body:
               'Paket $namaPelanggan akan berakhir dalam 3 hari (${FormatTanggal.formatTanggalBasic(p.tanggalBerakhir)})',
@@ -86,8 +83,10 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       final waktuKadaluarsa = p.tanggalBerakhir;
 
       if (waktuKadaluarsa.isAfter(sekarang)) {
+        // diperbaiki: Menggunakan .abs() untuk memastikan ID notifikasi positif.
+        // Juga menambahkan nilai unik (2) untuk notifikasi hari H.
         await _notifikasiServis.jadwalNotifikasi(
-          id: p.id.hashCode.abs() + 2000,
+          id: (p.id.hashCode.abs() + 2),
           title: '🔔 Paket Berakhir Sekarang',
           body:
               'Paket $namaPelanggan telah berakhir hari ini (${FormatTanggal.formatTanggalBasic(waktuKadaluarsa)}). Harap perbarui paket.',
@@ -102,9 +101,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       _listaPelangganAktifFuture = _pelangganAktifOperasi
           .ambilSemuaPelangganAktif()
           .then((list) {
-            list.sort((a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir));
-            return list;
-          });
+        list.sort((a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir));
+        return list;
+      });
     });
 
     _listaPelangganAktifFuture.then((pelanggan) {
@@ -151,6 +150,10 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
     if (konfirmasi == true) {
       try {
+        // ditambah: Membatalkan notifikasi yang sudah terjadwal saat data dihapus.
+        await _notifikasiServis.batalNotifikasi((pelanggan.id.hashCode.abs() + 1));
+        await _notifikasiServis.batalNotifikasi((pelanggan.id.hashCode.abs() + 2));
+
         final isOnline = await KoneksiInternetService.cekKoneksi();
         if (isOnline) {
           await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);

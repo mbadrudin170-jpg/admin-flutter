@@ -6,6 +6,7 @@
 
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:admin_wifi/utils/format_util.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:admin_wifi/data/operasi/dompet_operasi.dart';
 import 'package:admin_wifi/data/operasi/kategori_operasi.dart';
@@ -14,6 +15,7 @@ import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
+import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:admin_wifi/model/dompet_model.dart';
 import 'package:admin_wifi/model/kategori_model.dart';
 import 'package:admin_wifi/model/kritik_saran_model.dart';
@@ -33,7 +35,7 @@ class SinkronisasiDatabase {
     _timer = Timer.periodic(const Duration(minutes: 5), (timer) {
       developer.log(
         'Memulai sinkronisasi periodik...',
-        name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+        name: 'SinkronisasiService',
       );
       sinkronkanSemuaData();
     });
@@ -46,15 +48,11 @@ class SinkronisasiDatabase {
     _timer?.cancel();
   }
 
-  // dihapus: Fungsi hapusPelangganAktif telah dihapus dari kelas ini.
-  // Tanggung jawabnya akan dipindahkan ke lapisan Repository untuk pemisahan
-  // antara logika bisnis langsung (seperti penghapusan) dan sinkronisasi latar belakang.
-
   // Fungsi utama untuk sinkronisasi data dua arah.
   Future<void> sinkronkanSemuaData() async {
     developer.log(
       'Memulai sinkronisasi data inkremental...',
-      name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+      name: 'SinkronisasiService',
     );
     final lastSync = await _syncManager.getLastSyncTimestamp();
     final now = DateTime.now();
@@ -94,14 +92,17 @@ class SinkronisasiDatabase {
       await _syncManager.setLastSyncTimestamp(now);
       developer.log(
         'Sinkronisasi inkremental berhasil diselesaikan.',
-        name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+        name: 'SinkronisasiService',
       );
+
+      // 4. Jadwalkan notifikasi setelah sinkronisasi
+      await _jadwalkanNotifikasiUntukPelangganAktif();
     } catch (e, s) {
       developer.log(
         'Kesalahan besar saat sinkronisasi inkremental',
         error: e,
         stackTrace: s,
-        name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+        name: 'SinkronisasiService',
       );
     }
   }
@@ -113,7 +114,7 @@ class SinkronisasiDatabase {
   ) async {
     developer.log(
       'Mengunggah perubahan sejak $lastSync',
-      name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+      name: 'SinkronisasiService',
     );
     final batch = _firestore.batch();
 
@@ -121,7 +122,7 @@ class SinkronisasiDatabase {
       if (items.isNotEmpty) {
         developer.log(
           '  - Menemukan ${items.length} perubahan di koleksi $collectionName',
-          name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+          name: 'SinkronisasiService',
         );
         for (var item in items) {
           final docRef = _firestore
@@ -136,7 +137,7 @@ class SinkronisasiDatabase {
     developer.log(
       'Pengunggahan batch selesai.',
       name: 'SinkronisasiService',
-    ); // diubah: Nama log disesuaikan.
+    );
   }
 
   // Fungsi internal untuk mengunduh perubahan dari Firebase ke lokal.
@@ -146,7 +147,7 @@ class SinkronisasiDatabase {
   ) async {
     developer.log(
       'Mengunduh perubahan sejak $lastSync',
-      name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+      name: 'SinkronisasiService',
     );
 
     for (var collectionName in operasiMap.keys) {
@@ -158,7 +159,7 @@ class SinkronisasiDatabase {
       if (querySnapshot.docs.isNotEmpty) {
         developer.log(
           '  - Menemukan ${querySnapshot.docs.length} perubahan di koleksi $collectionName dari Firebase',
-          name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+          name: 'SinkronisasiService',
         );
         final op = operasiMap[collectionName];
 
@@ -167,31 +168,24 @@ class SinkronisasiDatabase {
               try {
                 final data = doc.data();
                 data['id'] ??= int.tryParse(doc.id) ?? doc.id;
-                // diubah: Menggunakan kurung kurawal untuk blok if.
                 if (op is KategoriOperasi) {
                   return Kategori.fromMap(data);
                 }
-                // diubah: Menggunakan kurung kurawal untuk blok if.
                 if (op is DompetOperasi) {
                   return Dompet.fromMap(data);
                 }
-                // diubah: Menggunakan kurung kurawal untuk blok if.
                 if (op is TransaksiOperasi) {
                   return Transaksi.fromMap(data);
                 }
-                // diubah: Menggunakan kurung kurawal untuk blok if.
                 if (op is PelangganOperasi) {
                   return Pelanggan.fromMap(data);
                 }
-                // diubah: Menggunakan kurung kurawal untuk blok if.
                 if (op is PaketOperasi) {
                   return Paket.fromMap(data);
                 }
-                // diubah: Menggunakan kurung kurawal untuk blok if.
                 if (op is PelangganAktifOperasi) {
                   return PelangganAktif.fromMap(data);
                 }
-                // diubah: Menggunakan kurung kurawal untuk blok if.
                 if (op is KritikSaranOperasi) {
                   return KritikSaran.fromMap(data);
                 }
@@ -200,7 +194,7 @@ class SinkronisasiDatabase {
                   'Gagal mem-parsing dokumen ${doc.id} dari koleksi $collectionName',
                   error: e,
                   stackTrace: s,
-                  name: 'SinkronisasiService', // diubah: Nama log disesuaikan.
+                  name: 'SinkronisasiService',
                 );
               }
               return null;
@@ -208,31 +202,24 @@ class SinkronisasiDatabase {
             .where((item) => item != null)
             .toList();
 
-        // diubah: Menggunakan kurung kurawal untuk blok if.
         if (op is KategoriOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Kategori>());
         }
-        // diubah: Menggunakan kurung kurawal untuk blok if.
         if (op is DompetOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Dompet>());
         }
-        // diubah: Menggunakan kurung kurawal untuk blok if.
         if (op is TransaksiOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Transaksi>());
         }
-        // diubah: Menggunakan kurung kurawal untuk blok if.
         if (op is PelangganOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Pelanggan>());
         }
-        // diubah: Menggunakan kurung kurawal untuk blok if.
         if (op is PaketOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Paket>());
         }
-        // diubah: Menggunakan kurung kurawal untuk blok if.
         if (op is PelangganAktifOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<PelangganAktif>());
         }
-        // diubah: Menggunakan kurung kurawal untuk blok if.
         if (op is KritikSaranOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<KritikSaran>());
         }
@@ -241,6 +228,68 @@ class SinkronisasiDatabase {
     developer.log(
       'Pengunduhan perubahan selesai.',
       name: 'SinkronisasiService',
-    ); // diubah: Nama log disesuaikan.
+    );
+  }
+
+  // Fungsi untuk memeriksa dan menjadwalkan notifikasi untuk semua pelanggan aktif.
+  Future<void> _jadwalkanNotifikasiUntukPelangganAktif() async {
+    developer.log(
+      'Memeriksa dan menjadwalkan notifikasi untuk pelanggan aktif...',
+      name: 'SinkronisasiService',
+    );
+    final pelangganAktifOperasi = PelangganAktifOperasi();
+    final pelangganOperasi = PelangganOperasi();
+    final notifikasiServis = NotifikasiServis();
+
+    final semuaPelangganAktif = await pelangganAktifOperasi.ambilSemuaPelangganAktif();
+    final sekarang = DateTime.now();
+
+    for (var p in semuaPelangganAktif) {
+      if (p.id == null) continue;
+
+      final dataPelanggan = await pelangganOperasi.ambilSatuPelangganById(
+        p.idPelanggan,
+      );
+      final namaPelanggan = dataPelanggan?.nama ?? 'Pelanggan';
+
+      // Notifikasi H-3
+      final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(
+        const Duration(days: 3),
+      );
+
+      // Jadwalkan hanya jika waktu notifikasi masih di masa depan
+      if (tigaHariSebelumKadaluarsa.isAfter(sekarang)) {
+        await notifikasiServis.jadwalNotifikasi(
+          id: (p.id.hashCode.abs() + 1),
+          title: '⏰ Paket Akan Berakhir',
+          body:
+              'Paket $namaPelanggan akan berakhir dalam 3 hari (${FormatTanggal.formatTanggalBasic(p.tanggalBerakhir)})',
+          jadwal: tigaHariSebelumKadaluarsa,
+        );
+      } else {
+        // Jika waktu notifikasi sudah lewat, batalkan notifikasi yang mungkin sudah ada.
+        await notifikasiServis.batalNotifikasi((p.id.hashCode.abs() + 1));
+      }
+
+      // Notifikasi Hari H
+      final waktuKadaluarsa = p.tanggalBerakhir;
+
+      if (waktuKadaluarsa.isAfter(sekarang)) {
+        await notifikasiServis.jadwalNotifikasi(
+          id: (p.id.hashCode.abs() + 2),
+          title: '🔔 Paket Berakhir Sekarang',
+          body:
+              'Paket $namaPelanggan telah berakhir hari ini (${FormatTanggal.formatTanggalBasic(waktuKadaluarsa)}). Harap perbarui paket.',
+          jadwal: waktuKadaluarsa,
+        );
+      } else {
+        // Jika sudah kadaluarsa, batalkan notifikasi hari H.
+        await notifikasiServis.batalNotifikasi((p.id.hashCode.abs() + 2));
+      }
+    }
+    developer.log(
+      'Pemeriksaan dan penjadwalan notifikasi selesai.',
+      name: 'SinkronisasiService',
+    );
   }
 }
