@@ -1,15 +1,17 @@
-// Path: lib/data/services/notifikasi_servis.dart
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// diubah: Menggunakan latest_all.dart untuk memastikan semua data timezone tersedia.
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+@pragma('vm:entry-point')
 void onDidReceiveNotificationResponse(
   NotificationResponse notificationResponse,
 ) async {
-  // TODO: Implementasikan logika untuk menangani notifikasi saat di-tap.
+  debugPrint(
+    'Notifikasi di-tap: ID=${notificationResponse.id}, '
+    'Payload=${notificationResponse.payload}',
+  );
+  // TODO: Implementasikan logika navigasi atau aksi lainnya
 }
 
 class NotifikasiServis {
@@ -28,20 +30,20 @@ class NotifikasiServis {
           InitializationSettings(
             android: androidInitializationSettings,
             iOS: darwinInitializationSettings,
+            macOS: darwinInitializationSettings,
           );
 
+      // ✅ PERBAIKAN: Semua menggunakan named parameter
       await _flutterLocalNotificationsPlugin.initialize(
-        settings: initializationSettings,
+        settings: initializationSettings, // WAJIB pakai nama 'settings'
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
         onDidReceiveBackgroundNotificationResponse:
             onDidReceiveNotificationResponse,
       );
 
-      // diperbaiki: Inisialisasi database timezone dan mengatur lokasi lokal.
       tz.initializeTimeZones();
       tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
       debugPrint('NotifikasiServis: Timezone lokal diatur ke Asia/Jakarta.');
-
       debugPrint('NotifikasiServis: Inisialisasi berhasil');
     } catch (e) {
       debugPrint('NotifikasiServis: Error inisialisasi - $e');
@@ -71,6 +73,20 @@ class NotifikasiServis {
           sound: true,
         );
       }
+
+      final MacOSFlutterLocalNotificationsPlugin? macOSImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                MacOSFlutterLocalNotificationsPlugin
+              >();
+      if (macOSImplementation != null) {
+        await macOSImplementation.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+      }
+
       debugPrint('NotifikasiServis: Permintaan izin selesai.');
     } catch (e) {
       debugPrint('NotifikasiServis: Gagal meminta izin notifikasi - $e');
@@ -95,10 +111,20 @@ class NotifikasiServis {
             showWhen: false,
           );
 
+      const DarwinNotificationDetails darwinNotificationDetails =
+          DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          );
+
       const NotificationDetails notificationDetails = NotificationDetails(
         android: androidNotificationDetails,
+        iOS: darwinNotificationDetails,
+        macOS: darwinNotificationDetails,
       );
 
+      // ✅ PERBAIKAN: Semua menggunakan named parameter
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         id: id,
         title: title,
@@ -106,6 +132,7 @@ class NotifikasiServis {
         scheduledDate: tz.TZDateTime.from(jadwal, tz.local),
         notificationDetails: notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: 'notifikasi_paket',
       );
 
       debugPrint(
@@ -118,10 +145,58 @@ class NotifikasiServis {
 
   Future<void> batalNotifikasi(int id) async {
     try {
+      // ✅ PERBAIKAN: Cancel juga harus pakai named parameter 'id'
       await _flutterLocalNotificationsPlugin.cancel(id: id);
       debugPrint('NotifikasiServis: Notifikasi dibatalkan - ID: $id');
     } catch (e) {
       debugPrint('NotifikasiServis: Error membatalkan notifikasi - $e');
+    }
+  }
+
+  Future<void> tampilkanNotifikasiLangsung({
+    required int id,
+    required String title,
+    required String body,
+  }) async {
+    try {
+      const AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+            'id_notifikasi_langsung',
+            'Notifikasi Langsung',
+            channelDescription:
+                'Channel untuk notifikasi yang ditampilkan langsung',
+            importance: Importance.max,
+            priority: Priority.high,
+            showWhen: true,
+          );
+
+      const DarwinNotificationDetails darwinNotificationDetails =
+          DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          );
+
+      const NotificationDetails notificationDetails = NotificationDetails(
+        android: androidNotificationDetails,
+        iOS: darwinNotificationDetails,
+        macOS: darwinNotificationDetails,
+      );
+
+      // ✅ PERBAIKAN: Semua menggunakan named parameter
+      await _flutterLocalNotificationsPlugin.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: notificationDetails,
+        payload: 'notifikasi_langsung',
+      );
+
+      debugPrint('NotifikasiServis: Notifikasi langsung ditampilkan - ID: $id');
+    } catch (e) {
+      debugPrint(
+        'NotifikasiServis: Error menampilkan notifikasi langsung - $e',
+      );
     }
   }
 }
