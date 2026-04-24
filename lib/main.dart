@@ -3,6 +3,7 @@
 // Fungsinya adalah untuk menginisialisasi Firebase, database lokal (SQLite),
 // dan layanan lainnya sebelum menjalankan aplikasi.
 
+import 'package:google_fonts/google_fonts.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:admin_wifi/data/services/navigasi_servis.dart';
@@ -60,18 +61,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color primarySeedColor = Colors.deepPurple;
 
-    final TextTheme appTextTheme = const TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: 'Oswald',
+    final TextTheme appTextTheme = TextTheme(
+      displayLarge: GoogleFonts.oswald(
         fontSize: 57,
         fontWeight: FontWeight.bold,
       ),
-      titleLarge: TextStyle(
-        fontFamily: 'Roboto',
-        fontSize: 22,
-        fontWeight: FontWeight.w500,
-      ),
-      bodyMedium: TextStyle(fontFamily: 'Open Sans', fontSize: 14),
+      titleLarge: GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.w500),
+      bodyMedium: GoogleFonts.openSans(fontSize: 14),
     );
 
     final ThemeData lightTheme = ThemeData(
@@ -81,11 +77,10 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       textTheme: appTextTheme,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: primarySeedColor,
         foregroundColor: Colors.white,
-        titleTextStyle: TextStyle(
-          fontFamily: 'Oswald',
+        titleTextStyle: GoogleFonts.oswald(
           fontSize: 24,
           fontWeight: FontWeight.bold,
         ),
@@ -96,8 +91,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: primarySeedColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: const TextStyle(
-            fontFamily: 'Roboto',
+          textStyle: GoogleFonts.roboto(
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),

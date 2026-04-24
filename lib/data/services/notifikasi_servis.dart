@@ -200,4 +200,22 @@ class NotifikasiServis {
   Future<void> batalNotifikasi(int id) async {
     await _flutterLocalNotificationsPlugin.cancel(id: id);
   }
+
+  /// Memperbarui jadwal notifikasi yang sudah ada.
+  /// Jika notifikasi dengan ID yang sama sudah dijadwalkan, jadwalnya akan ditimpa dengan yang baru.
+  Future<void> perbaruiJadwalNotifikasi({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime jadwal,
+  }) async {
+    try {
+      // Memanggil fungsi jadwalNotifikasi karena ia akan menimpa jadwal lama jika ID sama.
+      await jadwalNotifikasi(id: id, title: title, body: body, jadwal: jadwal);
+      debugPrint('✅ JADWAL DIPERBARUI: $id pada $jadwal');
+    } catch (e) {
+      debugPrint('❌ GAGAL PERBARUI JADWAL: $e');
+      rethrow;
+    }
+  }
 }
