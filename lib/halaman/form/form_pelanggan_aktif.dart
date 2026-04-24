@@ -224,9 +224,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
 
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Gagal menyimpan. Cek log untuk detail.'),
-              duration: const Duration(seconds: 4),
+              duration: Duration(seconds: 4),
             ),
           );
         }

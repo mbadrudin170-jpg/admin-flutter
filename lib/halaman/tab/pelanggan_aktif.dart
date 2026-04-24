@@ -101,9 +101,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       _listaPelangganAktifFuture = _pelangganAktifOperasi
           .ambilSemuaPelangganAktif()
           .then((list) {
-        list.sort((a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir));
-        return list;
-      });
+            list.sort((a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir));
+            return list;
+          });
     });
 
     _listaPelangganAktifFuture.then((pelanggan) {
@@ -151,8 +151,12 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     if (konfirmasi == true) {
       try {
         // ditambah: Membatalkan notifikasi yang sudah terjadwal saat data dihapus.
-        await _notifikasiServis.batalNotifikasi((pelanggan.id.hashCode.abs() + 1));
-        await _notifikasiServis.batalNotifikasi((pelanggan.id.hashCode.abs() + 2));
+        await _notifikasiServis.batalNotifikasi(
+          (pelanggan.id.hashCode.abs() + 1),
+        );
+        await _notifikasiServis.batalNotifikasi(
+          (pelanggan.id.hashCode.abs() + 2),
+        );
 
         final isOnline = await KoneksiInternetService.cekKoneksi();
         if (isOnline) {

@@ -134,10 +134,7 @@ class SinkronisasiDatabase {
     });
 
     await batch.commit();
-    developer.log(
-      'Pengunggahan batch selesai.',
-      name: 'SinkronisasiService',
-    );
+    developer.log('Pengunggahan batch selesai.', name: 'SinkronisasiService');
   }
 
   // Fungsi internal untuk mengunduh perubahan dari Firebase ke lokal.
@@ -241,7 +238,8 @@ class SinkronisasiDatabase {
     final pelangganOperasi = PelangganOperasi();
     final notifikasiServis = NotifikasiServis();
 
-    final semuaPelangganAktif = await pelangganAktifOperasi.ambilSemuaPelangganAktif();
+    final semuaPelangganAktif = await pelangganAktifOperasi
+        .ambilSemuaPelangganAktif();
     final sekarang = DateTime.now();
 
     for (var p in semuaPelangganAktif) {

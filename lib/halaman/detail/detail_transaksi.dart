@@ -32,7 +32,10 @@ class DetailTransaksiPage extends StatelessWidget {
             _buildDetailRow('ID', transaksi.id),
             _buildDetailRow('Keterangan', transaksi.keterangan),
             // diubah: Memperbaiki pemanggilan fungsi format tanggal.
-            _buildDetailRow('Tanggal', FormatTanggal.formatTanggalDanJam(transaksi.tanggal)),
+            _buildDetailRow(
+              'Tanggal',
+              FormatTanggal.formatTanggalDanJam(transaksi.tanggal),
+            ),
             _buildDetailRow(
               'Jumlah',
               NumberFormat.currency(

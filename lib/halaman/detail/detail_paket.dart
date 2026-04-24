@@ -66,7 +66,7 @@ class _DetailPaketPageState extends State<DetailPaketPage> {
         actions: [
           IconButton(
             onPressed: _editPaket,
-            icon: Icon(Icons.edit),
+            icon: const Icon(Icons.edit),
             tooltip: 'Edit Paket',
           ),
         ],

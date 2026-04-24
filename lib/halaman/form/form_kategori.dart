@@ -34,7 +34,10 @@ class _FormKategoriPageState extends State<FormKategoriPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Form Kategori'), leading: BackButton()),
+      appBar: AppBar(
+        title: const Text('Form Kategori'),
+        leading: const BackButton(),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

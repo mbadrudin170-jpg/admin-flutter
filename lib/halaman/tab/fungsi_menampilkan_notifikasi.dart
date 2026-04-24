@@ -106,7 +106,8 @@ class NotifikasiServis {
         body: body,
         scheduledDate: tz.TZDateTime.from(jadwal, tz.local),
         notificationDetails: notificationDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        // ✅ UBAH DARI exactAllowWhileIdle KE inexact
+        androidScheduleMode: AndroidScheduleMode.inexact,
       );
 
       debugPrint(

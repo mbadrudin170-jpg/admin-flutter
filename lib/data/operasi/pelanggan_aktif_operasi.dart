@@ -1,11 +1,11 @@
 // path: lib/data/operasi/pelanggan_aktif_operasi.dart
 // File ini menangani semua operasi Create, Read, Update, Delete (CRUD) untuk tabel 'pelanggan_aktif' di database SQLite lokal.
+import 'package:sqflite/sqflite.dart';
 
+import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
+import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:admin_wifi/data/services/notifikasi_servis.dart';
-import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 
 class PelangganAktifOperasi {
   final dbHelper = DatabaseHelper.instance;
