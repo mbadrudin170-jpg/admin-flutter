@@ -6,6 +6,7 @@
     <!-- ditambah: Izin untuk menampilkan notifikasi di Android 13+ -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <application
         android:label="admin_wifi"

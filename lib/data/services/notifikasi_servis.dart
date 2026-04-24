@@ -11,7 +11,6 @@ void onDidReceiveNotificationResponse(
     'Notifikasi di-tap: ID=${notificationResponse.id}, '
     'Payload=${notificationResponse.payload}',
   );
-  // TODO: Implementasikan logika navigasi atau aksi lainnya
 }
 
 class NotifikasiServis {
@@ -33,9 +32,8 @@ class NotifikasiServis {
             macOS: darwinInitializationSettings,
           );
 
-      // ✅ PERBAIKAN: Semua menggunakan named parameter
       await _flutterLocalNotificationsPlugin.initialize(
-        settings: initializationSettings, // WAJIB pakai nama 'settings'
+        settings: initializationSettings,
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
         onDidReceiveBackgroundNotificationResponse:
             onDidReceiveNotificationResponse,
@@ -93,6 +91,28 @@ class NotifikasiServis {
     }
   }
 
+  // ✅ BARU: Method untuk request exact alarm permission
+  Future<bool> requestExactAlarmPermission() async {
+    try {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
+
+      if (androidImplementation != null) {
+        final bool? granted = await androidImplementation
+            .requestExactAlarmsPermission();
+        debugPrint('NotifikasiServis: Exact alarm granted: $granted');
+        return granted ?? false;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('NotifikasiServis: Error request exact alarm: $e');
+      return false;
+    }
+  }
+
   Future<void> jadwalNotifikasi({
     required int id,
     required String title,
@@ -124,14 +144,15 @@ class NotifikasiServis {
         macOS: darwinNotificationDetails,
       );
 
-      // ✅ PERBAIKAN: Semua menggunakan named parameter
+      // 🔥 PERBAIKAN PENTING: Ganti ke inexactAllowWhileIdle
       await _flutterLocalNotificationsPlugin.zonedSchedule(
         id: id,
         title: title,
         body: body,
         scheduledDate: tz.TZDateTime.from(jadwal, tz.local),
         notificationDetails: notificationDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode:
+            AndroidScheduleMode.inexactAllowWhileIdle, // ← UBAH INI
         payload: 'notifikasi_paket',
       );
 
@@ -140,12 +161,12 @@ class NotifikasiServis {
       );
     } catch (e) {
       debugPrint('NotifikasiServis: Error jadwal notifikasi - $e');
+      rethrow; // ← Tambahkan ini agar error muncul di UI
     }
   }
 
   Future<void> batalNotifikasi(int id) async {
     try {
-      // ✅ PERBAIKAN: Cancel juga harus pakai named parameter 'id'
       await _flutterLocalNotificationsPlugin.cancel(id: id);
       debugPrint('NotifikasiServis: Notifikasi dibatalkan - ID: $id');
     } catch (e) {
@@ -183,7 +204,6 @@ class NotifikasiServis {
         macOS: darwinNotificationDetails,
       );
 
-      // ✅ PERBAIKAN: Semua menggunakan named parameter
       await _flutterLocalNotificationsPlugin.show(
         id: id,
         title: title,

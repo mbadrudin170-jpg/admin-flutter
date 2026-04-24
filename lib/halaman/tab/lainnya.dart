@@ -68,14 +68,19 @@ class _LainnyaTabState extends State<LainnyaPage> {
   Future<void> _jadwalkanNotifikasi() async {
     setState(() => _isLoading = true);
     try {
+      // Ubah ke 10 detik sesuai label
       final DateTime jadwal = DateTime.now().add(const Duration(seconds: 10));
       final int id = DateTime.now().millisecondsSinceEpoch.remainder(100000);
+
+      // Debug: Print waktu jadwal
+      debugPrint('Menjadwalkan notifikasi pada: $jadwal');
+      debugPrint('Waktu sekarang: ${DateTime.now()}');
 
       await _notifikasiServis.jadwalNotifikasi(
         id: id,
         title: 'Notifikasi Terjadwal',
         body:
-            'Notifikasi ini dijadwalkan pada \${jadwal.hour}:\${jadwal.minute}:\${jadwal.second}',
+            'Notifikasi ini dijadwalkan pada ${jadwal.hour}:${jadwal.minute.toString().padLeft(2, '0')}:${jadwal.second.toString().padLeft(2, '0')}',
         jadwal: jadwal,
       );
 
@@ -83,13 +88,14 @@ class _LainnyaTabState extends State<LainnyaPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '✅ Notifikasi dijadwalkan 10 detik dari sekarang (ID: $id)',
+              '✅ Notifikasi dijadwalkan pada ${jadwal.hour}:${jadwal.minute.toString().padLeft(2, '0')}:${jadwal.second.toString().padLeft(2, '0')} (ID: $id)',
             ),
             backgroundColor: Colors.blue,
           ),
         );
       }
     } catch (e) {
+      debugPrint('Error jadwalkan notifikasi: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
