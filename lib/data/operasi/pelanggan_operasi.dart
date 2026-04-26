@@ -40,26 +40,13 @@ class PelangganOperasi {
     return null;
   }
 
-  // Perbaikan: Mengganti nama metode agar sesuai dengan panggilan dari UI
-  Future<Pelanggan?> ambilSatuPelangganById(String id) async {
-    final db = await dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'pelanggan',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isNotEmpty) {
-      return Pelanggan.fromMap(maps.first);
-    }
-    return null;
-  }
-
   Future<void> updatePelanggan(Pelanggan pelanggan) async {
     final db = await dbHelper.database;
+    final now = DateTime.now();
+    final data = pelanggan.toMap()..['diperbarui'] = now.toIso8601String();
     await db.update(
       'pelanggan',
-      pelanggan.toMap(),
+      data,
       where: 'id = ?',
       whereArgs: [pelanggan.id],
     );

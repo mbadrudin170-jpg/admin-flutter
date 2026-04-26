@@ -242,7 +242,7 @@ class SinkronisasiDatabase {
     for (var p in semuaPelangganAktif) {
       if (p.id == null) continue;
 
-      final dataPelanggan = await pelangganOperasi.ambilSatuPelangganById(
+      final dataPelanggan = await pelangganOperasi.getPelangganById(
         p.idPelanggan,
       );
       final namaPelanggan = dataPelanggan?.nama ?? 'Pelanggan';

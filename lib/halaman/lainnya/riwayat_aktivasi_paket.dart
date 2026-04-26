@@ -65,7 +65,7 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
       if (p.id == null) continue;
 
       final pelangganOperasi = PelangganOperasi();
-      final dataPelanggan = await pelangganOperasi.ambilSatuPelangganById(
+      final dataPelanggan = await pelangganOperasi.getPelangganById(
         p.idPelanggan,
       );
       final namaPelanggan = dataPelanggan?.nama ?? 'Pelanggan';

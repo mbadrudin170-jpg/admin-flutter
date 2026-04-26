@@ -1,4 +1,3 @@
-// lib/halaman/form/form_pelanggan.dart
 // Halaman ini menyediakan formulir untuk menambah atau mengedit data pelanggan.
 
 import 'package:flutter/material.dart';
@@ -6,7 +5,8 @@ import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 
 class FormPelanggan extends StatefulWidget {
-  const FormPelanggan({super.key});
+  final Pelanggan? pelanggan;
+  const FormPelanggan({super.key, this.pelanggan});
 
   @override
   State<FormPelanggan> createState() => _FormPelangganState();
@@ -30,6 +30,18 @@ class _FormPelangganState extends State<FormPelanggan> {
   bool _isPasswordVisible = false;
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.pelanggan != null) {
+      _namaController.text = widget.pelanggan!.nama;
+      _teleponController.text = widget.pelanggan!.telepon;
+      _alamatController.text = widget.pelanggan!.alamat;
+      _passwordController.text = widget.pelanggan!.password;
+      _macAddressController.text = widget.pelanggan!.macAddress;
+    }
+  }
+
+  @override
   void dispose() {
     _namaController.dispose();
     _teleponController.dispose();
@@ -47,7 +59,7 @@ class _FormPelangganState extends State<FormPelanggan> {
   void _simpanForm() async {
     if (_formKey.currentState!.validate()) {
       final newPelanggan = Pelanggan(
-        id: DateTime.now().toString(),
+        id: widget.pelanggan?.id ?? DateTime.now().toString(),
         nama: _namaController.text,
         telepon: _teleponController.text,
         alamat: _alamatController.text,
@@ -55,7 +67,11 @@ class _FormPelangganState extends State<FormPelanggan> {
         macAddress: _macAddressController.text,
         diperbarui: DateTime.now().toIso8601String(),
       );
-      await PelangganOperasi().createPelanggan(newPelanggan);
+      if (widget.pelanggan == null) {
+        await PelangganOperasi().createPelanggan(newPelanggan);
+      } else {
+        await PelangganOperasi().updatePelanggan(newPelanggan);
+      }
       if (mounted) {
         // Kembalikan nilai true untuk menandakan ada perubahan
         Navigator.pop(context, true);
@@ -67,7 +83,7 @@ class _FormPelangganState extends State<FormPelanggan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Pelanggan'),
+        title: Text(widget.pelanggan == null ? 'Tambah Pelanggan' : 'Edit Pelanggan'),
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.white,
         leading: BackButton(

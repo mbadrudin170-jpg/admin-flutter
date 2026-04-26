@@ -14,7 +14,7 @@ class NamaPelangganWidget extends StatelessWidget {
     final PelangganOperasi pelangganOperasi = PelangganOperasi();
 
     return FutureBuilder<Pelanggan?>(
-      future: pelangganOperasi.ambilSatuPelangganById(idPelanggan),
+      future: pelangganOperasi.getPelangganById(idPelanggan),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Text(

@@ -48,7 +48,7 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
       final idPaket = _pelangganAktif.idPaket;
 
       final results = await Future.wait([
-        pelangganOperasi.ambilSatuPelangganById(_pelangganAktif.idPelanggan),
+        pelangganOperasi.getPelangganById(_pelangganAktif.idPelanggan),
         if (idPaket.isNotEmpty)
           // diubah: Menggunakan getPaketById yang sudah dikonsolidasi.
           paketOperasi.getPaketById(idPaket)

@@ -1,4 +1,5 @@
 // lib/halaman/detail/detail_pelanggan.dart
+import 'package:admin_wifi/halaman/form/form_pelanggan.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:flutter/services.dart';
@@ -27,6 +28,20 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      FormPelanggan(pelanggan: widget.pelanggan),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -119,8 +134,7 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
             // Ditambah: Tombol untuk menyalin semua informasi pelanggan
             ElevatedButton(
               onPressed: () {
-                final allInfo =
-                    '''
+                final allInfo = '''
 Nama: ${widget.pelanggan.nama}
 Telepon: ${widget.pelanggan.telepon}
 Alamat: ${widget.pelanggan.alamat}

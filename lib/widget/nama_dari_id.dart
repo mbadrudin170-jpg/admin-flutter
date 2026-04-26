@@ -15,7 +15,7 @@ class NamaDariIdWidget extends StatelessWidget {
 
     return FutureBuilder<Pelanggan?>(
       // PERBAIKAN: Menggunakan nama metode yang benar
-      future: pelangganOperasi.ambilSatuPelangganById(userId),
+      future: pelangganOperasi.getPelangganById(userId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(
