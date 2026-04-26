@@ -148,10 +148,11 @@ class SinkronisasiDatabase {
     );
 
     for (var collectionName in operasiMap.keys) {
-      final querySnapshot = await _firestore
-          .collection(collectionName)
-          .where('diperbarui', isGreaterThan: lastSync.toIso8601String())
-          .get();
+      developer.log('🔍 Mencoba akses koleksi: $collectionName', name: 'SinkronisasiService');
+
+      final querySnapshot = await _firestore.collection(collectionName).get();
+
+      developer.log('✅ Koleksi $collectionName: ${querySnapshot.docs.length} dokumen', name: 'SinkronisasiService');
 
       if (querySnapshot.docs.isNotEmpty) {
         developer.log(
@@ -165,6 +166,7 @@ class SinkronisasiDatabase {
               try {
                 final data = doc.data();
                 data['id'] ??= int.tryParse(doc.id) ?? doc.id;
+                data['diperbarui'] ??= DateTime.now().toIso8601String();
                 if (op is KategoriOperasi) {
                   return Kategori.fromMap(data);
                 }
@@ -186,13 +188,8 @@ class SinkronisasiDatabase {
                 if (op is KritikSaranOperasi) {
                   return KritikSaran.fromMap(data);
                 }
-              } catch (e, s) {
-                developer.log(
-                  'Gagal mem-parsing dokumen ${doc.id} dari koleksi $collectionName',
-                  error: e,
-                  stackTrace: s,
-                  name: 'SinkronisasiService',
-                );
+              } catch (e) {
+                developer.log('❌ Gagal akses $collectionName: $e', name: 'SinkronisasiService');
               }
               return null;
             })

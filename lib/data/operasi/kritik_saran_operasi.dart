@@ -1,4 +1,5 @@
 // path: lib/data/operasi/kritik_saran_operasi.dart
+import 'dart:developer' as developer;
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/kritik_saran_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -34,6 +35,22 @@ class KritikSaranOperasi {
     });
   }
 
+  // Fungsi untuk mengambil satu data kritik dan saran berdasarkan ID.
+  Future<KritikSaran> getKritikSaranById(String id) async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'kritik_saran',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return KritikSaran.fromMap(maps.first);
+    } else {
+      throw Exception('ID $id tidak ditemukan');
+    }
+  }
+
   // ditambah: Fungsi untuk mendapatkan perubahan data sejak sinkronisasi terakhir.
   Future<List<KritikSaran>> getPerubahan(DateTime lastSync) async {
     final db = await dbHelper.database;
@@ -61,5 +78,102 @@ class KritikSaranOperasi {
       );
     }
     await batch.commit(noResult: true);
+  }
+
+  // ditambah: Fungsi untuk menghapus kritik saran berdasarkan ID
+  Future<void> hapusKritikSaran(String id) async {
+    try {
+      final db = await dbHelper.database;
+
+      // Cek apakah data ada sebelum dihapus
+      final data = await db.query(
+        'kritik_saran',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+
+      if (data.isEmpty) {
+        throw Exception('Data dengan ID $id tidak ditemukan');
+      }
+
+      // Hapus data
+      await db.delete('kritik_saran', where: 'id = ?', whereArgs: [id]);
+
+      developer.log('✅ Berhasil menghapus kritik saran dengan ID: $id');
+    } catch (e) {
+      developer.log('❌ Gagal menghapus kritik saran: $e');
+      rethrow; // Melempar ulang error untuk ditangani di UI
+    }
+  }
+
+  // ditambah: Fungsi untuk menghapus semua kritik saran
+  Future<void> hapusSemuaKritikSaran() async {
+    try {
+      final db = await dbHelper.database;
+
+      await db.delete('kritik_saran');
+
+      developer.log('✅ Berhasil menghapus semua kritik saran');
+    } catch (e) {
+      developer.log('❌ Gagal menghapus semua kritik saran: $e');
+      rethrow;
+    }
+  }
+
+  // ditambah: Fungsi untuk menghapus kritik saran berdasarkan userId
+  Future<void> hapusByUserId(String userId) async {
+    try {
+      final db = await dbHelper.database;
+
+      final deletedCount = await db.delete(
+        'kritik_saran',
+        where: 'userId = ?',
+        whereArgs: [userId],
+      );
+
+      developer.log(
+        '✅ Berhasil menghapus $deletedCount kritik saran dari user: $userId',
+      );
+    } catch (e) {
+      developer.log('❌ Gagal menghapus kritik saran by userId: $e');
+      rethrow;
+    }
+  }
+
+  // Di file: lib/data/operasi/kritik_saran_operasi.dart
+  // TAMBAHKAN method ini:
+
+  Future<void> debugCekTabel() async {
+    try {
+      final db = await dbHelper.database;
+
+      // Cek apakah tabel ada
+      final result = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='kritik_saran'",
+      );
+      developer.log('📋 Tabel kritik_saran ada: ${result.isNotEmpty}');
+
+      // Cek jumlah data
+      final count = await db.rawQuery(
+        'SELECT COUNT(*) as count FROM kritik_saran',
+      );
+      developer.log('📊 Jumlah data: ${count.first['count']}');
+
+      // Lihat struktur tabel
+      final tableInfo = await db.rawQuery('PRAGMA table_info(kritik_saran)');
+      developer.log('🏗️ Struktur tabel:');
+      for (var col in tableInfo) {
+        developer.log('  - ${col['name']} (${col['type']})');
+      }
+
+      // Lihat semua data
+      final allData = await db.query('kritik_saran');
+      developer.log('📦 Semua data:');
+      for (var data in allData) {
+        developer.log('  $data');
+      }
+    } catch (e) {
+      developer.log('❌ Error debug: $e');
+    }
   }
 }
