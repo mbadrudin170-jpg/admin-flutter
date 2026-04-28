@@ -145,15 +145,13 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                     const SizedBox(height: 8),
                     _buildPaketDisplay(),
                     const SizedBox(height: 8),
-                    // diubah: Menggunakan kelas FormatTanggal dan FormatJam.
                     Text(
-                      'Mulai: ${FormatTanggal.formatTanggalBasic(_pelangganAktif.tanggalMulai)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalMulai)}',
+                      'Mulai: ${FormatTanggal.formatTanggalRingkas(_pelangganAktif.tanggalMulai)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalMulai)}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 8),
-                    // diubah: Menggunakan kelas FormatTanggal dan FormatJam.
                     Text(
-                      'Berakhir: ${FormatTanggal.formatTanggalBasic(_pelangganAktif.tanggalBerakhir)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalBerakhir)}',
+                      'Berakhir: ${FormatTanggal.formatTanggalRingkas(_pelangganAktif.tanggalBerakhir)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalBerakhir)}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 16),
@@ -220,4 +218,8 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
       );
     }
   }
+}
+
+Widget _wadahInfo (){
+  return Padding(padding: padding)
 }

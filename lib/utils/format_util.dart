@@ -21,6 +21,11 @@ class FormatTanggal {
     final format = DateFormat('d MMM yyyy, HH:mm', 'id_ID');
     return format.format(tanggal);
   }
+
+  /// Mengubah [DateTime] menjadi format tanggal ringkas "E, d MMM yy" (contoh: "Sel, 17 Agu 26").
+  static String formatTanggalRingkas(DateTime tanggal) {
+    return DateFormat('E, d MMM yy', 'id_ID').format(tanggal);
+  }
 }
 
 /// Kelas utilitas untuk semua pemformatan yang terkait dengan waktu/jam.
@@ -56,6 +61,7 @@ class FormatUang {
 
   /// Memformat angka [double] menjadi format mata uang Rupiah ("Rp 50.000").
   static String formatMataUang(double jumlah) {
+    // Kembali ke implementasi standar yang menghasilkan format -Rp XX.XXX
     final formatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
