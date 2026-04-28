@@ -1,34 +1,17 @@
 // path: lib/halaman/lainnya/riwayat_aktivasi_paket.dart
-// File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
+// File ini bertanggung jawab untuk menampilkan daftar riwayat langganan.
 
-// diubah: Mengimpor utilitas terpusat.
+import 'package:admin_wifi/data/operasi/riwayat_langganan_operasi.dart';
+import 'package:admin_wifi/halaman/detail/detail_riwayat_langganan.dart';
+import 'package:admin_wifi/model/riwayat_langganan_model.dart';
+import 'package:admin_wifi/model/enum/status_pembayaran.dart'; // Diperbarui
 import 'package:admin_wifi/utils/format_util.dart';
-import 'package:admin_wifi/utils/perhitungan_util.dart';
-import 'package:admin_wifi/data/repositori/pelanggan_aktif_repositori.dart';
-import 'package:admin_wifi/services/cek_koneksi_internet.dart';
-import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:flutter/material.dart';
-import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
-import 'package:admin_wifi/halaman/detail/detail_pelanggan_aktif.dart';
-import 'package:admin_wifi/halaman/form/form_pelanggan_aktif.dart';
-import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
 import 'package:admin_wifi/widget/nama_paket.dart';
 import 'package:admin_wifi/widget/nama_pelanggan.dart';
-import 'package:admin_wifi/model/enum/status_pembayaran.dart';
 
-enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
-
-enum OpsiUrutkan {
-  tanggal,
-  tanggalMulai,
-  namaAZ,
-  namaZA,
-  lunas,
-  belumLunas,
-  paketAktif,
-  paketTidakAktif,
-}
+enum OpsiUrutkan { terbaru, terlama, namaAZ, namaZA, lunas, belumLunas }
 
 class RiwayatAktivasiPaketPage extends StatefulWidget {
   const RiwayatAktivasiPaketPage({super.key});
@@ -39,101 +22,35 @@ class RiwayatAktivasiPaketPage extends StatefulWidget {
 }
 
 class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
-  final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
-  final PelangganAktifRepositori _pelangganAktifRepositori =
-      PelangganAktifRepositori();
-  late Future<List<PelangganAktif>> _listaPelangganAktifFuture = Future.value(
+  final RiwayatLanggananOperasi _riwayatOperasi = RiwayatLanggananOperasi();
+  late Future<List<RiwayatLanggananModel>> _listRiwayatFuture = Future.value(
     [],
   );
-  final NotifikasiServis _notifikasiServis = NotifikasiServis();
-  OpsiUrutkan _urutanAktif = OpsiUrutkan.tanggal;
+  OpsiUrutkan _urutanAktif = OpsiUrutkan.terbaru;
 
   @override
   void initState() {
     super.initState();
-    _inisialisasiNotifikasi();
-    _loadPelangganAktif();
+    _loadRiwayat();
   }
 
-  Future<void> _inisialisasiNotifikasi() async {
-    await _notifikasiServis.inisialisasi();
-  }
-
-  void _periksaDanJadwalkanNotifikasi(List<PelangganAktif> pelanggan) async {
-    final sekarang = DateTime.now();
-
-    for (var p in pelanggan) {
-      if (p.id == null) continue;
-
-      final pelangganOperasi = PelangganOperasi();
-      final dataPelanggan = await pelangganOperasi.getPelangganById(
-        p.idPelanggan,
-      );
-      final namaPelanggan = dataPelanggan?.nama ?? 'Pelanggan';
-
-      final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(
-        const Duration(days: 3),
-      );
-
-      if (tigaHariSebelumKadaluarsa.isAfter(sekarang)) {
-        await _notifikasiServis.jadwalNotifikasi(
-          id: p.id.hashCode.abs() + 1000,
-          title: '⏰ Paket Akan Berakhir',
-          body:
-              'Paket $namaPelanggan akan berakhir dalam 3 hari (${FormatTanggal.formatTanggalBasic(p.tanggalBerakhir)})',
-          jadwal: tigaHariSebelumKadaluarsa,
-        );
-      }
-
-      final waktuKadaluarsa = p.tanggalBerakhir;
-
-      if (waktuKadaluarsa.isAfter(sekarang)) {
-        await _notifikasiServis.jadwalNotifikasi(
-          id: p.id.hashCode.abs() + 2000,
-          title: '🔔 Paket Berakhir Sekarang',
-          body:
-              'Paket $namaPelanggan telah berakhir hari ini (${FormatTanggal.formatTanggalBasic(waktuKadaluarsa)}). Harap perbarui paket.',
-          jadwal: waktuKadaluarsa,
-        );
-      }
-    }
-  }
-
-  Future<void> _loadPelangganAktif() async {
+  Future<void> _loadRiwayat() async {
     setState(() {
-      _listaPelangganAktifFuture = _pelangganAktifOperasi
-          .ambilSemuaPelangganAktif()
-          .then((list) {
-            list.sort((a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir));
-            return list;
-          });
-    });
-
-    _listaPelangganAktifFuture.then((pelanggan) {
-      if (pelanggan.isNotEmpty) {
-        _periksaDanJadwalkanNotifikasi(pelanggan);
-      }
+      _listRiwayatFuture = _riwayatOperasi.ambilSemuaRiwayat().then((list) {
+        // Pengurutan default: terbaru
+        list.sort((a, b) => b.diperbarui!.compareTo(a.diperbarui!));
+        return list;
+      });
     });
   }
 
-  Future<void> _hapusPelangganAktif(PelangganAktif pelanggan) async {
-    if (pelanggan.id == null) return;
-
+  Future<void> _hapusRiwayat(RiwayatLanggananModel riwayat) async {
     final bool? konfirmasi = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Konfirmasi Hapus'),
-          content: Wrap(
-            children: [
-              const Text('Apakah Anda yakin ingin menghapus '),
-              NamaPelangganWidget(
-                idPelanggan: pelanggan.idPelanggan,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const Text('?'),
-            ],
-          ),
+          content: const Text('Apakah Anda yakin ingin menghapus riwayat ini?'),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -153,37 +70,71 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
 
     if (konfirmasi == true) {
       try {
-        final isOnline = await KoneksiInternetService.cekKoneksi();
-        if (isOnline) {
-          await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Mode offline: Data akan dihapus dari server saat online.',
-                ),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          }
-        }
-
-        await _pelangganAktifOperasi.hapusPelangganAktif(pelanggan.id!);
+        await _riwayatOperasi.hapusRiwayat(riwayat.id);
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Pelanggan aktif berhasil dihapus.'),
+            content: Text('Riwayat berhasil dihapus.'),
             backgroundColor: Colors.green,
           ),
         );
-        _loadPelangganAktif();
+        _loadRiwayat();
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Gagal menghapus pelanggan: $e'),
+            content: Text('Gagal menghapus riwayat: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _hapusSemuaRiwayat() async {
+    final bool? konfirmasi = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Hapus Semua Riwayat?'),
+          content: const Text(
+            'Apakah Anda yakin ingin menghapus SEMUA riwayat? Tindakan ini tidak dapat dibatalkan.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(
+                'Hapus Semua',
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (konfirmasi == true) {
+      try {
+        await _riwayatOperasi.hapusSemuaRiwayat();
+
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Semua riwayat berhasil dihapus.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        _loadRiwayat();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal menghapus semua riwayat: $e'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -192,7 +143,7 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
   }
 
   Future<void> _urutkanList(OpsiUrutkan pilihan) async {
-    final list = await _listaPelangganAktifFuture;
+    final list = await _listRiwayatFuture;
     final pelangganOperasi = PelangganOperasi();
 
     final Map<String, String> namaMap = {};
@@ -201,14 +152,14 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
       namaMap[p.id] = p.nama;
     }
 
-    int Function(PelangganAktif, PelangganAktif) comparator;
+    int Function(RiwayatLanggananModel, RiwayatLanggananModel) comparator;
 
     switch (pilihan) {
-      case OpsiUrutkan.tanggal:
-        comparator = (a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir);
+      case OpsiUrutkan.terbaru:
+        comparator = (a, b) => b.diperbarui!.compareTo(a.diperbarui!);
         break;
-      case OpsiUrutkan.tanggalMulai:
-        comparator = (a, b) => a.tanggalMulai.compareTo(b.tanggalMulai);
+      case OpsiUrutkan.terlama:
+        comparator = (a, b) => a.diperbarui!.compareTo(b.diperbarui!);
         break;
       case OpsiUrutkan.namaAZ:
       case OpsiUrutkan.namaZA:
@@ -231,23 +182,12 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
               : (isLunasA ? 1 : -1);
         };
         break;
-      case OpsiUrutkan.paketAktif:
-      case OpsiUrutkan.paketTidakAktif:
-        comparator = (a, b) {
-          final isAktifA = PerhitunganUtil.sisaHari(a.tanggalBerakhir) >= 0;
-          final isAktifB = PerhitunganUtil.sisaHari(b.tanggalBerakhir) >= 0;
-          if (isAktifA == isAktifB) return 0;
-          return (pilihan == OpsiUrutkan.paketAktif)
-              ? (isAktifA ? -1 : 1)
-              : (isAktifA ? 1 : -1);
-        };
-        break;
     }
 
     list.sort(comparator);
 
     setState(() {
-      _listaPelangganAktifFuture = Future.value(list);
+      _listRiwayatFuture = Future.value(list);
       _urutanAktif = pilihan;
     });
   }
@@ -275,19 +215,14 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
         return SimpleDialog(
           title: const Text('Urutkan Berdasarkan'),
           children: <Widget>[
-            buildOption('Tanggal Berakhir', OpsiUrutkan.tanggal),
-            buildOption('Tanggal Mulai', OpsiUrutkan.tanggalMulai),
+            buildOption('Arsip Terbaru', OpsiUrutkan.terbaru),
+            buildOption('Arsip Terlama', OpsiUrutkan.terlama),
             buildOption('Nama (A-Z)', OpsiUrutkan.namaAZ),
             buildOption('Nama (Z-A)', OpsiUrutkan.namaZA),
             buildOption('Status Pembayaran (Lunas)', OpsiUrutkan.lunas),
             buildOption(
               'Status Pembayaran (Belum Lunas)',
               OpsiUrutkan.belumLunas,
-            ),
-            buildOption('Status Paket (Aktif)', OpsiUrutkan.paketAktif),
-            buildOption(
-              'Status Paket (Tidak Aktif)',
-              OpsiUrutkan.paketTidakAktif,
             ),
             SimpleDialogOption(
               child: const Text('Batal'),
@@ -303,134 +238,11 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
     }
   }
 
-  void _tambahPelangganAktif() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const FormPelangganAktif()),
-    );
-    if (!mounted) return;
-    if (result == true) {
-      _loadPelangganAktif();
-    }
-  }
-
-  void _opsiHapus() async {
-    final OpsiHapusPilihan? pilihan = await showDialog<OpsiHapusPilihan>(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: const Text('Pilih Opsi Hapus'),
-          children: <Widget>[
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiHapusPilihan.hapusKadaluarsa);
-              },
-              child: const Text('Hapus pelanggan kadaluarsa'),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiHapusPilihan.hapusSemua);
-              },
-              child: Text(
-                'Hapus Semua Pelanggan',
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                Navigator.pop(context, OpsiHapusPilihan.batal);
-              },
-              child: const Text('Batal'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (!mounted) return;
-
-    switch (pilihan) {
-      case OpsiHapusPilihan.hapusSemua:
-        final bool? konfirmasi = await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Konfirmasi Hapus Semua'),
-              content: const Text(
-                'Apakah Anda yakin ingin menghapus semua data pelanggan aktif? Tindakan ini tidak dapat dibatalkan.',
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Batal'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Hapus'),
-                ),
-              ],
-            );
-          },
-        );
-
-        if (konfirmasi == true) {
-          final isOnline = await KoneksiInternetService.cekKoneksi();
-          if (isOnline) {
-            final semuaPelanggan = await _pelangganAktifOperasi
-                .ambilSemuaPelangganAktif();
-            for (var pelanggan in semuaPelanggan) {
-              if (pelanggan.id != null) {
-                await _pelangganAktifRepositori.hapusPelangganAktif(
-                  pelanggan.id!,
-                );
-              }
-            }
-          }
-          await _pelangganAktifOperasi.hapusSemuaPelangganAktif();
-          _loadPelangganAktif();
-        }
-        break;
-      case OpsiHapusPilihan.hapusKadaluarsa:
-        final isOnline = await KoneksiInternetService.cekKoneksi();
-        if (isOnline) {
-          final semuaPelanggan = await _pelangganAktifOperasi
-              .ambilSemuaPelangganAktif();
-          final sekarang = DateTime.now();
-          final pelangganKadaluarsa = semuaPelanggan
-              .where((p) => p.tanggalBerakhir.isBefore(sekarang))
-              .toList();
-          for (var pelanggan in pelangganKadaluarsa) {
-            if (pelanggan.id != null) {
-              await _pelangganAktifRepositori.hapusPelangganAktif(
-                pelanggan.id!,
-              );
-            }
-          }
-        }
-        final int jumlahDihapus = await _pelangganAktifOperasi
-            .hapusPelangganKadaluarsa();
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              '$jumlahDihapus pelanggan kadaluarsa berhasil dihapus.',
-            ),
-            duration: const Duration(seconds: 3),
-          ),
-        );
-        _loadPelangganAktif();
-        break;
-      case OpsiHapusPilihan.batal:
-      default:
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Riwayat Aktivasi'),
+        title: const Text('Riwayat Langganan'),
         actions: [
           IconButton(
             icon: const Icon(Icons.sort),
@@ -438,14 +250,14 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
             tooltip: 'Urutkan',
           ),
           IconButton(
-            icon: const Icon(Icons.delete_forever),
-            onPressed: _opsiHapus,
-            tooltip: 'Hapus',
+            icon: const Icon(Icons.delete_sweep),
+            onPressed: _hapusSemuaRiwayat,
+            tooltip: 'Hapus Semua Riwayat',
           ),
         ],
       ),
-      body: FutureBuilder<List<PelangganAktif>>(
-        future: _listaPelangganAktifFuture,
+      body: FutureBuilder<List<RiwayatLanggananModel>>(
+        future: _listRiwayatFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -453,19 +265,19 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
-              child: Text('Tidak ada pelanggan aktif ditemukan.'),
+              child: Text('Tidak ada riwayat langganan ditemukan.'),
             );
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                final pelanggan = snapshot.data![index];
+                final riwayat = snapshot.data![index];
 
-                final statusPembayaranText = pelanggan.status.displayName;
+                final statusPembayaranText = riwayat.status.displayName;
                 final statusPembayaranColor =
-                    pelanggan.status == StatusPembayaran.lunas
-                    ? Colors.green
-                    : Colors.red;
+                    riwayat.status == StatusPembayaran.lunas
+                        ? Colors.green
+                        : Colors.red;
 
                 return Card(
                   margin: const EdgeInsets.symmetric(
@@ -473,67 +285,56 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
                     vertical: 7,
                   ),
                   clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onLongPress: () {
-                      _hapusPelangganAktif(pelanggan);
-                    },
+                  child: ListTile(
                     onTap: () async {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              DetailPelangganAktif(pelanggan: pelanggan),
+                              DetailRiwayatLanggananPage(riwayat: riwayat),
                         ),
                       );
+                      // Jika ada sinyal perubahan, muat ulang data
                       if (result == true) {
-                        _loadPelangganAktif();
+                        _loadRiwayat();
                       }
                     },
-                    child: ListTile(
-                      title: NamaPelangganWidget(
-                        idPelanggan: pelanggan.idPelanggan,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          NamaPaketWidget(idPaket: pelanggan.idPaket),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Pembayaran: $statusPembayaranText',
-                            style: TextStyle(
-                              color: statusPembayaranColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Status: ${PerhitunganUtil.getTeksSisaMasaAktif(pelanggan.tanggalBerakhir)}',
-                            style: TextStyle(
-                              color: PerhitunganUtil.getWarnaSisaMasaAktif(
-                                pelanggan.tanggalBerakhir,
-                              ),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Berakhir: ${FormatTanggal.formatTanggalBasic(pelanggan.tanggalBerakhir)} ${FormatJam.formatJamMenit(pelanggan.tanggalBerakhir)}',
-                          ),
-                        ],
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
+                    onLongPress: () {
+                      _hapusRiwayat(riwayat);
+                    },
+                    title: NamaPelangganWidget(
+                      idPelanggan: riwayat.idPelanggan,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        NamaPaketWidget(idPaket: riwayat.idPaket),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Pembayaran: $statusPembayaranText',
+                          style: TextStyle(
+                            color: statusPembayaranColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Diarsipkan pada: ${riwayat.diperbarui != null ? FormatTanggal.formatTanggalDanJam(riwayat.diperbarui!) : '-'}',
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Aktif: ${FormatTanggal.formatTanggalBasic(riwayat.tanggalMulai)} - ${FormatTanggal.formatTanggalBasic(riwayat.tanggalBerakhir)}',
+                        ),
+                      ],
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
                   ),
                 );
               },
             );
           }
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _tambahPelangganAktif,
-        child: const Icon(Icons.add),
       ),
     );
   }

@@ -1,6 +1,7 @@
 // path: lib/halaman/tab/pelanggan_aktif.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 
+import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/riwayat_langganan_operasi.dart';
 import 'package:admin_wifi/data/repositori/pelanggan_aktif_repositori.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
@@ -275,8 +276,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
   }
 
-  Future<void> _hapusPelangganAktif(PelangganAktif pelanggan) async {
-    if (pelanggan.id == null) return;
+  Future<void> _hapusPelangganAktif(PelangganAktif pelangganAktif) async {
+    if (pelangganAktif.id == null) return;
 
     final bool? konfirmasi = await showDialog<bool>(
       context: context,
@@ -287,7 +288,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
             children: [
               const Text('Apakah Anda yakin ingin menghapus '),
               NamaPelangganWidget(
-                idPelanggan: pelanggan.idPelanggan,
+                idPelanggan: pelangganAktif.idPelanggan,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const Text('?'),
@@ -312,14 +313,33 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
     if (konfirmasi == true) {
       try {
+        final paketOperasi = PaketOperasi();
+        final paket = await paketOperasi.getPaketById(pelangganAktif.idPaket);
+        if (paket == null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Data paket tidak ditemukan. Tidak dapat mengarsipkan.',
+                ),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
         // 1. Buat entri riwayat dari pelanggan yang akan dihapus
         final riwayat = RiwayatLanggananModel(
-          id: pelanggan.id!,
-          idPelanggan: pelanggan.idPelanggan,
-          idPaket: pelanggan.idPaket,
-          tanggalMulai: pelanggan.tanggalMulai,
-          tanggalBerakhir: pelanggan.tanggalBerakhir,
-          status: pelanggan.status,
+          id: pelangganAktif.id!,
+          idPelanggan: pelangganAktif.idPelanggan,
+          idPaket: pelangganAktif.idPaket,
+          namaPaket: paket.nama,
+          hargaPaket: paket.harga,
+          durasiPaket: paket.durasi,
+          tipeDurasiPaket: paket.tipe.name,
+          tanggalMulai: pelangganAktif.tanggalMulai,
+          tanggalBerakhir: pelangganAktif.tanggalBerakhir,
+          status: pelangganAktif.status,
           diperbarui: DateTime.now(),
         );
 
@@ -328,16 +348,18 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
         // 3. Hapus notifikasi terjadwal
         await _notifikasiServis.batalNotifikasi(
-          (pelanggan.id.hashCode.abs() + 1),
+          (pelangganAktif.id.hashCode.abs() + 1),
         );
         await _notifikasiServis.batalNotifikasi(
-          (pelanggan.id.hashCode.abs() + 2),
+          (pelangganAktif.id.hashCode.abs() + 2),
         );
 
         // 4. Hapus dari Firebase jika online
         final isOnline = await KoneksiInternetService.cekKoneksi();
         if (isOnline) {
-          await _pelangganAktifRepositori.hapusPelangganAktif(pelanggan.id!);
+          await _pelangganAktifRepositori.hapusPelangganAktif(
+            pelangganAktif.id!,
+          );
         } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -352,7 +374,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         }
 
         // 5. Hapus dari database lokal
-        await _pelangganAktifOperasi.hapusPelangganAktif(pelanggan.id!);
+        await _pelangganAktifOperasi.hapusPelangganAktif(pelangganAktif.id!);
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(

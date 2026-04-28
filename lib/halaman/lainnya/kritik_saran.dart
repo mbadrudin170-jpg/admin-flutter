@@ -45,9 +45,8 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
     });
   }
 
-  // Fungsi untuk menghapus kritik saran
+  // Fungsi untuk menghapus kritik saran dari halaman daftar (via long press)
   Future<void> _hapusKritikSaran(KritikSaran item) async {
-    // Periksa apakah ID tersedia
     if (item.id == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -60,7 +59,6 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
       return;
     }
 
-    // Tampilkan dialog konfirmasi
     final konfirmasi = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -84,21 +82,7 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
 
     if (konfirmasi == true && mounted) {
       try {
-        // Tampilkan loading indicator
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) =>
-              const Center(child: CircularProgressIndicator()),
-        );
-
-        // Panggil fungsi hapus dari operasi dengan null check
         await _kritikSaranOperasi.hapusKritikSaran(item.id!);
-
-        // Tutup loading dialog
-        if (mounted) Navigator.of(context).pop();
-
-        // Tampilkan pesan sukses
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -107,14 +91,8 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
             ),
           );
         }
-
-        // Refresh data
         _loadKritikSaran();
       } catch (e) {
-        // Tutup loading dialog jika masih ada
-        if (mounted) Navigator.of(context).pop();
-
-        // Tampilkan pesan error
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -134,62 +112,12 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
       body: FutureBuilder<List<KritikSaran>>(
         future: _kritikSaranFuture,
         builder: (context, snapshot) {
-          // DEBUG: Print state
-          developer.log('🔄 Connection State: ${snapshot.connectionState}');
-          developer.log('📦 Has Data: ${snapshot.hasData}');
-          developer.log('❌ Has Error: ${snapshot.hasError}');
-          if (snapshot.hasError) {
-            developer.log('💥 Error Details: ${snapshot.error}');
-          }
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            // Tampilkan error lebih detail
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error, color: Colors.red, size: 48),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Terjadi kesalahan:',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${snapshot.error}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.red[700]),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _loadKritikSaran,
-                      child: const Text('Coba Lagi'),
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.inbox, size: 64, color: Colors.grey[400]),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Belum ada kritik dan saran yang masuk.',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            );
+            return const Center(child: Text('Belum ada kritik dan saran.'));
           } else {
             final listKritikSaran = snapshot.data!;
             return ListView.builder(
@@ -205,15 +133,21 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
                   ),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(10),
-                    onTap: () {
+                    onTap: () async { // Jadikan onTap async
                       if (item.id != null) {
-                        Navigator.push(
+                        // Tangkap hasil dari Navigator.push
+                        final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
                                 DetailKritikSaranPage(id: item.id!),
                           ),
                         );
+
+                        // Jika hasilnya 'true', muat ulang data
+                        if (result == true) {
+                          _loadKritikSaran();
+                        }
                       }
                     },
                     onLongPress: () => _hapusKritikSaran(item),

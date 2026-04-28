@@ -24,8 +24,8 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      // diubah: Versi database dinaikkan ke 6 karena ada penambahan tabel baru.
-      version: 6,
+      // diubah: Versi database dinaikkan ke 7 karena ada penambahan tabel riwayat_langganan.
+      version: 7,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -60,6 +60,23 @@ class DatabaseHelper {
           userId TEXT NOT NULL,
           diperbarui TEXT NOT NULL,
           FOREIGN KEY (userId) REFERENCES pelanggan (id) ON DELETE CASCADE
+        )
+      ''');
+    }
+
+    // ditambah: Logika migrasi untuk versi 7, menambahkan tabel riwayat_langganan.
+    if (oldVersion < 7) {
+      await db.execute('''
+        CREATE TABLE riwayat_langganan(
+          id TEXT PRIMARY KEY,
+          id_pelanggan TEXT NOT NULL,
+          id_paket TEXT NOT NULL,
+          tanggalMulai TEXT NOT NULL,
+          tanggalBerakhir TEXT NOT NULL,
+          status TEXT NOT NULL,
+          diperbarui TEXT,
+          FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
+          FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
         )
       ''');
     }
@@ -158,6 +175,9 @@ class DatabaseHelper {
 
     // ditambah: Skema tabel baru untuk menyimpan data kritik dan saran.
     await _createKritikSaranTable(db);
+
+    // ditambah: Skema tabel baru untuk menyimpan data riwayat langganan.
+    await _createRiwayatLanggananTable(db);
   }
 
   // ditambah: Fungsi terpisah untuk membuat tabel kritik_saran.
@@ -171,6 +191,23 @@ class DatabaseHelper {
         diperbarui TEXT NOT NULL,
         FOREIGN KEY (userId) REFERENCES pelanggan (id) ON DELETE CASCADE
       )
+    ''');
+  }
+
+  // ditambah: Fungsi terpisah untuk membuat tabel riwayat_langganan.
+  Future<void> _createRiwayatLanggananTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS riwayat_langganan(
+          id TEXT PRIMARY KEY,
+          id_pelanggan TEXT NOT NULL,
+          id_paket TEXT NOT NULL,
+          tanggalMulai TEXT NOT NULL,
+          tanggalBerakhir TEXT NOT NULL,
+          status TEXT NOT NULL,
+          diperbarui TEXT,
+          FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
+          FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
+        )
     ''');
   }
 }

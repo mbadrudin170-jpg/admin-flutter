@@ -14,6 +14,7 @@ import 'package:admin_wifi/data/operasi/kritik_saran_operasi.dart';
 import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
+import 'package:admin_wifi/data/operasi/riwayat_langganan_operasi.dart'; // ditambah
 import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:admin_wifi/model/dompet_model.dart';
@@ -22,6 +23,7 @@ import 'package:admin_wifi/model/kritik_saran_model.dart';
 import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
+import 'package:admin_wifi/model/riwayat_langganan_model.dart'; // ditambah
 import 'package:admin_wifi/model/transaksi_model.dart';
 import 'package:admin_wifi/utils/sync_manager.dart';
 
@@ -64,6 +66,7 @@ class SinkronisasiDatabase {
     final paketOperasi = PaketOperasi();
     final pelangganAktifOperasi = PelangganAktifOperasi();
     final kritikSaranOperasi = KritikSaranOperasi();
+    final riwayatLanggananOperasi = RiwayatLanggananOperasi(); // ditambah
 
     try {
       // 1. Unggah perubahan lokal ke Firebase
@@ -75,6 +78,7 @@ class SinkronisasiDatabase {
         'paket': (await paketOperasi.getPerubahan(lastSync)),
         'pelanggan_aktif': (await pelangganAktifOperasi.getPerubahan(lastSync)),
         'kritik_saran': (await kritikSaranOperasi.getPerubahan(lastSync)),
+        'riwayat_langganan': (await riwayatLanggananOperasi.getPerubahan(lastSync)), // ditambah
       });
 
       // 2. Unduh perubahan dari Firebase ke lokal
@@ -86,6 +90,7 @@ class SinkronisasiDatabase {
         'paket': paketOperasi,
         'pelanggan_aktif': pelangganAktifOperasi,
         'kritik_saran': kritikSaranOperasi,
+        'riwayat_langganan': riwayatLanggananOperasi, // ditambah
       });
 
       // 3. Simpan waktu sinkronisasi yang berhasil
@@ -188,6 +193,9 @@ class SinkronisasiDatabase {
                 if (op is KritikSaranOperasi) {
                   return KritikSaran.fromMap(data);
                 }
+                if (op is RiwayatLanggananOperasi) { // ditambah
+                  return RiwayatLanggananModel.fromMap(data);
+                }
               } catch (e) {
                 developer.log('❌ Gagal akses $collectionName: $e', name: 'SinkronisasiService');
               }
@@ -216,6 +224,9 @@ class SinkronisasiDatabase {
         }
         if (op is KritikSaranOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<KritikSaran>());
+        }
+        if (op is RiwayatLanggananOperasi) { // ditambah
+          await op.sisipkanAtauPerbaruiBatch(items.cast<RiwayatLanggananModel>());
         }
       }
     }

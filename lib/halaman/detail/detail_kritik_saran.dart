@@ -1,4 +1,3 @@
-
 import 'package:admin_wifi/data/operasi/kritik_saran_operasi.dart';
 import 'package:admin_wifi/model/kritik_saran_model.dart';
 import 'package:admin_wifi/utils/format_util.dart';
@@ -24,11 +23,87 @@ class _DetailKritikSaranPageState extends State<DetailKritikSaranPage> {
     _kritikSaranFuture = _kritikSaranOperasi.getKritikSaranById(widget.id);
   }
 
+  // Fungsi untuk menghapus kritik saran
+  Future<void> _hapusKritikSaran() async {
+    // Tampilkan dialog konfirmasi
+    final konfirmasi = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Konfirmasi Hapus'),
+        content: const Text(
+          'Apakah Anda yakin ingin menghapus kritik dan saran ini?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
+    );
+
+    if (konfirmasi == true && mounted) {
+      try {
+        // Tampilkan loading indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator()),
+        );
+
+        // Panggil fungsi hapus dari operasi
+        await _kritikSaranOperasi.hapusKritikSaran(widget.id);
+
+        // Tutup loading dialog
+        if (mounted) Navigator.of(context).pop();
+
+        // Tampilkan pesan sukses
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Kritik dan saran berhasil dihapus'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+
+        // Kembali ke halaman sebelumnya dengan sinyal 'true'
+        if (mounted) Navigator.of(context).pop(true);
+      } catch (e) {
+        // Tutup loading dialog jika masih ada
+        if (mounted) Navigator.of(context).pop();
+
+        // Tampilkan pesan error
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal menghapus: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detail Kritik & Saran'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: _hapusKritikSaran,
+            tooltip: 'Hapus Kritik & Saran',
+          ),
+        ],
       ),
       body: FutureBuilder<KritikSaran>(
         future: _kritikSaranFuture,
@@ -36,9 +111,7 @@ class _DetailKritikSaranPageState extends State<DetailKritikSaranPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
+            return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final kritikSaran = snapshot.data!;
             return Padding(
@@ -73,19 +146,14 @@ class _DetailKritikSaranPageState extends State<DetailKritikSaranPage> {
                     alignment: Alignment.centerRight,
                     child: Text(
                       FormatTanggal.formatTanggalDanJam(kritikSaran.tanggal),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ),
                 ],
               ),
             );
           } else {
-            return const Center(
-              child: Text('Data tidak ditemukan'),
-            );
+            return const Center(child: Text('Data tidak ditemukan'));
           }
         },
       ),
