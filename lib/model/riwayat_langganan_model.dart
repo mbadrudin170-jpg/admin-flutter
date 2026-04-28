@@ -1,33 +1,28 @@
-// lib/model/pelanggan_aktif_model.dart
-// File ini mendefinisikan model data untuk PelangganAktif, termasuk atribut dan metode untuk konversi data.
+// Path: lib/model/riwayat_langganan_model.dart
 
-import 'package:uuid/uuid.dart';
 import 'enum/status_pembayaran.dart'; // Mengimpor enum terpusat
 
-class PelangganAktif {
-  final String? id;
+class RiwayatLanggananModel {
+  final String id;
   final String idPelanggan;
   final String idPaket;
   final DateTime tanggalMulai;
   final DateTime tanggalBerakhir;
   final StatusPembayaran status;
   final DateTime? diperbarui;
-  final String statusSinkronisasi;
 
-  PelangganAktif({
-    String? id,
+  RiwayatLanggananModel({
+    required this.id,
     required this.idPelanggan,
     required this.idPaket,
     required this.tanggalMulai,
     required this.tanggalBerakhir,
     required this.status,
     this.diperbarui,
-    this.statusSinkronisasi = 'SINKRON', // Default value
-  }) : id = id ?? const Uuid().v4();
+  });
 
-  // Konversi dari Map ke objek
-  factory PelangganAktif.fromMap(Map<String, dynamic> map) {
-    return PelangganAktif(
+  factory RiwayatLanggananModel.fromMap(Map<String, dynamic> map) {
+    return RiwayatLanggananModel(
       id: map['id'],
       idPelanggan: map['id_pelanggan'],
       idPaket: map['id_paket'],
@@ -40,11 +35,9 @@ class PelangganAktif {
       diperbarui: map['diperbarui'] != null
           ? DateTime.parse(map['diperbarui'])
           : null,
-      statusSinkronisasi: map['status_sinkronisasi'] ?? 'SINKRON',
     );
   }
 
-  // Konversi dari objek ke Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -54,7 +47,6 @@ class PelangganAktif {
       'tanggalBerakhir': tanggalBerakhir.toIso8601String(),
       'status': status.name,
       'diperbarui': diperbarui?.toIso8601String(),
-      'status_sinkronisasi': statusSinkronisasi,
     };
   }
 }
