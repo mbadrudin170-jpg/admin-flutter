@@ -10,9 +10,9 @@ class PerhitunganUtil {
   /// Fungsi ini menghitung selisih hari antara tanggal berakhir dan tanggal sekarang.
   /// Mengembalikan jumlah sisa hari dalam bentuk integer.
   /// Jika tanggal berakhir sudah lewat, hasilnya akan menjadi negatif.
-  static int sisaHari(DateTime tanggalBerakhir) {
+  static int sisaHari(DateTime tanggalBerakhir, {DateTime? now}) {
     // ditambah: Mengambil tanggal saat ini tanpa informasi jam, menit, atau detik.
-    final tanggalSekarang = DateUtils.dateOnly(DateTime.now());
+    final tanggalSekarang = DateUtils.dateOnly(now ?? DateTime.now());
 
     // ditambah: Mengambil tanggal berakhir tanpa informasi waktu untuk perbandingan yang akurat.
     final akhir = DateUtils.dateOnly(tanggalBerakhir);
@@ -24,9 +24,9 @@ class PerhitunganUtil {
   /// diubah: Logika fungsi diperbarui untuk memberikan detail waktu yang lebih presisi (hari, jam, menit).
   /// Fungsi untuk mendapatkan representasi teks dari sisa masa aktif.
   /// Contoh: "Sisa 5 hari", "Sisa 12 jam", atau "Berakhir".
-  static String getTeksSisaMasaAktif(DateTime tanggalBerakhir) {
+  static String getTeksSisaMasaAktif(DateTime tanggalBerakhir, {DateTime? now}) {
     // diubah: Menghitung selisih waktu yang presisi menggunakan Duration untuk mendapatkan jam dan menit.
-    final sisa = tanggalBerakhir.difference(DateTime.now());
+    final sisa = tanggalBerakhir.difference(now ?? DateTime.now());
 
     // diubah: Jika sisa durasi negatif (sudah lewat), langsung kembalikan teks "Berakhir".
     if (sisa.isNegative) {
@@ -50,9 +50,9 @@ class PerhitunganUtil {
   /// - Hijau: Jika sisa masa aktif lebih dari 7 hari.
   /// - Oranye: Jika sisa masa aktif antara 1 hingga 7 hari.
   /// - Merah: Jika paket berakhir hari ini atau sudah kadaluarsa.
-  static Color getWarnaSisaMasaAktif(DateTime tanggalBerakhir) {
+  static Color getWarnaSisaMasaAktif(DateTime tanggalBerakhir, {DateTime? now}) {
     // ditambah: Menghitung sisa hari sebagai dasar penentuan warna.
-    final sisa = sisaHari(tanggalBerakhir);
+    final sisa = sisaHari(tanggalBerakhir, now: now);
 
     // ditambah: Logika untuk memilih warna berdasarkan sisa hari.
     if (sisa > 7) {

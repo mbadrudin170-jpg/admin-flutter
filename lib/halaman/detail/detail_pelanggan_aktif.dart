@@ -105,7 +105,7 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_pelanggan?.nama ?? _pelangganAktif.idPelanggan),
+        title: Text(_pelanggan?.nama ?? 'Detail Pelanggan'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -128,48 +128,58 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      'Nama: ${_pelanggan?.nama ?? _pelangganAktif.idPelanggan}',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildTeleponDisplay(),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Status: ${_pelangganAktif.status.displayName}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildPaketDisplay(),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Mulai: ${FormatTanggal.formatTanggalRingkas(_pelangganAktif.tanggalMulai)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalMulai)}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Berakhir: ${FormatTanggal.formatTanggalRingkas(_pelangganAktif.tanggalBerakhir)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalBerakhir)}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 16),
-                    // ditambah: Menampilkan sisa masa aktif menggunakan PerhitunganUtil.
-                    Text(
-                      PerhitunganUtil.getTeksSisaMasaAktif(
-                        _pelangganAktif.tanggalBerakhir,
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Center(
+                            child: Text(
+                              _pelanggan?.nama ?? _pelangganAktif.idPelanggan,
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Divider(),
+                          _buildInfoRow(
+                            'No HP',
+                            _pelanggan?.telepon ?? 'Tidak ditemukan',
+                          ),
+                          _buildInfoRow(
+                            'Paket',
+                            _paket?.nama ?? '(ID: ${_pelangganAktif.idPaket})',
+                          ),
+                          _buildInfoRow(
+                            'Status',
+                            _pelangganAktif.status.displayName,
+                          ),
+
+                          _buildInfoRow(
+                            'Mulai',
+                            '${FormatTanggal.formatTanggalRingkas(_pelangganAktif.tanggalMulai)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalMulai)}',
+                          ),
+                          _buildInfoRow(
+                            'Berakhir',
+                            '${FormatTanggal.formatTanggalRingkas(_pelangganAktif.tanggalBerakhir)} - ${FormatJam.formatJamMenit(_pelangganAktif.tanggalBerakhir)}',
+                          ),
+                          const Divider(),
+                          const SizedBox(height: 16),
+                          // ditambah: Menampilkan sisa masa aktif menggunakan PerhitunganUtil.
+                          Text(
+                            PerhitunganUtil.getTeksSisaMasaAktif(
+                              _pelangganAktif.tanggalBerakhir,
+                            ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
+                                  color: PerhitunganUtil.getWarnaSisaMasaAktif(
+                                    _pelangganAktif.tanggalBerakhir,
+                                  ),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: PerhitunganUtil.getWarnaSisaMasaAktif(
-                          _pelangganAktif.tanggalBerakhir,
-                        ),
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
               ),
             ),
           ],
@@ -178,48 +188,26 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
     );
   }
 
-  Widget _buildTeleponDisplay() {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (_pelanggan != null) {
-      return Text(
-        'No HP: ${_pelanggan!.telepon}',
-        style: Theme.of(context).textTheme.titleMedium,
-      );
-    } else {
-      return Text(
-        'No HP tidak ditemukan',
-        style: Theme.of(
-          context,
-        ).textTheme.titleMedium?.copyWith(color: Colors.red),
-      );
-    }
+  // This is the parameterized helper method you asked for.
+  // It takes a 'label' and a 'value' to create a consistent row style.
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.titleMedium),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
   }
-
-  Widget _buildPaketDisplay() {
-    if (_isLoading) {
-      return Text(
-        'Memuat nama paket...',
-        style: Theme.of(context).textTheme.titleMedium,
-      );
-    }
-    if (_paket != null) {
-      return Text(
-        'Paket: ${_paket!.nama}',
-        style: Theme.of(context).textTheme.titleMedium,
-      );
-    } else {
-      return Text(
-        'Paket: (ID: ${_pelangganAktif.idPaket}) tidak ditemukan',
-        style: Theme.of(
-          context,
-        ).textTheme.titleMedium?.copyWith(color: Colors.red),
-      );
-    }
-  }
-}
-
-Widget _wadahInfo (){
-  return Padding(padding: padding)
 }
