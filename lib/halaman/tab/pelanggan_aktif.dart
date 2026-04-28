@@ -1,4 +1,3 @@
-
 // path: lib/halaman/tab/pelanggan_aktif.dart
 // File ini bertanggung jawab untuk menampilkan daftar pelanggan yang aktif.
 
@@ -19,8 +18,9 @@ import 'package:admin_wifi/widget/nama_pelanggan.dart';
 enum OpsiHapusPilihan { hapusSemua, hapusKadaluarsa, batal }
 
 enum OpsiUrutkan {
-  tanggal,
+  tanggalBerakhir,
   tanggalMulai,
+  diPerbarui,
   namaAZ,
   namaZA,
   lunas,
@@ -50,7 +50,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   bool _isLoading = true;
 
   // State untuk UI
-  OpsiUrutkan _urutanAktif = OpsiUrutkan.tanggal;
+  OpsiUrutkan _urutanAktif = OpsiUrutkan.tanggalBerakhir;
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
 
@@ -72,7 +72,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _hasilFilter = _semuaPelanggan.where((pelanggan) {
-        final nama = _mapNamaPelanggan[pelanggan.idPelanggan]?.toLowerCase() ?? '';
+        final nama =
+            _mapNamaPelanggan[pelanggan.idPelanggan]?.toLowerCase() ?? '';
         return nama.contains(query);
       }).toList();
       // Setelah filtering, terapkan sorting yang sedang aktif
@@ -91,8 +92,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       final pelangganList = await _pelangganOperasi.getPelanggan();
       _mapNamaPelanggan = {for (var p in pelangganList) p.id: p.nama};
 
-      final pelangganAktifList =
-          await _pelangganAktifOperasi.ambilSemuaPelangganAktif();
+      final pelangganAktifList = await _pelangganAktifOperasi
+          .ambilSemuaPelangganAktif();
 
       _semuaPelanggan = pelangganAktifList;
       _hasilFilter = pelangganAktifList;
@@ -104,9 +105,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal memuat data: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal memuat data: $e')));
       }
     } finally {
       if (mounted && !forceRefresh) {
@@ -124,13 +125,16 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       if (p.id == null) continue;
 
       final namaPelanggan = _mapNamaPelanggan[p.idPelanggan] ?? 'Pelanggan';
-      final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(const Duration(days: 3));
+      final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(
+        const Duration(days: 3),
+      );
 
       if (tigaHariSebelumKadaluarsa.isAfter(sekarang)) {
         await _notifikasiServis.jadwalNotifikasi(
           id: (p.id.hashCode.abs() + 1),
           title: '⏰ Paket Akan Berakhir',
-          body: 'Paket $namaPelanggan akan berakhir dalam 3 hari (${FormatTanggal.formatTanggalBasic(p.tanggalBerakhir)})',
+          body:
+              'Paket $namaPelanggan akan berakhir dalam 3 hari (${FormatTanggal.formatTanggalBasic(p.tanggalBerakhir)})',
           jadwal: tigaHariSebelumKadaluarsa,
         );
       }
@@ -141,7 +145,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         await _notifikasiServis.jadwalNotifikasi(
           id: (p.id.hashCode.abs() + 2),
           title: '🔔 Paket Berakhir Sekarang',
-          body: 'Paket $namaPelanggan telah berakhir hari ini (${FormatTanggal.formatTanggalBasic(waktuKadaluarsa)}). Harap perbarui paket.',
+          body:
+              'Paket $namaPelanggan telah berakhir hari ini (${FormatTanggal.formatTanggalBasic(waktuKadaluarsa)}). Harap perbarui paket.',
           jadwal: waktuKadaluarsa,
         );
       }
@@ -185,8 +190,12 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
     if (konfirmasi == true) {
       try {
-        await _notifikasiServis.batalNotifikasi((pelanggan.id.hashCode.abs() + 1));
-        await _notifikasiServis.batalNotifikasi((pelanggan.id.hashCode.abs() + 2));
+        await _notifikasiServis.batalNotifikasi(
+          (pelanggan.id.hashCode.abs() + 1),
+        );
+        await _notifikasiServis.batalNotifikasi(
+          (pelanggan.id.hashCode.abs() + 2),
+        );
 
         final isOnline = await KoneksiInternetService.cekKoneksi();
         if (isOnline) {
@@ -195,7 +204,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Mode offline: Data akan dihapus dari server saat online.'),
+                content: Text(
+                  'Mode offline: Data akan dihapus dari server saat online.',
+                ),
                 backgroundColor: Colors.orange,
               ),
             );
@@ -224,22 +235,34 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     }
   }
 
-  Future<void> _urutkanList(OpsiUrutkan pilihan, {bool fromFilter = false}) async {
+  Future<void> _urutkanList(
+    OpsiUrutkan pilihan, {
+    bool fromFilter = false,
+  }) async {
     int Function(PelangganAktif, PelangganAktif) comparator;
 
     switch (pilihan) {
-      case OpsiUrutkan.tanggal:
+      case OpsiUrutkan.tanggalBerakhir:
         comparator = (a, b) => a.tanggalBerakhir.compareTo(b.tanggalBerakhir);
         break;
       case OpsiUrutkan.tanggalMulai:
         comparator = (a, b) => a.tanggalMulai.compareTo(b.tanggalMulai);
+        break;
+      case OpsiUrutkan.diPerbarui:
+        comparator = (a, b) {
+          final dateA = a.diperbarui ?? a.tanggalMulai;
+          final dateB = b.diperbarui ?? b.tanggalMulai;
+          return dateB.compareTo(dateA); // Terbaru di atas
+        };
         break;
       case OpsiUrutkan.namaAZ:
       case OpsiUrutkan.namaZA:
         comparator = (a, b) {
           final namaA = _mapNamaPelanggan[a.idPelanggan] ?? '';
           final namaB = _mapNamaPelanggan[b.idPelanggan] ?? '';
-          return pilihan == OpsiUrutkan.namaAZ ? namaA.compareTo(namaB) : namaB.compareTo(namaA);
+          return pilihan == OpsiUrutkan.namaAZ
+              ? namaA.compareTo(namaB)
+              : namaB.compareTo(namaA);
         };
         break;
       case OpsiUrutkan.lunas:
@@ -248,7 +271,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           final isLunasA = a.status == StatusPembayaran.lunas;
           final isLunasB = b.status == StatusPembayaran.lunas;
           if (isLunasA == isLunasB) return 0;
-          return (pilihan == OpsiUrutkan.lunas) ? (isLunasA ? -1 : 1) : (isLunasA ? 1 : -1);
+          return (pilihan == OpsiUrutkan.lunas)
+              ? (isLunasA ? -1 : 1)
+              : (isLunasA ? 1 : -1);
         };
         break;
       case OpsiUrutkan.paketAktif:
@@ -257,7 +282,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           final isAktifA = PerhitunganUtil.sisaHari(a.tanggalBerakhir) >= 0;
           final isAktifB = PerhitunganUtil.sisaHari(b.tanggalBerakhir) >= 0;
           if (isAktifA == isAktifB) return 0;
-          return (pilihan == OpsiUrutkan.paketAktif) ? (isAktifA ? -1 : 1) : (isAktifA ? 1 : -1);
+          return (pilihan == OpsiUrutkan.paketAktif)
+              ? (isAktifA ? -1 : 1)
+              : (isAktifA ? 1 : -1);
         };
         break;
     }
@@ -284,7 +311,9 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
               onPressed: () => Navigator.pop(context, value),
               child: Text(
                 text,
-                style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
             ),
           );
@@ -293,14 +322,22 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         return SimpleDialog(
           title: const Text('Urutkan Berdasarkan'),
           children: <Widget>[
-            buildOption('Tanggal Berakhir', OpsiUrutkan.tanggal),
+            buildOption('Tanggal Berakhir', OpsiUrutkan.tanggalBerakhir),
             buildOption('Tanggal Mulai', OpsiUrutkan.tanggalMulai),
+            buildOption('Terakhir Diperbarui', OpsiUrutkan.diPerbarui),
+
             buildOption('Nama (A-Z)', OpsiUrutkan.namaAZ),
             buildOption('Nama (Z-A)', OpsiUrutkan.namaZA),
             buildOption('Status Pembayaran (Lunas)', OpsiUrutkan.lunas),
-            buildOption('Status Pembayaran (Belum Lunas)', OpsiUrutkan.belumLunas),
+            buildOption(
+              'Status Pembayaran (Belum Lunas)',
+              OpsiUrutkan.belumLunas,
+            ),
             buildOption('Status Paket (Aktif)', OpsiUrutkan.paketAktif),
-            buildOption('Status Paket (Tidak Aktif)', OpsiUrutkan.paketTidakAktif),
+            buildOption(
+              'Status Paket (Tidak Aktif)',
+              OpsiUrutkan.paketTidakAktif,
+            ),
             SimpleDialogOption(
               child: const Text('Batal'),
               onPressed: () => Navigator.pop(context),
@@ -516,71 +553,80 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _semuaPelanggan.isEmpty
-              ? const Center(child: Text('Tidak ada pelanggan aktif ditemukan.'))
-              : _hasilFilter.isEmpty && _searchController.text.isNotEmpty
-                  ? const Center(child: Text('Pelanggan tidak ditemukan.'))
-                  : ListView.builder(
-                      itemCount: _hasilFilter.length,
-                      itemBuilder: (context, index) {
-                        final pelanggan = _hasilFilter[index];
-                        final statusPembayaranText = pelanggan.status.displayName;
-                        final statusPembayaranColor = pelanggan.status == StatusPembayaran.lunas ? Colors.green : Colors.red;
+          ? const Center(child: Text('Tidak ada pelanggan aktif ditemukan.'))
+          : _hasilFilter.isEmpty && _searchController.text.isNotEmpty
+          ? const Center(child: Text('Pelanggan tidak ditemukan.'))
+          : ListView.builder(
+              itemCount: _hasilFilter.length,
+              itemBuilder: (context, index) {
+                final pelanggan = _hasilFilter[index];
+                final statusPembayaranText = pelanggan.status.displayName;
+                final statusPembayaranColor =
+                    pelanggan.status == StatusPembayaran.lunas
+                    ? Colors.green
+                    : Colors.red;
 
-                        return Card(
-                          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                          clipBehavior: Clip.antiAlias,
-                          child: InkWell(
-                            onLongPress: () {
-                              _hapusPelangganAktif(pelanggan);
-                            },
-                            onTap: () async {
-                              final result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => DetailPelangganAktif(pelanggan: pelanggan),
-                                ),
-                              );
-                              if (result == true) {
-                                _loadData(forceRefresh: true);
-                              }
-                            },
-                            child: ListTile(
-                              title: NamaPelangganWidget(
-                                idPelanggan: pelanggan.idPelanggan,
-                                style: const TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  NamaPaketWidget(idPaket: pelanggan.idPaket),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Pembayaran: $statusPembayaranText',
-                                    style: TextStyle(
-                                      color: statusPembayaranColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Status: ${PerhitunganUtil.getTeksSisaMasaAktif(pelanggan.tanggalBerakhir)}',
-                                    style: TextStyle(
-                                      color: PerhitunganUtil.getWarnaSisaMasaAktif(pelanggan.tanggalBerakhir),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Berakhir: ${FormatTanggal.formatTanggalBasic(pelanggan.tanggalBerakhir)} ${FormatJam.formatJamMenit(pelanggan.tanggalBerakhir)}',
-                                  ),
-                                ],
-                              ),
-                              trailing: const Icon(Icons.chevron_right),
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 7,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onLongPress: () {
+                      _hapusPelangganAktif(pelanggan);
+                    },
+                    onTap: () async {
+                      // DIUBAH: Hapus 'result' dan kondisi if.
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DetailPelangganAktif(pelanggan: pelanggan),
+                        ),
+                      );
+                      // Selalu muat ulang data setelah kembali dari halaman detail.
+                      _loadData(forceRefresh: true);
+                    },
+                    child: ListTile(
+                      title: NamaPelangganWidget(
+                        idPelanggan: pelanggan.idPelanggan,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          NamaPaketWidget(idPaket: pelanggan.idPaket),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Pembayaran: $statusPembayaranText',
+                            style: TextStyle(
+                              color: statusPembayaranColor,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        );
-                      },
+                          const SizedBox(height: 4),
+                          Text(
+                            'Status: ${PerhitunganUtil.getTeksSisaMasaAktif(pelanggan.tanggalBerakhir)}',
+                            style: TextStyle(
+                              color: PerhitunganUtil.getWarnaSisaMasaAktif(
+                                pelanggan.tanggalBerakhir,
+                              ),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Berakhir: ${FormatTanggal.formatTanggalBasic(pelanggan.tanggalBerakhir)} ${FormatJam.formatJamMenit(pelanggan.tanggalBerakhir)}',
+                          ),
+                        ],
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
                     ),
+                  ),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: _tambahPelangganAktif,
         child: const Icon(Icons.add),

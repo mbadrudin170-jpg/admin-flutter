@@ -3,6 +3,8 @@ import 'package:admin_wifi/halaman/form/form_pelanggan.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailPelangganPage extends StatefulWidget {
   final Pelanggan pelanggan;
@@ -14,6 +16,24 @@ class DetailPelangganPage extends StatefulWidget {
 
 class DetailPelangganPageState extends State<DetailPelangganPage> {
   bool _isPasswordVisible = false;
+
+  Future<void> _launchWhatsApp(String phoneNumber) async {
+    String formattedNumber = '62${phoneNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
+    final Uri whatsappUri = Uri.parse('https://wa.me/$formattedNumber');
+
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tidak dapat membuka WhatsApp. Pastikan sudah terinstal.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +75,24 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
             const SizedBox(height: 10),
             Row(
               children: [
-                Text(
-                  'Telepon: ${widget.pelanggan.telepon}',
-                  style: const TextStyle(fontSize: 16),
+                InkWell(
+                  onTap: () => _launchWhatsApp(widget.pelanggan.telepon),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Telepon: ${widget.pelanggan.telepon}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green.shade700, size: 20),
+                    ],
+                  ),
                 ),
-                const Spacer(), // Ini akan mendorong ikon ke ujung kanan
+                const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.content_copy, size: 20.0),
                   onPressed: () {
@@ -83,14 +116,13 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10),
-            // lib/halaman/detail/detail_pelanggan.dart
             Row(
               children: [
                 Text(
                   'MAC Address: ${widget.pelanggan.macAddress}',
                   style: const TextStyle(fontSize: 16),
                 ),
-                const Spacer(), // Mendorong ikon ke ujung kanan
+                const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.content_copy, size: 20.0),
                   onPressed: () {
@@ -130,8 +162,7 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 20), // Ditambah: Spasi sebelum tombol
-            // Ditambah: Tombol untuk menyalin semua informasi pelanggan
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 final allInfo = '''

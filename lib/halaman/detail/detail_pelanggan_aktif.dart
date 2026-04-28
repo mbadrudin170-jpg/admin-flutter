@@ -6,11 +6,13 @@ import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/halaman/form/form_pelanggan_aktif.dart';
 import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
+import 'package:admin_wifi/whatsapp/info_paket.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
-// diubah: Mengimpor file utilitas terpusat.
 import 'package:admin_wifi/utils/format_util.dart';
 import 'package:admin_wifi/utils/perhitungan_util.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DetailPelangganAktif extends StatefulWidget {
   final PelangganAktif pelanggan;
@@ -23,7 +25,6 @@ class DetailPelangganAktif extends StatefulWidget {
 
 class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
   late PelangganAktif _pelangganAktif;
-  // State untuk data yang dimuat
   Pelanggan? _pelanggan;
   Paket? _paket;
   bool _isLoading = true;
@@ -33,6 +34,27 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
     super.initState();
     _pelangganAktif = widget.pelanggan;
     _loadDetails();
+  }
+
+  Future<void> _launchWhatsApp(String phoneNumber) async {
+    String formattedNumber =
+        '62${phoneNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
+    final Uri whatsappUri = Uri.parse('https://wa.me/$formattedNumber');
+
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Tidak dapat membuka WhatsApp. Pastikan sudah terinstal.',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _loadDetails() async {
@@ -50,7 +72,6 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
       final results = await Future.wait([
         pelangganOperasi.getPelangganById(_pelangganAktif.idPelanggan),
         if (idPaket.isNotEmpty)
-          // diubah: Menggunakan getPaketById yang sudah dikonsolidasi.
           paketOperasi.getPaketById(idPaket)
         else
           Future.value(null),
@@ -141,7 +162,7 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                           ),
                           const SizedBox(height: 16),
                           const Divider(),
-                          _buildInfoRow(
+                          _buildWhatsAppInfoRow(
                             'No HP',
                             _pelanggan?.telepon ?? 'Tidak ditemukan',
                           ),
@@ -164,7 +185,6 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                           ),
                           const Divider(),
                           const SizedBox(height: 16),
-                          // ditambah: Menampilkan sisa masa aktif menggunakan PerhitunganUtil.
                           Text(
                             PerhitunganUtil.getTeksSisaMasaAktif(
                               _pelangganAktif.tanggalBerakhir,
@@ -178,6 +198,26 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                                 ),
                             textAlign: TextAlign.center,
                           ),
+
+                          // ... Bagian lain dari widget Column
+                          const SizedBox(height: 24),
+                          // Tombol untuk memicu pengiriman rincian aktivasi melalui WhatsApp
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.send_to_mobile),
+                            label: const Text('Kirim Info via WhatsApp'),
+                            onPressed: () {
+                              // Memanggil fungsi statis untuk mengirim pesan
+                              PesanInfoPaket.kirimRincianPaket(_pelangganAktif);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                          ),
+
+                          // ... Bagian lain dari widget Column
                         ],
                       ),
               ),
@@ -188,8 +228,6 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
     );
   }
 
-  // This is the parameterized helper method you asked for.
-  // It takes a 'label' and a 'value' to create a consistent row style.
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -204,6 +242,46 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
               style: Theme.of(
                 context,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWhatsAppInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.titleMedium),
+          InkWell(
+            onTap: () => _launchWhatsApp(value),
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 4.0,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    value,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FaIcon(
+                    FontAwesomeIcons.whatsapp,
+                    color: Colors.green.shade700,
+                    size: 20,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
