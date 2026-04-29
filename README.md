@@ -1,80 +1,93 @@
 # **Aturan lainnya untuk AI**
 
-1. **Penggunaan Bahasa Indonesia**: Selalu gunakan bahasa Indonesia untuk penamaan fungsi, variabel, parameter, nama file, serta saat berkomunikasi dengan saya.
+Berikut adalah serangkaian aturan yang harus diikuti oleh AI untuk menjaga konsistensi, kejelasan, dan kualitas dalam pengembangan proyek ini.
 
-2. **Komentar Path File**: Selalu tambahkan komentar yang berisi path file di bagian paling atas pada setiap file yang dikerjakan. Contoh: `// path: lib/main.dart`
+1.  **Penggunaan Bahasa Indonesia**: Wajib menggunakan Bahasa Indonesia yang formal dan jelas dalam semua aspek pengembangan, termasuk penamaan fungsi, variabel, parameter, nama file, serta dalam setiap interaksi verbal dan tulisan.
 
-3. **Membaca README.md Sebelum Mengerjakan Proyek**: Sebelum mengerjakan proyek, AI diharapkan selalu membaca file `README.md` untuk memahami alur kerja proyek.
+2.  **Komentar Path File**: Setiap file yang dibuat atau dimodifikasi harus memiliki komentar di baris paling atas yang menunjukkan path lengkap file tersebut. Format: `// path: lib/nama_folder/nama_file.dart`.
 
-4. **Keterangan Fungsi dan Fitur Setelah Pengerjaan**: Ketika AI selesai mengerjakan tugas pada suatu file, tambahkan atau edit keterangan mengenai fungsi dan fitur yang ada di file tersebut. Tulis keterangan per file agar mudah saya ketahui.
+3.  **Prosedur Awal Pengerjaan**: Sebelum memulai tugas pengembangan apa pun, AI diwajibkan untuk membaca dan memahami keseluruhan isi dari file `README.md` ini. Tujuannya adalah untuk menyelaraskan pemahaman mengenai alur kerja, standar, dan dokumentasi proyek yang berlaku.
 
-5. **Aturan Sebelum Build**:
-   - Baca dahulu file `README.md` untuk mengetahui apakah ada fitur baru atau hanya perbaikan bug.
-   - Jika hanya perbaikan bug, maka yang dinaikkan hanya nomor build saja, jangan naikkan versi di `pubspec.yaml`.
-   - Jalankan perintah: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`
-   - Jangan melakukan build sebelum saya perintahkan.
+4.  **Dokumentasi Perubahan**: Setelah menyelesaikan modifikasi pada sebuah file, AI harus menambahkan atau memperbarui bagian dokumentasi file tersebut di dalam `README.md`. Ini mencakup deskripsi fitur, daftar fungsi, dan catatan relevan lainnya.
 
-6. **Konsistensi dan Kejelasan**: Selalu jaga konsistensi dan kejelasan dalam proyek saya.
+5.  **Protokol Proses Build**:
+    *   Sebelum memulai proses build, lakukan analisis terhadap file `README.md` untuk mengidentifikasi apakah perubahan yang dilakukan merupakan penambahan fitur baru atau hanya perbaikan bug.
+    *   Jika perubahan hanya berupa perbaikan bug, hanya nomor `buildNumber` di `pubspec.yaml` yang boleh dinaikkan. Versi aplikasi (`version`) harus tetap.
+    *   Proses build hanya boleh dilakukan atas perintah eksplisit dari saya.
+    *   Ketika diperintahkan, jalankan perintah berikut secara berurutan: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
 
-7. **Pembaruan README.md Setelah Pengerjaan**: Setelah selesai mengerjakan tugas, edit isi file `README.md` berdasarkan file yang dikerjakan. Hindari mencantumkan contoh kode yang dapat menyebabkan error atau warning. Cukup tuliskan keterangan tujuan file, fitur, dan fungsi.
+6.  **Menjaga Konsistensi**: AI bertanggung jawab untuk menjaga konsistensi kode, struktur proyek, dan pola desain di seluruh aplikasi.
 
-8. **Komentar Perubahan Kode**: Beri keterangan komentar di samping atau di atas kode yang diubah/ditambah dengan struktur:
-   - `// dihapus: [alasan dihapus]`
-   - `// diubah/ditambah: [alasan diubah/ditambah]`
+7.  **Pembaruan Dokumentasi README.md**: Setelah menyelesaikan pekerjaan, segera perbarui bagian dokumentasi yang relevan di dalam file `README.md`. Fokus pada deskripsi tujuan file, fitur yang diimplementasikan, dan daftar fungsi. Hindari menyertakan contoh kode yang ambigu atau berpotensi menimbulkan error.
 
-9. **Menjalankan Flutter Analyze**: Setelah melakukan pekerjaan, jalankan `flutter analyze` di terminal untuk memastikan tidak ada error atau warning.
+8.  **Komentar Perubahan Kode**: Setiap baris kode yang dihapus, diubah, atau ditambahkan harus disertai dengan komentar yang jelas mengenai alasannya. Gunakan format berikut:
+    *   `// dihapus: [alasan penghapusan]`
+    *   `// diubah: [alasan perubahan]`
+    *   `// ditambah: [alasan penambahan]`
 
-10. **Konfirmasi Sebelum Mengerjakan**: Sebelum mengerjakan tugas, berikan penjelasan mengenai apa yang akan dikerjakan. Saya akan mengonfirmasi dengan kata: `setuju`, `oke`, `ok`, `ya`, `yes` sebagai tanda izin. Jika saya menulis `jangan`, `tidak`, `nggk`, `nggak`, maka AI tidak boleh mengerjakan tugas tersebut.
+9.  **Analisis Kode Statis**: Setelah menyelesaikan modifikasi kode, jalankan perintah `flutter analyze` di terminal untuk memastikan tidak ada error atau *warning* yang tersisa.
 
-11. **Komentar pada Setiap Fungsi**: Tambahkan keterangan di atas setiap fungsi yang menjelaskan alasan fungsi tersebut dibuat. Contoh: `// untuk menavigasi ke halaman A`
+10. **Mekanisme Konfirmasi**: Sebelum melakukan tindakan atau modifikasi apa pun, AI harus memberikan penjelasan rinci mengenai rencana kerjanya. Pekerjaan hanya boleh dilanjutkan setelah mendapatkan konfirmasi eksplisit dari saya (misalnya: `setuju`, `oke`, `ok`, `ya`, `yes`). Jika saya merespons dengan negasi (misalnya: `jangan`, `tidak`, `nggak`), AI harus membatalkan rencana tersebut.
 
-12. **Komentar Tambahan pada Kode**: Tambahkan komentar pada beberapa bagian kode di dalam file agar saya tidak bingung memahami alasan kode tersebut dibuat.
+11. **Dokumentasi Fungsi**: Setiap fungsi yang dibuat harus memiliki komentar di atasnya yang menjelaskan tujuan dan kegunaan fungsi tersebut secara singkat dan jelas. Contoh: `// untuk menavigasi pengguna ke halaman pengaturan profil.`
 
-13. **Perintah Clean**: Jika saya memerintahkan `clean`, AI harus menjalankan `flutter clean && flutter pub get` di terminal.
+12. **Komentar Penjelas Kode**: Tambahkan komentar-komentar informatif di dalam blok kode yang kompleks atau penting untuk membantu pemahaman mengenai logika atau alur kerja kode tersebut.
 
-14. **Larangan Asumsi Liar**: AI diharapkan tidak berasumsi liar agar semua file tetap sinkron.
+13. **Perintah `clean`**: Jika saya memberikan instruksi `clean`, AI harus segera menjalankan perintah `flutter clean && flutter pub get` di terminal.
 
-15. **Pola Asynchronous untuk I/O, Network, Database**: Setiap kali membuat fungsi yang melibatkan I/O, network request, atau database, selalu gunakan pola asynchronous (`async/await`) dan bungkus hasilnya dalam objek `Future`. Hindari penggunaan `.then()` berantai.
+14. **Menghindari Asumsi**: AI dilarang keras membuat asumsi yang tidak didasarkan pada instruksi atau dokumentasi yang ada. Hal ini untuk memastikan semua komponen proyek tetap sinkron dan selaras.
 
-16. **Format Pembaruan README.md**: Setelah pengerjaan file selesai, edit bagian dokumentasi file di `README.md` dan kelompokkan berdasarkan folder dengan format berikut:
+15. **Pola Pemrograman Asinkron**: Setiap fungsi yang berinteraksi dengan operasi I/O (input/output), permintaan jaringan (*network request*), atau akses database wajib diimplementasikan menggunakan pola *Asynchronous* (`async`/`await`) dan mengembalikan objek `Future`. Hindari penggunaan metode `.then()` yang berantai untuk menjaga keterbacaan kode.
+
+16. **Format Standar Pembaruan README.md**: Saat memperbarui dokumentasi file di `README.md` setelah pengerjaan, kelompokkan dokumentasi berdasarkan direktori dan gunakan format terstruktur berikut:
     ```
-    File: lib/path/nama_file.dart
-    Fitur: [Nama Fitur]
+    File: lib/path/ke/nama_file.dart
+    Fitur: [Nama Fitur Utama yang Dikerjakan]
     Daftar Fungsi:
-    - namaFungsiA(): Penjelasan singkat kegunaan fungsi.
-    - namaFungsiB(): Penjelasan singkat kegunaan fungsi.
-    Catatan: [Informasi tambahan jika ada]
-    Rules: [Aturan khusus seperti format tanggal, jam, dan angka yang wajib digunakan, merujuk ke file tertentu]
+    - namaFungsiA(): Penjelasan singkat, jelas, dan padat mengenai kegunaan fungsi.
+    - namaFungsiB(): Penjelasan singkat, jelas, dan padat mengenai kegunaan fungsi.
+    Catatan: [Informasi tambahan, dependensi, atau konteks penting lainnya jika ada.]
+    Rules: [Aturan spesifik yang harus diikuti saat menggunakan atau memodifikasi file ini. Contoh: "Untuk format tanggal dan angka, wajib menggunakan utilitas dari 'lib/utils/format_util.dart' agar konsisten."]
     ```
 
-17. **Kritik dan Saran untuk Saya**: Setelah memperbarui isi file `README.md`, tambahkan kritik dan saran untuk saya agar proyek ini bisa lebih profesional, baik dari segi fitur, pengelolaan, efisiensi, dan lainnya. Tulis kritik dan saran tersebut di bawah aturan ini.
-
 ---
 
-**Kritik dan Saran untuk Saya**:
+# **Kritik dan Saran untuk Peningkatan Proyek**
 
-1. **Dokumentasi Berkelanjutan**: Saran saya agar setiap kali menambahkan fitur baru, segera perbarui dokumentasi di `README.md` secara real-time, jangan menunggu akhir pengerjaan. Ini akan membantu pelacakan perubahan.
+Berdasarkan analisis terhadap struktur dan aturan proyek, berikut adalah beberapa saran yang dapat dipertimbangkan untuk meningkatkan profesionalisme, efisiensi, dan kualitas aplikasi Anda:
 
-2. **Pengujian Otomatis**: Untuk meningkatkan profesionalisme, pertimbangkan menambahkan unit testing dan widget testing pada proyek. Ini akan meminimalkan bug saat build.
+1.  **Implementasi Pengujian Otomatis (Testing)**:
+    *   **Saran**: Mulai mengadopsi *unit testing* untuk memverifikasi logika bisnis (misalnya, fungsi di `perhitungan_util.dart`) dan *widget testing* untuk memastikan komponen UI berfungsi seperti yang diharapkan.
+    *   **Manfaat**: Ini akan secara drastis mengurangi regresi (bug yang muncul kembali) setiap kali ada perubahan, meningkatkan kepercayaan diri saat merilis versi baru, dan menjadikan proyek lebih profesional dan andal.
 
-3. **Manajemen State**: Jika proyek sudah semakin kompleks, gunakan manajemen state yang terstruktur seperti Riverpod, Bloc, atau GetX untuk menjaga kode tetap bersih dan mudah di-maintain.
+2.  **Manajemen State yang Lebih Terstruktur**:
+    *   **Saran**: Saat ini, manajemen state masih bersifat lokal (`setState`). Seiring bertambahnya kompleksitas, pertimbangkan untuk mengadopsi solusi manajemen state yang lebih terpusat dan skalabel seperti **Riverpod** atau **Provider**.
+    *   **Manfaat**: Memisahkan logika bisnis dari UI, membuat kode lebih mudah diuji (*testable*), dikelola (*maintainable*), dan dipahami oleh anggota tim lain di masa depan.
 
-4. **Code Review Berkala**: Lakukan code review mandiri atau minta rekan kerja meninjau kode secara berkala untuk menjaga kualitas dan konsistensi.
+3.  **Struktur Proyek Berbasis Fitur (Feature-Driven)**:
+    *   **Saran**: Kelompokkan file tidak hanya berdasarkan tipe (misalnya, `halaman`, `model`), tetapi juga berdasarkan fitur. Contoh: folder `lib/fitur/pelanggan/` akan berisi `halaman/`, `model/`, dan `operasi/` yang khusus untuk fitur pelanggan.
+    *   **Manfaat**: Membuat proyek lebih mudah dinavigasi saat skala aplikasi membesar dan memungkinkan pengembangan fitur secara lebih modular dan independen.
 
-5. **Versioning yang Jelas**: Tetapkan standar versioning (contoh: Semantic Versioning) agar perbedaan antara major, minor, dan patch lebih mudah dipahami.
+4.  **Penerapan Version Control Semantik (Semantic Versioning)**:
+    *   **Saran**: Adopsi standar *Semantic Versioning* (MAJOR.MINOR.PATCH) secara disiplin.
+        *   **MAJOR**: Untuk perubahan yang tidak kompatibel (API breaking changes).
+        *   **MINOR**: Untuk penambahan fitur baru yang kompatibel.
+        *   **PATCH**: Untuk perbaikan bug yang kompatibel.
+    *   **Manfaat**: Memberikan kejelasan kepada tim dan pengguna mengenai signifikansi setiap rilis versi baru.
 
-6. **Logging dan Error Handling**: Tambahkan sistem logging yang baik untuk mencatat error atau aktivitas penting, serta tangani error dengan lebih elegan menggunakan `try-catch` dan feedback ke pengguna.
-
-7. **Optimasi Build**: Untuk build APK, pertimbangkan membedakan mode `--debug` untuk pengujian internal dan `--release` untuk distribusi, serta gunakan `--obfuscate` jika diperlukan untuk keamanan.
+5.  **Pengelolaan Dependensi dan Keamanan**:
+    *   **Saran**: Lakukan audit dependensi secara berkala dengan menjalankan `flutter pub outdated`. Segera perbarui paket yang usang untuk mendapatkan perbaikan bug, peningkatan performa, dan patch keamanan.
+    *   **Manfaat**: Mencegah masalah yang disebabkan oleh paket yang tidak lagi didukung dan menjaga keamanan aplikasi dari kerentanan yang diketahui.
 
 ---
-
 
 # **Dokumentasi Proyek Aplikasi Admin WiFi**
 
 Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen ini berfungsi sebagai panduan utama untuk memahami arsitektur, fungsionalitas, dan alur kerja pengembangan aplikasi.
 
 ---
+
+## **Folder: lib/utils**
 
 **File:** `lib/utils/perhitungan_util.dart`
 **Fitur:** Utilitas Perhitungan Umum
@@ -98,6 +111,8 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
+## **Folder: lib/halaman/detail**
+
 **File:** `lib/halaman/detail/detail_pelanggan_aktif.dart`
 **Fitur:** Tampilan Detail Pelanggan Aktif
 **Daftar Fungsi:**
@@ -107,6 +122,8 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 **Rules:** Halaman ini harus menerima objek `PelangganAktif` sebagai argumen. Untuk menampilkan sisa masa aktif dan format tanggal, **wajib** menggunakan utilitas dari `perhitungan_util.dart` dan `format_util.dart`.
 
 ---
+
+## **Folder: lib/halaman/tab**
 
 **File:** `lib/halaman/tab/pelanggan_aktif.dart`
 **Fitur:** Manajemen Daftar Pelanggan Aktif
@@ -141,6 +158,35 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
+**File:** `lib/halaman/tab/pesan.dart`
+**Fitur:** Manajemen Pesanan. Halaman ini digunakan untuk melihat, mengelola, dan memfilter daftar pesanan yang masuk.
+**Daftar Fungsi:**
+*   `_muatPesanan()`: Memuat daftar pesanan dari database berdasarkan filter status yang aktif.
+*   `_updateStatus(PesananModel pesanan, String statusBaru)`: Memperbarui status sebuah pesanan (misalnya dari 'baru' menjadi 'diproses').
+*   `_hapusPesanan(PesananModel pesanan)`: Menghapus sebuah pesanan dari database setelah konfirmasi.
+*   `_buildFilterChips()`: Membangun UI untuk filter pesanan berdasarkan status (Semua, Baru, Diproses, Selesai, Ditolak).
+*   `_showPesananDetail(PesananModel pesanan)`: Menampilkan detail lengkap dari sebuah pesanan dalam *modal bottom sheet*.
+**Catatan:** Halaman ini menyediakan ringkasan jumlah total pesanan dan memungkinkan interaksi cepat untuk mengubah status atau menghapus pesanan.
+**Rules:**
+*   Pemformatan tanggal pesanan wajib menggunakan utilitas dari `format_util.dart`.
+*   Setiap operasi yang mengubah data (update status, hapus) harus memanggil `_muatPesanan()` untuk merefleksikan perubahan di UI.
+
+---
+
+**File:** `lib/halaman/tab/lainnya.dart`
+**Fitur:** Pusat Pengaturan dan Navigasi. Halaman ini berfungsi sebagai hub untuk mengakses berbagai halaman manajemen lainnya dan untuk menguji fungsionalitas notifikasi.
+**Daftar Fungsi:**
+*   `_initNotifikasi()`: Menginisialisasi layanan notifikasi.
+*   `_tampilkanNotifikasiLangsung()`: Mengirim notifikasi tes secara langsung.
+*   `_jadwalkanNotifikasi()`: Menjadwalkan notifikasi tes untuk 10 detik ke depan.
+*   `_buildNavigationButton(...)`: Fungsi pembantu untuk membuat tombol navigasi yang konsisten.
+**Catatan:** Halaman ini berisi daftar navigasi ke semua halaman pengaturan dan manajemen penting dalam aplikasi, termasuk halaman 'Daftar Pesanan'.
+**Rules:** Penambahan halaman manajemen baru harus disertai dengan penambahan tombol navigasi di file ini menggunakan `_buildNavigationButton` untuk menjaga konsistensi UI.
+
+---
+
+## **Folder: lib/halaman/lainnya**
+
 **File:** `lib/halaman/lainnya/kritik_saran.dart`
 **Fitur:** Tampilan Kritik dan Saran Pengguna
 **Daftar Fungsi:**
@@ -150,7 +196,7 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
-### File: `lib/halaman/lainnya/paket.dart`
+**File:** `lib/halaman/lainnya/paket.dart`
 **Fitur:** Manajemen Paket WiFi. Halaman ini bertanggung jawab untuk menampilkan daftar paket, serta menyediakan fungsionalitas untuk menambah, mengedit, dan menghapus paket.
 **Daftar Fungsi:**
 - `_refreshPaketList()`: Memuat ulang daftar paket dari database untuk memastikan data yang ditampilkan di UI selalu yang terbaru.

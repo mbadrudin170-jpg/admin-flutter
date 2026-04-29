@@ -7,6 +7,7 @@ import '../lainnya/paket.dart';
 import '../lainnya/pelanggan.dart';
 import '../lainnya/riwayat_aktivasi_paket.dart';
 import '../lainnya/tentang_aplikasi.dart';
+import 'pesan.dart';
 
 class LainnyaPage extends StatefulWidget {
   const LainnyaPage({super.key});
@@ -224,6 +225,14 @@ class _LainnyaTabState extends State<LainnyaPage> {
           const SizedBox(height: 8),
 
           // diubah: Tambahkan tombol navigasi ke halaman lainnya
+          _buildNavigationButton(
+            title: 'Daftar Pesanan',
+            icon: Icons.shopping_cart,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HalamanPesan()),
+            ),
+          ),
           _buildNavigationButton(
             title: 'Kelola Kategori',
             icon: Icons.category,
