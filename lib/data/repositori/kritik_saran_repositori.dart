@@ -14,7 +14,7 @@ class KritikSaranRepositori {
   // ==================== OPERASI FIREBASE ====================
 
   /// Mengambil semua data kritik saran dari Firebase
-  Future<List<KritikSaran>> getKritikSaranDariFirebase() async {
+  Future<List<KritikSaranModel>> getKritikSaranDariFirebase() async {
     try {
       final snapshot = await _firestore
           .collection(_koleksi)
@@ -29,7 +29,7 @@ class KritikSaranRepositori {
         data['id'] = doc.id;
 
         // Panggil fromMap hanya dengan 1 parameter (Map)
-        return KritikSaran.fromMap(data);
+        return KritikSaranModel.fromMap(data);
       }).toList();
     } catch (e) {
       developer.log('❌ Gagal mengambil data dari Firebase: $e');
@@ -38,7 +38,9 @@ class KritikSaranRepositori {
   }
 
   /// Menambah kritik saran ke Firebase
-  Future<String> tambahKritikSaranKeFirebase(KritikSaran kritikSaran) async {
+  Future<String> tambahKritikSaranKeFirebase(
+    KritikSaranModel kritikSaran,
+  ) async {
     try {
       final docRef = await _firestore
           .collection(_koleksi)
@@ -54,7 +56,9 @@ class KritikSaranRepositori {
   }
 
   /// Memperbarui kritik saran di Firebase
-  Future<void> perbaruiKritikSaranDiFirebase(KritikSaran kritikSaran) async {
+  Future<void> perbaruiKritikSaranDiFirebase(
+    KritikSaranModel kritikSaran,
+  ) async {
     try {
       if (kritikSaran.id == null) {
         throw Exception('ID tidak boleh null untuk update');
@@ -87,7 +91,9 @@ class KritikSaranRepositori {
       // Hapus dokumen
       await _firestore.collection(_koleksi).doc(id).delete();
 
-      developer.log('✅ Berhasil menghapus kritik saran dari Firebase dengan ID: $id');
+      developer.log(
+        '✅ Berhasil menghapus kritik saran dari Firebase dengan ID: $id',
+      );
     } catch (e) {
       developer.log('❌ Gagal menghapus kritik saran dari Firebase: $e');
       rethrow;
@@ -138,7 +144,9 @@ class KritikSaranRepositori {
         '✅ Berhasil menghapus ${snapshot.docs.length} kritik saran dari user $userId',
       );
     } catch (e) {
-      developer.log('❌ Gagal menghapus kritik saran by userId dari Firebase: $e');
+      developer.log(
+        '❌ Gagal menghapus kritik saran by userId dari Firebase: $e',
+      );
       rethrow;
     }
   }

@@ -21,7 +21,7 @@ class TransaksiPage extends StatefulWidget {
 
 class _TransaksiPageState extends State<TransaksiPage> {
   final TransaksiOperasi _transaksiOperasi = TransaksiOperasi();
-  late Future<List<Transaksi>> _listaTransaksiFuture;
+  late Future<List<TransaksiModel>> _listaTransaksiFuture;
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
 
   void _loadTransaksi() {
     setState(() {
-      _listaTransaksiFuture = _transaksiOperasi.getTransaksi();
+      _listaTransaksiFuture = _transaksiOperasi.ambilSemuaTransaksi();
     });
   }
 
@@ -49,7 +49,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Transaksi')),
-      body: FutureBuilder<List<Transaksi>>(
+      body: FutureBuilder<List<TransaksiModel>>(
         future: _listaTransaksiFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -167,7 +167,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
     );
   }
 
-  Widget _bangunItemTransaksi(Transaksi transaksi) {
+  Widget _bangunItemTransaksi(TransaksiModel transaksi) {
     return ListTile(
       onTap: () {
         Navigator.push(
@@ -218,10 +218,10 @@ class _TransaksiPageState extends State<TransaksiPage> {
     );
   }
 
-  Map<DateTime, List<Transaksi>> _groupTransaksiByDate(
-    List<Transaksi> transaksi,
+  Map<DateTime, List<TransaksiModel>> _groupTransaksiByDate(
+    List<TransaksiModel> transaksi,
   ) {
-    final Map<DateTime, List<Transaksi>> grouped = {};
+    final Map<DateTime, List<TransaksiModel>> grouped = {};
     for (final t in transaksi) {
       final date = DateTime(t.tanggal.year, t.tanggal.month, t.tanggal.day);
       if (grouped[date] == null) {

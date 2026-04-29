@@ -16,7 +16,7 @@ class KritikSaranPage extends StatefulWidget {
 
 class _KritikSaranPageState extends State<KritikSaranPage> {
   final KritikSaranOperasi _kritikSaranOperasi = KritikSaranOperasi();
-  late Future<List<KritikSaran>> _kritikSaranFuture;
+  late Future<List<KritikSaranModel>> _kritikSaranFuture;
 
   @override
   void initState() {
@@ -46,7 +46,7 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
   }
 
   // Fungsi untuk menghapus kritik saran dari halaman daftar (via long press)
-  Future<void> _hapusKritikSaran(KritikSaran item) async {
+  Future<void> _hapusKritikSaran(KritikSaranModel item) async {
     if (item.id == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -109,7 +109,7 @@ class _KritikSaranPageState extends State<KritikSaranPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Kritik & Saran')),
-      body: FutureBuilder<List<KritikSaran>>(
+      body: FutureBuilder<List<KritikSaranModel>>(
         future: _kritikSaranFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

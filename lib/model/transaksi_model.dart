@@ -20,7 +20,7 @@ extension TipeTransaksiExtension on TipeTransaksi {
   }
 }
 
-class Transaksi {
+class TransaksiModel {
   final String id;
   final String keterangan;
   final DateTime tanggal;
@@ -30,7 +30,7 @@ class Transaksi {
   final Kategori kategori;
   final SubKategori subKategori;
 
-  Transaksi({
+  TransaksiModel({
     required this.id,
     required this.keterangan,
     required this.tanggal,
@@ -56,8 +56,8 @@ class Transaksi {
   }
 
   // Create a Transaksi object from a Map
-  factory Transaksi.fromMap(Map<String, dynamic> map) {
-    return Transaksi(
+  factory TransaksiModel.fromMap(Map<String, dynamic> map) {
+    return TransaksiModel(
       id: map['id'],
       keterangan: map['keterangan'],
       tanggal: DateTime.parse(map['tanggal']),

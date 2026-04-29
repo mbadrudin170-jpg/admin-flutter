@@ -24,8 +24,8 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      // diubah: Versi database dinaikkan ke 8 karena ada perubahan skema tabel riwayat_langganan.
-      version: 8,
+      // diubah: Versi database dinaikkan ke 10 karena skema tabel pesanan berubah.
+      version: 10,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -49,6 +49,7 @@ class DatabaseHelper {
       await db.execute("DROP TABLE IF EXISTS dompet");
       await db.execute("DROP TABLE IF EXISTS kritik_saran");
       await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
+      await db.execute("DROP TABLE IF EXISTS pesanan"); // ditambah: Hapus tabel pesanan jika ada.
       await _createTables(db);
       return; // Return agar tidak menjalankan migrasi lainnya
     }
@@ -82,6 +83,17 @@ class DatabaseHelper {
       await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
       // Buat ulang tabel dengan skema yang benar
       await _createRiwayatLanggananTable(db);
+    }
+
+    // ditambah: Logika migrasi untuk versi 9, menambahkan tabel pesanan.
+    if (oldVersion < 9) {
+        await _createPesananTable(db);
+    }
+
+    // diubah: Logika migrasi untuk versi 10, mengubah skema tabel pesanan.
+    if (oldVersion < 10) {
+        await db.execute("DROP TABLE IF EXISTS pesanan");
+        await _createPesananTable(db);
     }
   }
 
@@ -181,6 +193,9 @@ class DatabaseHelper {
 
     // ditambah: Skema tabel baru untuk menyimpan data riwayat langganan.
     await _createRiwayatLanggananTable(db);
+    
+    // ditambah: Skema tabel baru untuk menyimpan data pesanan.
+    await _createPesananTable(db);
   }
 
   // ditambah: Fungsi terpisah untuk membuat tabel kritik_saran.
@@ -218,6 +233,20 @@ class DatabaseHelper {
           FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
           FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
         )
+    ''');
+  }
+
+  // diubah: Fungsi terpisah untuk membuat tabel pesanan dengan skema yang diperbarui.
+  Future<void> _createPesananTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS pesanan(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_pelanggan TEXT NOT NULL,
+        id_paket TEXT NOT NULL,
+        tanggal TEXT NOT NULL,
+        FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
+        FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
+      )
     ''');
   }
 }

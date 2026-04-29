@@ -78,7 +78,9 @@ class SinkronisasiDatabase {
         'paket': (await paketOperasi.getPerubahan(lastSync)),
         'pelanggan_aktif': (await pelangganAktifOperasi.getPerubahan(lastSync)),
         'kritik_saran': (await kritikSaranOperasi.getPerubahan(lastSync)),
-        'riwayat_langganan': (await riwayatLanggananOperasi.getPerubahan(lastSync)), // ditambah
+        'riwayat_langganan': (await riwayatLanggananOperasi.getPerubahan(
+          lastSync,
+        )), // ditambah
       });
 
       // 2. Unduh perubahan dari Firebase ke lokal
@@ -153,11 +155,17 @@ class SinkronisasiDatabase {
     );
 
     for (var collectionName in operasiMap.keys) {
-      developer.log('🔍 Mencoba akses koleksi: $collectionName', name: 'SinkronisasiService');
+      developer.log(
+        '🔍 Mencoba akses koleksi: $collectionName',
+        name: 'SinkronisasiService',
+      );
 
       final querySnapshot = await _firestore.collection(collectionName).get();
 
-      developer.log('✅ Koleksi $collectionName: ${querySnapshot.docs.length} dokumen', name: 'SinkronisasiService');
+      developer.log(
+        '✅ Koleksi $collectionName: ${querySnapshot.docs.length} dokumen',
+        name: 'SinkronisasiService',
+      );
 
       if (querySnapshot.docs.isNotEmpty) {
         developer.log(
@@ -179,7 +187,7 @@ class SinkronisasiDatabase {
                   return Dompet.fromMap(data);
                 }
                 if (op is TransaksiOperasi) {
-                  return Transaksi.fromMap(data);
+                  return TransaksiModel.fromMap(data);
                 }
                 if (op is PelangganOperasi) {
                   return Pelanggan.fromMap(data);
@@ -191,13 +199,17 @@ class SinkronisasiDatabase {
                   return PelangganAktif.fromMap(data);
                 }
                 if (op is KritikSaranOperasi) {
-                  return KritikSaran.fromMap(data);
+                  return KritikSaranModel.fromMap(data);
                 }
-                if (op is RiwayatLanggananOperasi) { // ditambah
+                if (op is RiwayatLanggananOperasi) {
+                  // ditambah
                   return RiwayatLanggananModel.fromMap(data);
                 }
               } catch (e) {
-                developer.log('❌ Gagal akses $collectionName: $e', name: 'SinkronisasiService');
+                developer.log(
+                  '❌ Gagal akses $collectionName: $e',
+                  name: 'SinkronisasiService',
+                );
               }
               return null;
             })
@@ -211,7 +223,7 @@ class SinkronisasiDatabase {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Dompet>());
         }
         if (op is TransaksiOperasi) {
-          await op.sisipkanAtauPerbaruiBatch(items.cast<Transaksi>());
+          await op.sisipkanAtauPerbaruiBatch(items.cast<TransaksiModel>());
         }
         if (op is PelangganOperasi) {
           await op.sisipkanAtauPerbaruiBatch(items.cast<Pelanggan>());
@@ -223,10 +235,13 @@ class SinkronisasiDatabase {
           await op.sisipkanAtauPerbaruiBatch(items.cast<PelangganAktif>());
         }
         if (op is KritikSaranOperasi) {
-          await op.sisipkanAtauPerbaruiBatch(items.cast<KritikSaran>());
+          await op.sisipkanAtauPerbaruiBatch(items.cast<KritikSaranModel>());
         }
-        if (op is RiwayatLanggananOperasi) { // ditambah
-          await op.sisipkanAtauPerbaruiBatch(items.cast<RiwayatLanggananModel>());
+        if (op is RiwayatLanggananOperasi) {
+          // ditambah
+          await op.sisipkanAtauPerbaruiBatch(
+            items.cast<RiwayatLanggananModel>(),
+          );
         }
       }
     }

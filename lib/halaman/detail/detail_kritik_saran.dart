@@ -15,7 +15,7 @@ class DetailKritikSaranPage extends StatefulWidget {
 
 class _DetailKritikSaranPageState extends State<DetailKritikSaranPage> {
   final KritikSaranOperasi _kritikSaranOperasi = KritikSaranOperasi();
-  late Future<KritikSaran> _kritikSaranFuture;
+  late Future<KritikSaranModel> _kritikSaranFuture;
 
   @override
   void initState() {
@@ -105,7 +105,7 @@ class _DetailKritikSaranPageState extends State<DetailKritikSaranPage> {
           ),
         ],
       ),
-      body: FutureBuilder<KritikSaran>(
+      body: FutureBuilder<KritikSaranModel>(
         future: _kritikSaranFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

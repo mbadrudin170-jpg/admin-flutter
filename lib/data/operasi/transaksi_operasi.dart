@@ -1,30 +1,31 @@
+
 // lib/data/operasi/transaksi_operasi.dart
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TransaksiOperasi {
-  // Perbaikan: Gunakan instance singleton
   final dbHelper = DatabaseHelper.instance;
 
-  Future<void> createTransaksi(Transaksi transaksi) async {
+
+  Future<int> tambahTransaksi(TransaksiModel transaksi) async {
     final db = await dbHelper.database;
-    await db.insert(
+    return await db.insert(
       'transaksi',
       transaksi.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  Future<List<Transaksi>> getTransaksi() async {
+  Future<List<TransaksiModel>> ambilSemuaTransaksi() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query('transaksi');
     return List.generate(maps.length, (i) {
-      return Transaksi.fromMap(maps[i]);
+      return TransaksiModel.fromMap(maps[i]);
     });
   }
 
-  Future<void> updateTransaksi(Transaksi transaksi) async {
+  Future<void> updateTransaksi(TransaksiModel transaksi) async {
     final db = await dbHelper.database;
     await db.update(
       'transaksi',
@@ -39,19 +40,17 @@ class TransaksiOperasi {
     await db.delete('transaksi', where: 'id = ?', whereArgs: [id]);
   }
 
-  // == METODE BARU UNTUK SINKRONISASI INKREMENTAL ==
-
-  Future<List<Transaksi>> getPerubahan(DateTime since) async {
+  Future<List<TransaksiModel>> getPerubahan(DateTime since) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       'transaksi',
       where: 'diperbarui > ?',
       whereArgs: [since.toIso8601String()],
     );
-    return List.generate(maps.length, (i) => Transaksi.fromMap(maps[i]));
+    return List.generate(maps.length, (i) => TransaksiModel.fromMap(maps[i]));
   }
 
-  Future<void> sisipkanAtauPerbaruiBatch(List<Transaksi> items) async {
+  Future<void> sisipkanAtauPerbaruiBatch(List<TransaksiModel> items) async {
     final db = await dbHelper.database;
     final batch = db.batch();
     for (var item in items) {

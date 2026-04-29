@@ -1,9 +1,4 @@
 // lib/main.dart
-// File ini adalah titik masuk utama (main entry point) untuk aplikasi.
-// Fungsinya adalah untuk menginisialisasi Firebase, database lokal (SQLite),
-// dan layanan lainnya sebelum menjalankan aplikasi.
-
-import 'package:google_fonts/google_fonts.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:admin_wifi/data/services/navigasi_servis.dart';
@@ -15,42 +10,54 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/splash_screen.dart';
+import 'package:admin_wifi/data/operasi/pesan_operasi.dart'; // Import Operasi
+import 'package:admin_wifi/server/server_lokal.dart'; // Import Server
 
 void main() async {
-  // Pastikan binding Flutter sudah siap sebelum melakukan inisialisasi asinkron.
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // Inisialisasi Firebase.
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+
+    // Inisialisasi Timezone
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
-    // ditambah: Inisialisasi layanan notifikasi.
+
+    // 1. Siapkan Notifikasi (Pastikan ini sudah didefinisikan)
     final notifikasiServis = NotifikasiServis();
     await notifikasiServis.inisialisasi();
-    await notifikasiServis
-        .requestPermissions(); // ditambah: Meminta izin notifikasi setelah inisialisasi.
+    await notifikasiServis.requestPermissions();
 
-    // Inisialisasi data lokalisasi untuk format tanggal.
     await initializeDateFormatting('id_ID', null);
 
-    // Inisialisasi database lokal (SQLite).
+    // 2. Siapkan Database & Operasi
     final dbHelper = DatabaseHelper.instance;
     await dbHelper.database;
+    final pesanOperasi = PesanOperasi(dbHelper);
 
-    // Menjalankan proses sinkronisasi di latar belakang tanpa menunggu (await)
-    // agar runApp() dapat segera dipanggil dan menghindari timeout dari sistem operasi.
+    // 3. Jalankan ServerLokal
+    final server = ServerLokal(pesanOperasi);
+
+    // PERBAIKAN: Gunakan nama fungsi 'tampilkanNotifikasiLangsung'
+    server.jalankanServer((pesananBaru) {
+      notifikasiServis.tampilkanNotifikasiLangsung(
+        id:
+            pesananBaru.id ??
+            DateTime.now().millisecond, // Gunakan ID dari DB atau unik
+        title: "Pesanan Masuk! 💰",
+        body: "${pesananBaru.idPelanggan} membeli ${pesananBaru.idPaket}",
+      );
+    });
+
     SinkronisasiDatabase().sinkronkanSemuaData().catchError((error) {
       debugPrint("Gagal melakukan sinkronisasi otomatis: $error");
     });
   } catch (e) {
-    // Tangkap error jika terjadi kegagalan inisialisasi agar aplikasi tidak langsung crash.
     debugPrint("Terjadi kesalahan saat inisialisasi: $e");
   }
 
-  // Segera jalankan aplikasi agar SplashScreen muncul.
   runApp(const MyApp());
 }
 
@@ -61,13 +68,23 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color primarySeedColor = Colors.deepPurple;
 
-    final TextTheme appTextTheme = TextTheme(
-      displayLarge: GoogleFonts.oswald(
+    // Gunakan Oswald lokal untuk semua text theme
+    final TextTheme appTextTheme = const TextTheme(
+      displayLarge: TextStyle(
+        fontFamily: 'Roboto',
         fontSize: 57,
         fontWeight: FontWeight.bold,
       ),
-      titleLarge: GoogleFonts.roboto(fontSize: 22, fontWeight: FontWeight.w500),
-      bodyMedium: GoogleFonts.openSans(fontSize: 14),
+      titleLarge: TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
     );
 
     final ThemeData lightTheme = ThemeData(
@@ -77,10 +94,12 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       textTheme: appTextTheme,
-      appBarTheme: AppBarTheme(
+      fontFamily: 'Roboto', // SET GLOBAL FONT FAMILY
+      appBarTheme: const AppBarTheme(
         backgroundColor: primarySeedColor,
         foregroundColor: Colors.white,
-        titleTextStyle: GoogleFonts.oswald(
+        titleTextStyle: TextStyle(
+          fontFamily: 'Roboto',
           fontSize: 24,
           fontWeight: FontWeight.bold,
         ),
@@ -91,7 +110,8 @@ class MyApp extends StatelessWidget {
           backgroundColor: primarySeedColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: GoogleFonts.roboto(
+          textStyle: const TextStyle(
+            fontFamily: 'Roboto',
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -101,11 +121,11 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Admin Wifi',
+      debugShowCheckedModeBanner: false,
       theme: lightTheme,
-      themeMode: ThemeMode.light, // Selalu gunakan tema terang
+      themeMode: ThemeMode.light,
       home: const SplashScreen(),
-      navigatorKey:
-          NavigasiServis.navigatorKey, // diubah: Menambahkan navigatorKey
+      navigatorKey: NavigasiServis.navigatorKey,
     );
   }
 }

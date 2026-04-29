@@ -8,7 +8,7 @@ import 'package:admin_wifi/model/transaksi_model.dart';
 import 'package:admin_wifi/utils/format_util.dart';
 
 class DetailTransaksiPage extends StatelessWidget {
-  final Transaksi transaksi;
+  final TransaksiModel transaksi;
 
   const DetailTransaksiPage({super.key, required this.transaksi});
 

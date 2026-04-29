@@ -1,7 +1,8 @@
+
 // path: lib/model/kritik_saran_model.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class KritikSaran {
+class KritikSaranModel {
   final String? id;
   final String isi;
   final DateTime tanggal;
@@ -9,7 +10,7 @@ class KritikSaran {
   // ditambah: Menambahkan properti untuk melacak waktu pembaruan.
   final DateTime? diperbarui;
 
-  KritikSaran({
+  KritikSaranModel({
     this.id,
     required this.isi,
     required this.tanggal,
@@ -32,8 +33,8 @@ class KritikSaran {
   }
 
   // Factory constructor untuk membuat objek dari Map (dari SQLite atau Firestore)
-  factory KritikSaran.fromMap(Map<String, dynamic> map) {
-    return KritikSaran(
+  factory KritikSaranModel.fromMap(Map<String, dynamic> map) {
+    return KritikSaranModel(
       id: map['id']?.toString(),
       isi: map['isi'] ?? '',
       userId: map['userId'] ?? '',
