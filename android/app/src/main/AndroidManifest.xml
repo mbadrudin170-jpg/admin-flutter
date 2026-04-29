@@ -50,10 +50,12 @@
             android:value="2" />
     </application>
     
+    <!-- QUERIES UNTUK WHATSAPP -->
     <queries>
-        <intent>
-            <action android:name="android.intent.action.PROCESS_TEXT"/>
-            <data android:mimeType="text/plain"/>
-        </intent>
+        <!-- Untuk bisa membuka WhatsApp -->
+        <package android:name="com.whatsapp" />
+        <!-- Opsional: Untuk membuka WhatsApp Business -->
+        <package android:name="com.whatsapp.w4b" />
     </queries>
+
 </manifest>

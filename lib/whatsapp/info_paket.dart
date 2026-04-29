@@ -30,6 +30,7 @@ class PesanInfoPaket {
       if (pelanggan == null || paket == null) {
         developer.log(
           'Gagal mengirim pesan: Pelanggan atau Paket tidak ditemukan.',
+          name: 'PesanInfoPaket',
         );
         return;
       }
@@ -57,7 +58,7 @@ class PesanInfoPaket {
     }
   }
 
-  /// Metode privat untuk memformat string pesan.
+  // diubah: Format pesan diperbaiki agar lebih rapi dan profesional.
   static String _buatPesan(
     Pelanggan pelanggan,
     Paket paket,
@@ -67,39 +68,55 @@ class PesanInfoPaket {
     final namaPelanggan = pelanggan.nama;
     final namaPaket = paket.nama;
     final hargaPaket = FormatUang.formatMataUang(paket.harga.toDouble());
-    final tanggalMulai = FormatTanggal.formatTanggalBasic(
+    final tanggalMulai = FormatTanggal.formatTanggalDanJam(
       pelangganAktif.tanggalMulai,
     );
-    final tanggalBerakhir = FormatTanggal.formatTanggalBasic(
+    final tanggalBerakhir = FormatTanggal.formatTanggalDanJam(
       pelangganAktif.tanggalBerakhir,
     );
 
     return '''
-🔔 *Rincian Aktivasi Paket* 🔔
+*-- Rincian Aktivasi Paket --*
 
-Halo *$namaPelanggan*,
+Halo, *$namaPelanggan*.
+Terima kasih telah melakukan aktivasi.
 
-Berikut adalah rincian aktivasi paket internet Anda:
+Berikut adalah detail paket Anda:
+-----------------------------------
+📦 *Paket:*
+  $namaPaket
 
-✅ *Paket:* $namaPaket
-💰 *Harga:* $hargaPaket
-🗓️ *Tanggal Mulai:* $tanggalMulai
-🗓️ *Tanggal Berakhir:* $tanggalBerakhir
-💳 *Status:* $statusPembayaran
+💰 *Harga:*
+  $hargaPaket
 
-Terima kasih telah menggunakan layanan kami!
+▶️ *Mulai Aktif:*
+  $tanggalMulai
+
+⏹️ *Berakhir Pada:*
+  $tanggalBerakhir
+
+✅ *Status Pembayaran:*
+  $statusPembayaran
+-----------------------------------
+
+Semoga harimu menyenangkan!
 ''';
   }
 
-  /// Metode privat untuk meluncurkan WhatsApp.
+  // diubah: Logika pemformatan nomor dan penanganan error diperbaiki.
   static Future<void> _kirimViaWhatsApp(
     String nomorTelepon,
     String pesan,
   ) async {
-    // Format nomor telepon ke standar internasional (contoh: 628123...)
-    String formattedNumber =
-        '62${nomorTelepon.replaceAll(RegExp(r'[^0-9]'), '')}';
+    // 1. Format nomor telepon ke standar internasional (misal: 62812...)
+    String formattedNumber = nomorTelepon.replaceAll(RegExp(r'[^0-9]'), '');
+    if (formattedNumber.startsWith('0')) {
+      formattedNumber = '62${formattedNumber.substring(1)}';
+    } else if (!formattedNumber.startsWith('62')) {
+      formattedNumber = '62$formattedNumber';
+    }
 
+    // 2. Buat URI untuk WhatsApp
     final whatsappUri = Uri(
       scheme: 'https',
       host: 'wa.me',
@@ -107,11 +124,22 @@ Terima kasih telah menggunakan layanan kami!
       queryParameters: {'text': pesan},
     );
 
-    if (await canLaunchUrl(whatsappUri)) {
-      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
-    } else {
+    // 3. Coba luncurkan URL dengan penanganan error
+    try {
+      if (await canLaunchUrl(whatsappUri)) {
+        await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
+      } else {
+        developer.log(
+          'Tidak dapat membuka WhatsApp. Pastikan aplikasi sudah terinstal dan konfigurasi <queries> di AndroidManifest.xml sudah benar.',
+          name: 'PesanInfoPaket.Error',
+        );
+      }
+    } catch (e, s) {
       developer.log(
-        'Tidak dapat membuka WhatsApp. Pastikan aplikasi sudah terinstal.',
+        'Gagal meluncurkan URL WhatsApp',
+        name: 'PesanInfoPaket.Error',
+        error: e,
+        stackTrace: s,
       );
     }
   }

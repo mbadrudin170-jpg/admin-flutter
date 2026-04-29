@@ -49,7 +49,9 @@ class DatabaseHelper {
       await db.execute("DROP TABLE IF EXISTS dompet");
       await db.execute("DROP TABLE IF EXISTS kritik_saran");
       await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
-      await db.execute("DROP TABLE IF EXISTS pesanan"); // ditambah: Hapus tabel pesanan jika ada.
+      await db.execute(
+        "DROP TABLE IF EXISTS pesanan",
+      ); // ditambah: Hapus tabel pesanan jika ada.
       await _createTables(db);
       return; // Return agar tidak menjalankan migrasi lainnya
     }
@@ -76,7 +78,7 @@ class DatabaseHelper {
         )
       ''');
     }
-    
+
     // ditambah: Logika migrasi untuk versi 8, memperbaiki skema riwayat_langganan
     if (oldVersion < 8) {
       // Hapus tabel lama jika ada untuk menghindari konflik kolom
@@ -87,13 +89,13 @@ class DatabaseHelper {
 
     // ditambah: Logika migrasi untuk versi 9, menambahkan tabel pesanan.
     if (oldVersion < 9) {
-        await _createPesananTable(db);
+      await _createPesananTable(db);
     }
 
     // diubah: Logika migrasi untuk versi 10, mengubah skema tabel pesanan.
     if (oldVersion < 10) {
-        await db.execute("DROP TABLE IF EXISTS pesanan");
-        await _createPesananTable(db);
+      await db.execute("DROP TABLE IF EXISTS pesanan");
+      await _createPesananTable(db);
     }
   }
 
@@ -193,7 +195,7 @@ class DatabaseHelper {
 
     // ditambah: Skema tabel baru untuk menyimpan data riwayat langganan.
     await _createRiwayatLanggananTable(db);
-    
+
     // ditambah: Skema tabel baru untuk menyimpan data pesanan.
     await _createPesananTable(db);
   }

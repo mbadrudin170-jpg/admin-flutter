@@ -37,8 +37,14 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
   }
 
   Future<void> _launchWhatsApp(String phoneNumber) async {
-    String formattedNumber =
-        '62${phoneNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
+    // diubah: Logika pemformatan nomor telepon diperbaiki
+    String formattedNumber = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
+    if (formattedNumber.startsWith('0')) {
+      formattedNumber = '62${formattedNumber.substring(1)}';
+    } else if (!formattedNumber.startsWith('62')) {
+      formattedNumber = '62$formattedNumber';
+    }
+
     final Uri whatsappUri = Uri.parse('https://wa.me/$formattedNumber');
 
     if (await canLaunchUrl(whatsappUri)) {
