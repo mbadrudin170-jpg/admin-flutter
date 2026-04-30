@@ -3,6 +3,8 @@ import 'dart:developer' as developer;
 import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
+import 'package:admin_wifi/halaman/detail/detail_paket.dart';
+import 'package:admin_wifi/halaman/detail/detail_pelanggan.dart';
 import 'package:admin_wifi/halaman/form/form_pelanggan_aktif.dart';
 import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
@@ -161,9 +163,25 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           Center(
-                            child: Text(
-                              _pelanggan?.nama ?? _pelangganAktif.idPelanggan,
-                              style: Theme.of(context).textTheme.headlineSmall,
+                            child: TextButton(
+                              onPressed: () {
+                                if (_pelanggan != null) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailPelangganPage(
+                                        pelanggan: _pelanggan!,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                _pelanggan?.nama ?? _pelangganAktif.idPelanggan,
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineSmall,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -172,9 +190,23 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
                             'No HP',
                             _pelanggan?.telepon ?? 'Tidak ditemukan',
                           ),
-                          _buildInfoRow(
-                            'Paket',
-                            _paket?.nama ?? '(ID: ${_pelangganAktif.idPaket})',
+                          TextButton(
+                            onPressed: () {
+                              if (_paket != null) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        DetailPaketPage(paket: _paket!),
+                                  ),
+                                );
+                              }
+                            },
+                            child: _buildInfoRow(
+                              'Paket',
+                              _paket?.nama ??
+                                  '(ID: ${_pelangganAktif.idPaket})',
+                            ),
                           ),
                           _buildInfoRow(
                             'Status',

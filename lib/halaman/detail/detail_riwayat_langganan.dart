@@ -8,6 +8,7 @@ import 'package:admin_wifi/utils/format_util.dart';
 import 'package:admin_wifi/widget/nama_paket.dart';
 import 'package:admin_wifi/widget/nama_pelanggan.dart';
 import 'package:flutter/material.dart';
+import 'package:admin_wifi/migrasi_diarsipkan.dart';
 
 class DetailRiwayatLanggananPage extends StatefulWidget {
   final RiwayatLanggananModel riwayat;
@@ -57,6 +58,10 @@ class _DetailRiwayatLanggananPageState
       appBar: AppBar(
         title: const Text('Detail Riwayat'),
         actions: [
+          const IconButton(
+            onPressed: migrasiDiarsipkan,
+            icon: Icon(Icons.search),
+          ),
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: _goToEditPage,

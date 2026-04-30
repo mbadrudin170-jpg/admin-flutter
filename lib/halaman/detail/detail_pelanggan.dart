@@ -18,7 +18,8 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
   bool _isPasswordVisible = false;
 
   Future<void> _launchWhatsApp(String phoneNumber) async {
-    String formattedNumber = '62${phoneNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
+    String formattedNumber =
+        '62${phoneNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
     final Uri whatsappUri = Uri.parse('https://wa.me/$formattedNumber');
 
     if (await canLaunchUrl(whatsappUri)) {
@@ -27,7 +28,9 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Tidak dapat membuka WhatsApp. Pastikan sudah terinstal.'),
+            content: Text(
+              'Tidak dapat membuka WhatsApp. Pastikan sudah terinstal.',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -88,7 +91,11 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green.shade700, size: 20),
+                      FaIcon(
+                        FontAwesomeIcons.whatsapp,
+                        color: Colors.green.shade700,
+                        size: 20,
+                      ),
                     ],
                   ),
                 ),
@@ -148,6 +155,7 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
                   'Password: ${_isPasswordVisible ? widget.pelanggan.password : '********'}',
                   style: const TextStyle(fontSize: 16),
                 ),
+                const Spacer(),
                 IconButton(
                   icon: Icon(
                     _isPasswordVisible
@@ -165,7 +173,8 @@ class DetailPelangganPageState extends State<DetailPelangganPage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                final allInfo = '''
+                final allInfo =
+                    '''
 Nama: ${widget.pelanggan.nama}
 Telepon: ${widget.pelanggan.telepon}
 Alamat: ${widget.pelanggan.alamat}

@@ -19,27 +19,6 @@ class NotifikasiServis {
 
   Future<void> inisialisasi() async {
     try {
-      // 🔥 PERBAIKAN: Hapus parameter 'priority' yang tidak valid
-      const AndroidNotificationChannel channel = AndroidNotificationChannel(
-        channelId,
-        channelName,
-        description: 'Notifikasi untuk aplikasi Admin WiFi',
-        importance: Importance.max,
-        playSound: true,
-        enableVibration: true,
-        enableLights: true,
-        ledColor: Colors.blue,
-        showBadge: true,
-      );
-
-      final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
-          _flutterLocalNotificationsPlugin
-              .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin
-              >();
-
-      await androidPlugin?.createNotificationChannel(channel);
-
       const AndroidInitializationSettings androidSettings =
           AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -59,6 +38,7 @@ class NotifikasiServis {
         macOS: iosSettings,
       );
 
+      // 🔥 1. INIT DULU
       await _flutterLocalNotificationsPlugin.initialize(
         settings: initSettings,
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
@@ -66,6 +46,27 @@ class NotifikasiServis {
             onDidReceiveNotificationResponse,
       );
 
+      // 🔥 2. BARU BUAT CHANNEL
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        channelId,
+        channelName,
+        description: 'Notifikasi untuk aplikasi Admin WiFi',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+        enableLights: true,
+        ledColor: Colors.blue,
+        showBadge: true,
+      );
+
+      final androidPlugin = _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+
+      await androidPlugin?.createNotificationChannel(channel);
+
+      // 🔥 3. TIMEZONE
       tz.initializeTimeZones();
       tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
 

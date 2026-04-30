@@ -24,8 +24,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      // diubah: Versi database dinaikkan ke 10 karena skema tabel pesanan berubah.
-      version: 10,
+      version: 11,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -38,7 +37,7 @@ class DatabaseHelper {
 
   // Fungsi untuk menangani migrasi skema saat versi database berubah.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // ditambah: Logika migrasi untuk versi < 5 yang sudah ada.
+    // ... (Logika migrasi sebelumnya tetap sama) ...
     if (oldVersion < 5) {
       await db.execute("DROP TABLE IF EXISTS kategori");
       await db.execute("DROP TABLE IF EXISTS sub_kategori");
@@ -49,21 +48,16 @@ class DatabaseHelper {
       await db.execute("DROP TABLE IF EXISTS dompet");
       await db.execute("DROP TABLE IF EXISTS kritik_saran");
       await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
-      await db.execute(
-        "DROP TABLE IF EXISTS pesanan",
-      ); // ditambah: Hapus tabel pesanan jika ada.
+      await db.execute("DROP TABLE IF EXISTS pesanan");
       await _createTables(db);
-      return; // Return agar tidak menjalankan migrasi lainnya
+      return;
     }
 
-    // ditambah: Logika migrasi untuk versi 6, menambahkan tabel kritik_saran.
     if (oldVersion < 6) {
       await _createKritikSaranTable(db);
     }
 
-    // ditambah: Logika migrasi untuk versi 7, menambahkan tabel riwayat_langganan.
     if (oldVersion < 7) {
-      // Skema awal, akan diperbaiki di v8
       await db.execute('''
         CREATE TABLE IF NOT EXISTS riwayat_langganan(
           id TEXT PRIMARY KEY,
@@ -79,27 +73,29 @@ class DatabaseHelper {
       ''');
     }
 
-    // ditambah: Logika migrasi untuk versi 8, memperbaiki skema riwayat_langganan
     if (oldVersion < 8) {
-      // Hapus tabel lama jika ada untuk menghindari konflik kolom
       await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
-      // Buat ulang tabel dengan skema yang benar
       await _createRiwayatLanggananTable(db);
     }
 
-    // ditambah: Logika migrasi untuk versi 9, menambahkan tabel pesanan.
     if (oldVersion < 9) {
       await _createPesananTable(db);
     }
 
-    // diubah: Logika migrasi untuk versi 10, mengubah skema tabel pesanan.
     if (oldVersion < 10) {
       await db.execute("DROP TABLE IF EXISTS pesanan");
       await _createPesananTable(db);
     }
+
+    // DITAMBAHKAN: Logika migrasi untuk v11
+    if (oldVersion < 11) {
+      await db.execute(
+        'ALTER TABLE riwayat_langganan ADD COLUMN diarsipkan TEXT',
+      );
+    }
   }
 
-  // Fungsi untuk membuat semua tabel dalam database.
+  // ... (kode _createTables dan tabel lainnya tetap sama) ...
   Future<void> _createTables(Database db) async {
     // 1. Kategori
     await db.execute('''
@@ -190,17 +186,11 @@ class DatabaseHelper {
       )
     ''');
 
-    // ditambah: Skema tabel baru untuk menyimpan data kritik dan saran.
     await _createKritikSaranTable(db);
-
-    // ditambah: Skema tabel baru untuk menyimpan data riwayat langganan.
     await _createRiwayatLanggananTable(db);
-
-    // ditambah: Skema tabel baru untuk menyimpan data pesanan.
     await _createPesananTable(db);
   }
 
-  // ditambah: Fungsi terpisah untuk membuat tabel kritik_saran.
   Future<void> _createKritikSaranTable(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS kritik_saran(
@@ -214,7 +204,6 @@ class DatabaseHelper {
     ''');
   }
 
-  // ditambah: Fungsi terpisah untuk membuat tabel riwayat_langganan dengan skema yang sudah diperbaiki.
   Future<void> _createRiwayatLanggananTable(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS riwayat_langganan(
@@ -232,13 +221,13 @@ class DatabaseHelper {
           tanggal_berakhir TEXT NOT NULL,
           status TEXT NOT NULL,
           diperbarui TEXT,
+          skan TEXT, -- Kolom baru ditambahkan
           FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
           FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
         )
     ''');
   }
 
-  // diubah: Fungsi terpisah untuk membuat tabel pesanan dengan skema yang diperbarui.
   Future<void> _createPesananTable(Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS pesanan(

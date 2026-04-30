@@ -340,6 +340,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           tanggalMulai: pelangganAktif.tanggalMulai,
           tanggalBerakhir: pelangganAktif.tanggalBerakhir,
           status: pelangganAktif.status,
+          diarsipkan: DateTime.now(),
           diperbarui: DateTime.now(),
         );
 
@@ -627,11 +628,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
   List<Widget> _buildDefaultActions() {
     return [
-      IconButton(
-        icon: const Icon(Icons.cloud_upload),
-        onPressed: _unggahKeFirebase,
-        tooltip: 'Unggah ke Firebase',
-      ),
       IconButton(
         icon: const Icon(Icons.search),
         onPressed: () {

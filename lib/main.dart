@@ -10,8 +10,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/splash_screen.dart';
-import 'package:admin_wifi/data/operasi/pesan_operasi.dart'; // Import Operasi
-import 'package:admin_wifi/server/server_lokal.dart'; // Import Server
+// import 'package:admin_wifi/data/operasi/pesan_operasi.dart'; // Import Operasi
+// import 'package:admin_wifi/server/server_lokal.dart'; // Import Server
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,21 +35,21 @@ void main() async {
     // 2. Siapkan Database & Operasi
     final dbHelper = DatabaseHelper.instance;
     await dbHelper.database;
-    final pesanOperasi = PesanOperasi(dbHelper);
+    // final pesanOperasi = PesanOperasi(dbHelper);
 
     // 3. Jalankan ServerLokal
-    final server = ServerLokal(pesanOperasi);
+    // final server = ServerLokal(pesanOperasi);
 
     // PERBAIKAN: Gunakan nama fungsi 'tampilkanNotifikasiLangsung'
-    server.jalankanServer((pesananBaru) {
-      notifikasiServis.tampilkanNotifikasiLangsung(
-        id:
-            pesananBaru.id ??
-            DateTime.now().millisecond, // Gunakan ID dari DB atau unik
-        title: "Pesanan Masuk! 💰",
-        body: "${pesananBaru.idPelanggan} membeli ${pesananBaru.idPaket}",
-      );
-    });
+    // // server.jalankanServer((pesananBaru) {
+    //   notifikasiServis.tampilkanNotifikasiLangsung(
+    //     id:
+    //         pesananBaru.id ??
+    //         DateTime.now().millisecond, // Gunakan ID dari DB atau unik
+    //     title: "Pesanan Masuk! 💰",
+    //     body: "${pesananBaru.idPelanggan} membeli ${pesananBaru.idPaket}",
+    //   );
+    // });
 
     SinkronisasiDatabase().sinkronkanSemuaData().catchError((error) {
       debugPrint("Gagal melakukan sinkronisasi otomatis: $error");

@@ -4,14 +4,23 @@
 import 'package:admin_wifi/data/operasi/riwayat_langganan_operasi.dart';
 import 'package:admin_wifi/halaman/detail/detail_riwayat_langganan.dart';
 import 'package:admin_wifi/model/riwayat_langganan_model.dart';
-import 'package:admin_wifi/model/enum/status_pembayaran.dart'; // Diperbarui
+import 'package:admin_wifi/model/enum/status_pembayaran.dart';
 import 'package:admin_wifi/utils/format_util.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/widget/nama_paket.dart';
 import 'package:admin_wifi/widget/nama_pelanggan.dart';
+import 'package:admin_wifi/migrasi_diarsipkan.dart';
 
-enum OpsiUrutkan { terbaru, terlama, namaAZ, namaZA, lunas, belumLunas }
+enum OpsiUrutkan {
+  hariIni,
+  terbaru,
+  terlama,
+  namaAZ,
+  namaZA,
+  lunas,
+  belumLunas,
+}
 
 class RiwayatAktivasiPaketPage extends StatefulWidget {
   const RiwayatAktivasiPaketPage({super.key});
@@ -38,7 +47,11 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
     setState(() {
       _listRiwayatFuture = _riwayatOperasi.ambilSemuaRiwayat().then((list) {
         // Pengurutan default: terbaru
-        list.sort((a, b) => b.diperbarui!.compareTo(a.diperbarui!));
+        list.sort((a, b) {
+          final dateA = a.diarsipkan ?? a.diperbarui ?? DateTime(1970);
+          final dateB = b.diarsipkan ?? b.diperbarui ?? DateTime(1970);
+          return dateB.compareTo(dateA);
+        });
         return list;
       });
     });
@@ -155,11 +168,64 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
     int Function(RiwayatLanggananModel, RiwayatLanggananModel) comparator;
 
     switch (pilihan) {
+      case OpsiUrutkan.hariIni:
+        // DIPERBAIKI: Menggunakan logika fallback yang aman untuk tanggal
+        list.sort((a, b) {
+          final now = DateTime.now();
+          final today = DateTime(now.year, now.month, now.day);
+
+          final dateA = a.diarsipkan ?? a.diperbarui ?? DateTime(1970);
+          final dateB = b.diarsipkan ?? b.diperbarui ?? DateTime(1970);
+
+          final aIsToday =
+              dateA.year == today.year &&
+              dateA.month == today.month &&
+              dateA.day == today.day;
+          final bIsToday =
+              dateB.year == today.year &&
+              dateB.month == today.month &&
+              dateB.day == today.day;
+
+          if (aIsToday && !bIsToday) {
+            return -1; // a hari ini, b tidak -> a duluan
+          }
+          if (!aIsToday && bIsToday) {
+            return 1; // b hari ini, a tidak -> b duluan
+          }
+
+          // Jika keduanya hari ini atau keduanya bukan hari ini, urutkan berdasarkan waktu terbaru
+          return dateB.compareTo(dateA);
+        });
+        // Setelah diurutkan, filter untuk hanya menampilkan yang hari ini
+        final filteredList = list.where((item) {
+          final now = DateTime.now();
+          final today = DateTime(now.year, now.month, now.day);
+          final itemDate = item.diarsipkan ?? item.diperbarui;
+          return itemDate != null &&
+              itemDate.year == today.year &&
+              itemDate.month == today.month &&
+              itemDate.day == today.day;
+        }).toList();
+
+        setState(() {
+          _listRiwayatFuture = Future.value(filteredList);
+          _urutanAktif = pilihan;
+        });
+        return; // Return agar tidak menjalankan sort di luar switch
+
       case OpsiUrutkan.terbaru:
-        comparator = (a, b) => b.diperbarui!.compareTo(a.diperbarui!);
+        comparator = (a, b) {
+          final dateA = a.diarsipkan ?? a.diperbarui ?? DateTime(1970);
+          final dateB = b.diarsipkan ?? b.diperbarui ?? DateTime(1970);
+          return dateB.compareTo(dateA);
+        };
         break;
       case OpsiUrutkan.terlama:
-        comparator = (a, b) => a.diperbarui!.compareTo(b.diperbarui!);
+        comparator = (a, b) {
+          final dateA = a.diarsipkan ?? a.diperbarui ?? DateTime(1970);
+          final dateB = b.diarsipkan ?? b.diperbarui ?? DateTime(1970);
+          return dateA.compareTo(dateB);
+        };
         break;
       case OpsiUrutkan.namaAZ:
       case OpsiUrutkan.namaZA:
@@ -215,6 +281,7 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
         return SimpleDialog(
           title: const Text('Urutkan Berdasarkan'),
           children: <Widget>[
+            buildOption('Hari Ini', OpsiUrutkan.hariIni),
             buildOption('Arsip Terbaru', OpsiUrutkan.terbaru),
             buildOption('Arsip Terlama', OpsiUrutkan.terlama),
             buildOption('Nama (A-Z)', OpsiUrutkan.namaAZ),
@@ -234,6 +301,10 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
     );
 
     if (pilihan != null) {
+      // Jika memilih 'Hari Ini', muat ulang semua data lalu filter
+      if (pilihan == OpsiUrutkan.hariIni) {
+        await _loadRiwayat(); // Muat ulang semua data
+      }
       _urutkanList(pilihan);
     }
   }
@@ -244,6 +315,10 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
       appBar: AppBar(
         title: const Text('Riwayat Langganan'),
         actions: [
+          const IconButton(
+            onPressed: migrasiDiarsipkan,
+            icon: Icon(Icons.search),
+          ),
           IconButton(
             icon: const Icon(Icons.sort),
             onPressed: _showUrutkanDialog,
@@ -264,8 +339,12 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('Tidak ada riwayat langganan ditemukan.'),
+            return Center(
+              child: Text(
+                _urutanAktif == OpsiUrutkan.hariIni
+                    ? 'Tidak ada riwayat untuk hari ini.'
+                    : 'Tidak ada riwayat langganan ditemukan.',
+              ),
             );
           } else {
             return ListView.builder(
@@ -276,8 +355,10 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
                 final statusPembayaranText = riwayat.status.displayName;
                 final statusPembayaranColor =
                     riwayat.status == StatusPembayaran.lunas
-                        ? Colors.green
-                        : Colors.red;
+                    ? Colors.green
+                    : Colors.red;
+
+                final tanggalArsip = riwayat.diarsipkan ?? riwayat.diperbarui;
 
                 return Card(
                   margin: const EdgeInsets.symmetric(
@@ -320,7 +401,7 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Diarsipkan pada: ${riwayat.diperbarui != null ? FormatTanggal.formatTanggalDanJam(riwayat.diperbarui!) : '-'}',
+                          'Diarsipkan pada: ${tanggalArsip != null ? FormatTanggal.formatTanggalDanJam(tanggalArsip) : '-'}',
                         ),
                         const SizedBox(height: 4),
                         Text(

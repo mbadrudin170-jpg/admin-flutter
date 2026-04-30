@@ -17,6 +17,7 @@ class RiwayatLanggananModel {
   final DateTime tanggalBerakhir;
   final StatusPembayaran status;
   final DateTime? diperbarui;
+  final DateTime? diarsipkan;
 
   RiwayatLanggananModel({
     String? id,
@@ -30,6 +31,7 @@ class RiwayatLanggananModel {
     required this.tanggalBerakhir,
     required this.status,
     this.diperbarui,
+    this.diarsipkan,
   }) : id = id ?? const Uuid().v4(); // Generate UUID jika tidak ada
 
   factory RiwayatLanggananModel.fromMap(Map<String, dynamic> map) {
@@ -55,6 +57,9 @@ class RiwayatLanggananModel {
       diperbarui: map['diperbarui'] != null
           ? DateTime.parse(map['diperbarui'])
           : null,
+      diarsipkan: map['diarsipkan'] != null
+          ? DateTime.parse(map['diarsipakan'])
+          : null,
     );
   }
 
@@ -74,6 +79,7 @@ class RiwayatLanggananModel {
       'tanggal_berakhir': tanggalBerakhir.toIso8601String(),
       'status': status.name,
       'diperbarui': diperbarui?.toIso8601String(),
+      'diarsipkan': diarsipkan?.toIso8601String(),
     };
   }
 }
