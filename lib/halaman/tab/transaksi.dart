@@ -21,7 +21,6 @@ class TransaksiPage extends StatefulWidget {
 class _TransaksiPageState extends State<TransaksiPage> {
   final TransaksiOperasi _transaksiOperasi = TransaksiOperasi();
   late Future<List<TransaksiModel>> _listaTransaksiFuture;
-  // 1. Tambahkan GlobalKey untuk me-refresh ringkasan
   final GlobalKey<_RingkasanTransaksiState> _ringkasanKey = GlobalKey();
 
   @override
@@ -33,7 +32,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
   void _loadTransaksi() {
     setState(() {
       _listaTransaksiFuture = _transaksiOperasi.ambilSemuaTransaksi();
-      // 2. Panggil refresh pada widget ringkasan
       _ringkasanKey.currentState?.refresh();
     });
   }
@@ -54,7 +52,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
       appBar: AppBar(title: const Text('Transaksi')),
       body: Column(
         children: [
-          // 3. Ganti pemanggilan _bangunRingkasan dengan widget khusus
           RingkasanTransaksi(key: _ringkasanKey),
           Expanded(
             child: FutureBuilder<List<TransaksiModel>>(
@@ -192,7 +189,6 @@ class _TransaksiPageState extends State<TransaksiPage> {
   }
 }
 
-// 4. Buat widget terpisah untuk ringkasan
 class RingkasanTransaksi extends StatefulWidget {
   const RingkasanTransaksi({super.key});
 
@@ -215,17 +211,19 @@ class _RingkasanTransaksiState extends State<RingkasanTransaksi> {
   }
 
   Future<Map<String, double>> _getSummaryData() async {
-    final pemasukan = await _transaksiOperasi.getTotalPemasukan();
-    final pengeluaran = await _transaksiOperasi.getTotalPengeluaran();
-    // Anda bisa menambahkan logic untuk transfer di sini jika ada fungsinya
+    // Panggil semua future secara bersamaan untuk efisiensi
+    final results = await Future.wait([
+      _transaksiOperasi.getTotalPemasukan(),
+      _transaksiOperasi.getTotalPengeluaran(),
+      _transaksiOperasi.getNetTotal(),
+    ]);
     return {
-      'pemasukan': pemasukan,
-      'pengeluaran': pengeluaran,
-      'transfer': 0.0,
+      'pemasukan': results[0],
+      'pengeluaran': results[1],
+      'total': results[2],
     };
   }
 
-  // Metode ini bisa dipanggil dari parent untuk refresh
   void refresh() {
     setState(() {
       _loadSummary();
@@ -244,9 +242,10 @@ class _RingkasanTransaksiState extends State<RingkasanTransaksi> {
           );
         }
 
+        // Ambil data dari snapshot, jika tidak ada, gunakan 0.0
         final pemasukan = snapshot.data?['pemasukan'] ?? 0.0;
         final pengeluaran = snapshot.data?['pengeluaran'] ?? 0.0;
-        final transfer = snapshot.data?['transfer'] ?? 0.0;
+        final total = snapshot.data?['total'] ?? 0.0;
 
         return Card(
           margin: const EdgeInsets.all(8.0),
@@ -258,7 +257,12 @@ class _RingkasanTransaksiState extends State<RingkasanTransaksi> {
               children: [
                 _buildInfo('Pemasukan', pemasukan, Colors.green),
                 _buildInfo('Pengeluaran', pengeluaran, Colors.red),
-                _buildInfo('Transfer', transfer, Colors.blue),
+                // Tampilkan total dengan warna dinamis
+                _buildInfo(
+                  'Total',
+                  total,
+                  total >= 0 ? Colors.blue : Colors.red,
+                ),
               ],
             ),
           ),

@@ -1,11 +1,10 @@
-// path: lib/splash_screen.dart
-// File ini bertanggung jawab untuk menampilkan layar pembuka dan memeriksa koneksi internet.
 
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/halaman_utama.dart';
-// diubah: Impor diganti ke layanan koneksi internet terpusat.
 import 'package:admin_wifi/services/cek_koneksi_internet.dart';
+import 'package:admin_wifi/services/cek_langganan_kadaluarsa_service.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,10 +21,10 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _startNavigation() async {
-    // diubah: Menggunakan layanan terpusat untuk memeriksa koneksi internet.
-    final bool isOnline = await KoneksiInternetService.cekKoneksi();
 
-    // Tunda navigasi untuk memberikan waktu bagi splash screen terlihat.
+    final bool isOnline = await KoneksiInternetService.cekKoneksi();
+    await CekLanggananKadaluarsaService().prosesLanggananKadaluarsa();
+
     Timer(const Duration(seconds: 3), () {
       if (!mounted) return;
 
@@ -34,7 +33,6 @@ class _SplashScreenState extends State<SplashScreen> {
         MaterialPageRoute(builder: (context) => const HalamanUtama()),
       ).then((_) {
         if (!mounted) return;
-        // Tampilkan SnackBar jika offline setelah HalamanUtama di-build.
         if (!isOnline) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
