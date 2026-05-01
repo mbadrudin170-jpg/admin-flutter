@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/widget/nama_paket.dart';
 import 'package:admin_wifi/widget/nama_pelanggan.dart';
-import 'package:admin_wifi/migrasi_diarsipkan.dart';
 
 enum OpsiUrutkan {
   hariIni,
@@ -315,10 +314,7 @@ class _RiwayatAktivasiPaketPageState extends State<RiwayatAktivasiPaketPage> {
       appBar: AppBar(
         title: const Text('Riwayat Langganan'),
         actions: [
-          const IconButton(
-            onPressed: migrasiDiarsipkan,
-            icon: Icon(Icons.search),
-          ),
+          
           IconButton(
             icon: const Icon(Icons.sort),
             onPressed: _showUrutkanDialog,

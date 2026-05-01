@@ -10,8 +10,11 @@ class RiwayatLanggananOperasi {
   // Tambah riwayat
   Future<int> tambahRiwayatLangganan(RiwayatLanggananModel riwayat) async {
     Database db = await dbHelper.database;
-    return await db.insert('riwayat_langganan', riwayat.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(
+      'riwayat_langganan',
+      riwayat.toMapForSqflite(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   // diubah: Tambahkan fungsi update
@@ -19,7 +22,7 @@ class RiwayatLanggananOperasi {
     Database db = await dbHelper.database;
     return await db.update(
       'riwayat_langganan',
-      riwayat.toMap(),
+      riwayat.toMapForSqflite(),
       where: 'id = ?',
       whereArgs: [riwayat.id],
     );
@@ -37,7 +40,11 @@ class RiwayatLanggananOperasi {
   // Hapus riwayat berdasarkan ID
   Future<int> hapusRiwayat(String id) async {
     Database db = await dbHelper.database;
-    return await db.delete('riwayat_langganan', where: 'id = ?', whereArgs: [id]);
+    return await db.delete(
+      'riwayat_langganan',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   // Hapus semua riwayat
@@ -61,13 +68,14 @@ class RiwayatLanggananOperasi {
 
   // Sisipkan atau perbarui batch untuk sinkronisasi
   Future<void> sisipkanAtauPerbaruiBatch(
-      List<RiwayatLanggananModel> riwayatList) async {
+    List<RiwayatLanggananModel> riwayatList,
+  ) async {
     final db = await dbHelper.database;
     final batch = db.batch();
     for (var riwayat in riwayatList) {
       batch.insert(
         'riwayat_langganan',
-        riwayat.toMap(),
+        riwayat.toMapForSqflite(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }

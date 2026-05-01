@@ -24,7 +24,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      version: 11,
+      version: 12, // VERSI DATABASE DINAikkan
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -37,7 +37,6 @@ class DatabaseHelper {
 
   // Fungsi untuk menangani migrasi skema saat versi database berubah.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // ... (Logika migrasi sebelumnya tetap sama) ...
     if (oldVersion < 5) {
       await db.execute("DROP TABLE IF EXISTS kategori");
       await db.execute("DROP TABLE IF EXISTS sub_kategori");
@@ -87,16 +86,23 @@ class DatabaseHelper {
       await _createPesananTable(db);
     }
 
-    // DITAMBAHKAN: Logika migrasi untuk v11
     if (oldVersion < 11) {
       await db.execute(
         'ALTER TABLE riwayat_langganan ADD COLUMN diarsipkan TEXT',
       );
     }
+
+    // DITAMBAHKAN: Logika migrasi untuk v12 untuk memperbaiki skema
+    if (oldVersion < 12) {
+      // Hapus tabel lama yang mungkin memiliki skema salah
+      await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
+      // Buat kembali tabel dengan skema yang benar
+      await _createRiwayatLanggananTable(db);
+    }
   }
 
-  // ... (kode _createTables dan tabel lainnya tetap sama) ...
   Future<void> _createTables(Database db) async {
+    // ... (kode tabel lain tetap sama) ...
     // 1. Kategori
     await db.execute('''
       CREATE TABLE kategori(
@@ -185,7 +191,7 @@ class DatabaseHelper {
         diperbarui TEXT NOT NULL
       )
     ''');
-
+    
     await _createKritikSaranTable(db);
     await _createRiwayatLanggananTable(db);
     await _createPesananTable(db);
@@ -221,7 +227,7 @@ class DatabaseHelper {
           tanggal_berakhir TEXT NOT NULL,
           status TEXT NOT NULL,
           diperbarui TEXT,
-          skan TEXT, -- Kolom baru ditambahkan
+          diarsipkan TEXT, -- DIPERBAIKI: dari 'skan' menjadi 'diarsipkan'
           FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
           FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
         )
