@@ -87,6 +87,24 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
+## **Folder: lib/data**
+
+**File:** `lib/data/sqlite.dart`
+**Fitur:** Pengelola Database SQLite
+**Daftar Fungsi:**
+*   `database`: Properti getter untuk mendapatkan atau menginisialisasi instance database.
+*   `_initDB()`: Menginisialisasi koneksi ke file database SQLite.
+*   `_onCreate(Database db, int version)`: Membuat semua tabel saat database pertama kali dibuat.
+*   `_onUpgrade(Database db, int oldVersion, int newVersion)`: Menangani migrasi skema database ketika versi dinaikkan.
+*   `_createTables(Database db)`: Berisi definisi skema untuk semua tabel dalam aplikasi.
+*   `_createKritikSaranTable(Database db)`: Membuat tabel `kritik_saran`.
+*   `_createRiwayatLanggananTable(Database db)`: Membuat tabel `riwayat_langganan`.
+*   `_createPesananTable(Database db)`: Membuat tabel `pesanan`.
+**Catatan:** File ini adalah satu-satunya titik akses untuk semua operasi database. Ini menangani pembuatan, migrasi, dan koneksi ke database SQLite. Perubahan skema terbaru adalah penambahan kolom `sync_status` ke tabel `pelanggan_aktif` untuk menyelaraskannya dengan model `PelangganAktif`.
+**Rules:** Setiap perubahan skema tabel harus disertai dengan kenaikan versi database di `_initDB()` dan logika migrasi yang sesuai di `_onUpgrade()`.
+
+---
+
 ## **Folder: lib/utils**
 
 **File:** `lib/utils/perhitungan_util.dart`
@@ -120,6 +138,23 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 *   `_navigateToEdit()`: Menavigasi ke form edit dan memuat ulang data setelah kembali.
 **Catatan:** Halaman ini bersifat *read-only* dan berfungsi sebagai ringkasan informasi seorang pelanggan aktif.
 **Rules:** Halaman ini harus menerima objek `PelangganAktif` sebagai argumen. Untuk menampilkan sisa masa aktif dan format tanggal, **wajib** menggunakan utilitas dari `perhitungan_util.dart` dan `format_util.dart`.
+
+---
+
+## **Folder: lib/halaman/form**
+
+**File:** `lib/halaman/form/form_pelanggan_aktif.dart`
+**Fitur:** Formulir Aktivasi dan Edit Pelanggan
+**Daftar Fungsi:**
+*   `_loadAllData()`: Memuat data pelanggan dan paket yang diperlukan untuk mengisi dropdown form.
+*   `_selectDate(BuildContext context)`: Menampilkan dialog pemilih tanggal untuk tanggal mulai aktivasi.
+*   `_selectTime(BuildContext context)`: Menampilkan dialog pemilih waktu untuk waktu mulai aktivasi.
+*   `_hitungTanggalBerakhir(DateTime startDate, Paket paket)`: Menghitung tanggal berakhir langganan berdasarkan durasi paket. Fungsi ini telah diperbaiki untuk menggunakan package `jiffy` agar penambahan durasi bulanan lebih aman dan akurat.
+*   `_saveForm()`: Memvalidasi dan menyimpan data aktivasi pelanggan baru atau pembaruan data yang sudah ada.
+**Catatan:** Formulir ini digunakan untuk membuat aktivasi baru atau mengedit aktivasi yang sudah ada. Terdapat perbaikan penting pada logika `_hitungTanggalBerakhir` untuk mencegah bug perhitungan tanggal.
+**Rules:**
+*   Setiap kali menyimpan data, form akan melakukan validasi untuk memastikan semua field yang diperlukan (pelanggan, paket, tanggal) telah terisi.
+*   Pemformatan tanggal dan jam pada tampilan form wajib menggunakan utilitas dari `format_util.dart`.
 
 ---
 

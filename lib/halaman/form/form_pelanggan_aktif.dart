@@ -13,6 +13,7 @@ import 'package:admin_wifi/model/enum/status_pembayaran.dart';
 // diubah: Mengimpor file utilitas terpusat.
 import 'package:admin_wifi/utils/format_util.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart'; // ditambah: Mengimpor package Jiffy untuk manipulasi tanggal.
 
 class FormPelangganAktif extends StatefulWidget {
   final PelangganAktif? pelangganAktif;
@@ -148,19 +149,16 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
   }
 
   DateTime _hitungTanggalBerakhir(DateTime startDate, Paket paket) {
+    // diubah: Menggunakan Jiffy untuk perhitungan bulan yang aman.
     switch (paket.tipe) {
       case TipeDurasi.jam:
         return startDate.add(Duration(hours: paket.durasi));
       case TipeDurasi.hari:
         return startDate.add(Duration(days: paket.durasi));
       case TipeDurasi.bulan:
-        return DateTime(
-          startDate.year,
-          startDate.month + paket.durasi,
-          startDate.day,
-          startDate.hour,
-          startDate.minute,
-        );
+        return Jiffy.parseFromDateTime(startDate)
+            .add(months: paket.durasi)
+            .dateTime;
       case TipeDurasi.menit:
         return startDate.add(Duration(minutes: paket.durasi));
     }

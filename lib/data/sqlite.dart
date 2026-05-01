@@ -24,7 +24,7 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      version: 12, // VERSI DATABASE DINAikkan
+      version: 13, // diubah: Versi database dinaikkan untuk migrasi skema.
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -99,6 +99,13 @@ class DatabaseHelper {
       // Buat kembali tabel dengan skema yang benar
       await _createRiwayatLanggananTable(db);
     }
+
+    // ditambah: Logika migrasi untuk v13 untuk menambahkan kolom sync_status.
+    if (oldVersion < 13) {
+      await db.execute(
+        "ALTER TABLE pelanggan_aktif ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'synced'",
+      );
+    }
   }
 
   Future<void> _createTables(Database db) async {
@@ -160,6 +167,7 @@ class DatabaseHelper {
         status TEXT NOT NULL,
         diperbarui TEXT NOT NULL,
         status_sinkronisasi TEXT NOT NULL DEFAULT 'SINKRON',
+        sync_status TEXT NOT NULL DEFAULT 'synced', -- ditambah: Kolom untuk mencocokkan model data.
         FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE ON UPDATE CASCADE
       )
@@ -191,7 +199,7 @@ class DatabaseHelper {
         diperbarui TEXT NOT NULL
       )
     ''');
-    
+
     await _createKritikSaranTable(db);
     await _createRiwayatLanggananTable(db);
     await _createPesananTable(db);
