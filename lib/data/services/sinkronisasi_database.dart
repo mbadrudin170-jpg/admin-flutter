@@ -19,7 +19,6 @@ import 'package:admin_wifi/model/transaksi_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/model/enum/sync_status.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';

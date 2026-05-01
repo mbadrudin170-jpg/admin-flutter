@@ -1,4 +1,3 @@
-
 // lib/data/operasi/transaksi_operasi.dart
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
@@ -6,7 +5,6 @@ import 'package:sqflite/sqflite.dart';
 
 class TransaksiOperasi {
   final dbHelper = DatabaseHelper.instance;
-
 
   Future<int> tambahTransaksi(TransaksiModel transaksi) async {
     final db = await dbHelper.database;
@@ -38,6 +36,39 @@ class TransaksiOperasi {
   Future<void> deleteTransaksi(String id) async {
     final db = await dbHelper.database;
     await db.delete('transaksi', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // == FUNGSI AGREGASI SALDO TRANSAKSI ==
+
+  /// Menghitung total dari semua transaksi bertipe 'Pemasukan'.
+  Future<double> getTotalPemasukan() async {
+    final db = await dbHelper.database;
+    final result = await db.rawQuery(
+      "SELECT SUM(jumlah) as total FROM transaksi WHERE tipe = 'Pemasukan'",
+    );
+    if (result.isNotEmpty && result.first['total'] != null) {
+      return (result.first['jumlah'] as num).toDouble();
+    }
+    return 0.0;
+  }
+
+  /// Menghitung total dari semua transaksi bertipe 'Pengeluaran'.
+  Future<double> getTotalPengeluaran() async {
+    final db = await dbHelper.database;
+    final result = await db.rawQuery(
+      "SELECT SUM(jumlah) as total FROM transaksi WHERE tipe = 'Pengeluaran'",
+    );
+    if (result.isNotEmpty && result.first['total'] != null) {
+      return (result.first['jumlah'] as num).toDouble();
+    }
+    return 0.0;
+  }
+
+  /// Menghitung selisih antara total pemasukan dan pengeluaran.
+  Future<double> getNetTotal() async {
+    final pemasukan = await getTotalPemasukan();
+    final pengeluaran = await getTotalPengeluaran();
+    return pemasukan - pengeluaran;
   }
 
   Future<List<TransaksiModel>> getPerubahan(DateTime since) async {

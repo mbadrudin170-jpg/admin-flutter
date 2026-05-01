@@ -2,7 +2,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'dart:developer' as developer;
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
@@ -132,43 +131,6 @@ class PelangganAktifOperasi {
       where: 'id = ?',
       whereArgs: [id],
     );
-  }
-
-  Future<List<Map<String, dynamic>>> getDeletedItems() async {
-    final db = await DatabaseHelper.instance.database;
-
-    return await db.query(
-      'pelanggan_aktif',
-      where: 'sync_status = ?',
-      whereArgs: [SyncStatus.deleted.name],
-    );
-  }
-
-  Future<void> syncDeletedToFirebase() async {
-    final db = await DatabaseHelper.instance.database;
-
-    final deletedItems = await db.query(
-      'pelanggan_aktif',
-      where: 'sync_status = ?',
-      whereArgs: [SyncStatus.deleted.name],
-    );
-
-    for (final item in deletedItems) {
-      final String id = item['id'].toString();
-      
-      try {
-        // 1. delete dari firebase
-        await FirebaseFirestore.instance
-            .collection('pelanggan_aktif')
-            .doc(id)
-            .delete();
-
-        // 2. setelah sukses, hapus lokal
-        await db.delete('pelanggan_aktif', where: 'id = ?', whereArgs: [id]);
-      } catch (e) {
-        developer.log('Gagal sync delete id=$id: $e', name: 'SyncService');
-      }
-    }
   }
 
   Future<void> hapusLokalPermanen(String id) async {

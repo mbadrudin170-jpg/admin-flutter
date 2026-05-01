@@ -3,8 +3,8 @@
 
 import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/riwayat_langganan_operasi.dart';
-// import 'package:admin_wifi/data/repositori/pelanggan_aktif_repositori.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
+import 'package:admin_wifi/model/enum/sync_status.dart';
 import 'package:admin_wifi/model/riwayat_langganan_model.dart';
 import 'package:admin_wifi/model/enum/status_pembayaran.dart';
 import 'package:admin_wifi/services/cek_koneksi_internet.dart';
@@ -43,8 +43,6 @@ class PelangganAktifPage extends StatefulWidget {
 class _PelangganAktifPageState extends State<PelangganAktifPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
   final PelangganOperasi _pelangganOperasi = PelangganOperasi();
-  // final PelangganAktifRepositori _pelangganAktifRepositori =
-  //     PelangganAktifRepositori();
   final NotifikasiServis _notifikasiServis = NotifikasiServis();
   final RiwayatLanggananOperasi _riwayatLanggananOperasi =
       RiwayatLanggananOperasi();
@@ -59,6 +57,8 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   OpsiUrutkan _urutanAktif = OpsiUrutkan.tanggalBerakhir;
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
+  // ditambah: State untuk mengontrol filter data yang belum sinkron
+  bool _tampilkanBelumSinkron = false;
 
   @override
   void initState() {
@@ -77,59 +77,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   void _onSearchChanged() {
     _applyFilterAndSort();
   }
-
-  // Future<void> _unggahKeFirebase() async {
-  //   final isOnline = await KoneksiInternetService.cekKoneksi();
-  //   if (!mounted) return;
-  //   if (!isOnline) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Tidak ada koneksi internet untuk mengunggah data.'),
-  //         backgroundColor: Colors.orange,
-  //       ),
-  //     );
-  //     return;
-  //   }
-
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     const SnackBar(
-  //       content: Text('Memulai proses unggah ke Firebase...'),
-  //       backgroundColor: Colors.blue,
-  //     ),
-  //   );
-
-  //   try {
-  //     final semuaPelangganLokal = await _pelangganAktifOperasi
-  //         .ambilSemuaPelangganAktif();
-
-  //     if (!mounted) return;
-  //     if (semuaPelangganLokal.isEmpty) {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Tidak ada data lokal untuk diunggah.')),
-  //       );
-  //       return;
-  //     }
-  //     for (final pelanggan in semuaPelangganLokal) {
-  //       await _pelangganAktifRepositori.simpanPelangganAktif(pelanggan);
-  //     }
-
-  //     if (!mounted) return;
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //         content: Text('Semua data berhasil diunggah ke Firebase.'),
-  //         backgroundColor: Colors.green,
-  //       ),
-  //     );
-  //   } catch (e) {
-  //     if (!mounted) return;
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text('Gagal mengunggah data: $e'),
-  //         backgroundColor: Theme.of(context).colorScheme.error,
-  //       ),
-  //     );
-  //   }
-  // }
 
   Future<void> _loadData({bool forceRefresh = false}) async {
     if (!mounted) return;
@@ -178,6 +125,13 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       }).toList();
     } else {
       tempResult = List.of(_semuaPelanggan);
+    }
+
+    // ditambah: Filter berdasarkan status sinkronisasi jika diaktifkan
+    if (_tampilkanBelumSinkron) {
+      tempResult = tempResult.where((pelanggan) {
+        return pelanggan.syncStatus == SyncStatus.write;
+      }).toList();
     }
 
     // 2. Urutkan hasil filter
@@ -275,8 +229,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   }
 
   Future<void> _hapusPelangganAktif(PelangganAktif pelangganAktif) async {
-    // if (pelangganAktif.id == null) return;
-
     final bool? konfirmasi = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -326,7 +278,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           }
           return;
         }
-        // 1. Buat entri riwayat dari pelanggan yang akan dihapus
         final riwayat = RiwayatLanggananModel(
           id: pelangganAktif.id,
           idPelanggan: pelangganAktif.idPelanggan,
@@ -342,10 +293,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           diperbarui: DateTime.now(),
         );
 
-        // 2. Simpan ke tabel riwayat
         await _riwayatLanggananOperasi.tambahRiwayatLangganan(riwayat);
-
-        // 3. Hapus notifikasi terjadwal
         await _notifikasiServis.batalNotifikasi(
           (pelangganAktif.id.hashCode.abs() + 1),
         );
@@ -353,26 +301,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           (pelangganAktif.id.hashCode.abs() + 2),
         );
 
-        // // 4. Hapus dari Firebase jika online
-        // final isOnline = await KoneksiInternetService.cekKoneksi();
-        // if (isOnline) {
-        //   // await _pelangganAktifRepositori.hapusPelangganAktif(
-        //     pelangganAktif.id!,
-        //   );
-        // } else {
-        //   if (mounted) {
-        //     ScaffoldMessenger.of(context).showSnackBar(
-        //       const SnackBar(
-        //         content: Text(
-        //           'Mode offline: Data akan dihapus dari server saat online.',
-        //         ),
-        //         backgroundColor: Colors.orange,
-        //       ),
-        //     );
-        //   }
-        // }
-
-        // 5. Hapus dari database lokal
         await _pelangganAktifOperasi.hapusPelangganAktif(pelangganAktif.id);
 
         if (!mounted) return;
@@ -523,39 +451,13 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         );
 
         if (konfirmasi == true) {
-          // final isOnline = await KoneksiInternetService.cekKoneksi();
-          // if (isOnline) {
-          //   final semuaPelanggan = await _pelangganAktifOperasi
-          //       .ambilSemuaPelangganAktif();
-          //   for (var pelanggan in semuaPelanggan) {
-          //     if (pelanggan.id != null) {
-          //       await _pelangganAktifRepositori.hapusPelangganAktif(
-          //         pelanggan.id!,
-          //       );
-          //     }
-          //   }
-          // }
           await _pelangganAktifOperasi.hapusSemuaPelangganAktif();
           _loadData(forceRefresh: true);
         }
         break;
       case OpsiHapusPilihan.hapusKadaluarsa:
         final isOnline = await KoneksiInternetService.cekKoneksi();
-        if (isOnline) {
-          // final semuaPelanggan = await _pelangganAktifOperasi
-          //     .ambilSemuaPelangganAktif();
-          // final sekarang = DateTime.now();
-          // // final pelangganKadaluarsa = semuaPelanggan
-          //     .where((p) => p.tanggalBerakhir.isBefore(sekarang))
-          //     .toList();
-          // // for (var pelanggan in pelangganKadaluarsa) {
-          //   // if (pelanggan.id != null) {
-          //   //   await _pelangganAktifRepositori.hapusPelangganAktif(
-          //   //     pelanggan.id!,
-          //   //   );
-          //   // }
-          // }
-        }
+        if (isOnline) {}
         final int jumlahDihapus = await _pelangganAktifOperasi
             .hapusPelangganKadaluarsa();
         if (!mounted) return;
@@ -626,6 +528,22 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
   List<Widget> _buildDefaultActions() {
     return [
+      // ditambah: Tombol untuk filter data yang belum sinkron
+      IconButton(
+        icon: Icon(
+          _tampilkanBelumSinkron ? Icons.sync_problem : Icons.sync,
+          color: _tampilkanBelumSinkron ? Colors.orange : null,
+        ),
+        onPressed: () {
+          setState(() {
+            _tampilkanBelumSinkron = !_tampilkanBelumSinkron;
+          });
+          _applyFilterAndSort();
+        },
+        tooltip: _tampilkanBelumSinkron
+            ? 'Tampilkan Semua'
+            : 'Hanya Tampilkan Belum Sinkron',
+      ),
       IconButton(
         icon: const Icon(Icons.search),
         onPressed: () {
@@ -658,11 +576,15 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           ? const Center(child: CircularProgressIndicator())
           : _semuaPelanggan.isEmpty
           ? const Center(child: Text('Tidak ada pelanggan aktif ditemukan.'))
-          : _hasilFilter.isEmpty && _searchController.text.isNotEmpty
-          ? const Center(child: Text('Pelanggan tidak ditemukan.'))
-          //  : RefreshIndicator(
-          //     // onRefresh: () => _unggahKeFirebase(),
-          //     child:
+          : _hasilFilter.isEmpty &&
+                (_searchController.text.isNotEmpty || _tampilkanBelumSinkron)
+          ? Center(
+              child: Text(
+                _tampilkanBelumSinkron
+                    ? 'Tidak ada data yang belum sinkron.'
+                    : 'Pelanggan tidak ditemukan.',
+              ),
+            )
           : ListView.builder(
               itemCount: _hasilFilter.length,
               itemBuilder: (context, index) {
@@ -694,6 +616,16 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                       _loadData(forceRefresh: true);
                     },
                     child: ListTile(
+                      // ditambah: Indikator visual untuk status sinkronisasi
+                      leading: pelanggan.syncStatus == SyncStatus.write
+                          ? const Tooltip(
+                              message: 'Perubahan belum diunggah',
+                              child: Icon(
+                                Icons.sync_problem,
+                                color: Colors.orange,
+                              ),
+                            )
+                          : null,
                       title: NamaPelangganWidget(
                         idPelanggan: pelanggan.idPelanggan,
                         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -732,7 +664,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
                 );
               },
             ),
-      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: _tambahPelangganAktif,
         child: const Icon(Icons.add),

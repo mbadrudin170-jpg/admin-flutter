@@ -19,6 +19,8 @@ class DompetPage extends StatefulWidget {
 
 class _DompetPageState extends State<DompetPage> {
   final DompetOperasi _dompetOperasi = DompetOperasi();
+  // Mengubah menjadi kunci untuk refresh FutureBuilder di RingkasanKeuangan
+  final GlobalKey<_RingkasanKeuanganState> _ringkasanKey = GlobalKey();
   late Future<List<Dompet>> _listaDompetFuture;
 
   @override
@@ -30,6 +32,8 @@ class _DompetPageState extends State<DompetPage> {
   void _loadDompet() {
     setState(() {
       _listaDompetFuture = _dompetOperasi.getDompet();
+      // Panggil metode refresh di RingkasanKeuangan jika sudah terbangun
+      _ringkasanKey.currentState?.refresh();
     });
   }
 
@@ -39,7 +43,7 @@ class _DompetPageState extends State<DompetPage> {
       MaterialPageRoute(builder: (context) => const FormDompet()),
     );
     if (result == true) {
-      _loadDompet(); // Muat ulang daftar dompet jika ada penambahan
+      _loadDompet(); // Muat ulang daftar dompet DAN ringkasan keuangan
     }
   }
 
@@ -49,7 +53,8 @@ class _DompetPageState extends State<DompetPage> {
       appBar: AppBar(title: const Text('Dompet')),
       body: Column(
         children: [
-          const RingkasanKeuangan(),
+          // Berikan kunci ke RingkasanKeuangan
+          RingkasanKeuangan(key: _ringkasanKey),
           Expanded(
             child: FutureBuilder<List<Dompet>>(
               future: _listaDompetFuture,
@@ -77,7 +82,9 @@ class _DompetPageState extends State<DompetPage> {
                               builder: (context) =>
                                   DetailDompet(dompet: dompet),
                             ),
-                          ).then((value) => _loadDompet());
+                          ).then(
+                            (_) => _loadDompet(),
+                          ); // Muat ulang setelah dari detail
                         },
                       );
                     },
@@ -97,32 +104,82 @@ class _DompetPageState extends State<DompetPage> {
   }
 }
 
-class RingkasanKeuangan extends StatelessWidget {
+// Mengubah menjadi StatefulWidget untuk mengelola state future-nya sendiri
+class RingkasanKeuangan extends StatefulWidget {
   const RingkasanKeuangan({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // NOTE: Anda perlu mengganti nilai placeholder ini dengan data asli
-    // dari operasi transaksi Anda.
-    const double pemasukan = 0.0;
-    const double pengeluaran = 0.0;
-    final double total = pemasukan - pengeluaran;
+  State<RingkasanKeuangan> createState() => _RingkasanKeuanganState();
+}
 
-    return Card(
-      margin: const EdgeInsets.all(12.0),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildInfo('Pemasukan', pemasukan, Colors.green),
-            _buildInfo('Pengeluaran', pengeluaran, Colors.red),
-            _buildInfo('Total', total, Theme.of(context).colorScheme.primary),
-          ],
-        ),
-      ),
+class _RingkasanKeuanganState extends State<RingkasanKeuangan> {
+  final DompetOperasi _dompetOperasi = DompetOperasi();
+  late Future<List<double>> _summaryFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSummary();
+  }
+
+  void _loadSummary() {
+    _summaryFuture = Future.wait([
+      _dompetOperasi.getTotalSaldoPositif(),
+      _dompetOperasi.getTotalSaldoNegatif(),
+      _dompetOperasi.getTotalSaldo(),
+    ]);
+  }
+
+  // Metode ini bisa dipanggil dari parent untuk refresh
+  void refresh() {
+    setState(() {
+      _loadSummary();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<double>>(
+      future: _summaryFuture,
+      builder: (context, snapshot) {
+        double pemasukan = 0.0;
+        double pengeluaran = 0.0;
+        double total = 0.0;
+
+        if (snapshot.connectionState == ConnectionState.done &&
+            snapshot.hasData) {
+          final result = snapshot.data!;
+          pemasukan = result[0];
+          pengeluaran = result[1].abs(); // Tampilkan sebagai angka positif
+          total = result[2];
+        }
+
+        // Tampilkan card dengan data (atau 0 jika masih loading/error)
+        return Card(
+          margin: const EdgeInsets.all(12.0),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20.0),
+            child: snapshot.connectionState == ConnectionState.waiting
+                ? const Center(child: CircularProgressIndicator())
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildInfo('Pemasukan', pemasukan, Colors.green),
+                      _buildInfo('Pengeluaran', pengeluaran, Colors.red),
+                      _buildInfo(
+                        'Total',
+                        total,
+                        Theme.of(context).colorScheme.primary,
+                      ),
+                    ],
+                  ),
+          ),
+        );
+      },
     );
   }
 

@@ -156,9 +156,9 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
       case TipeDurasi.hari:
         return startDate.add(Duration(days: paket.durasi));
       case TipeDurasi.bulan:
-        return Jiffy.parseFromDateTime(startDate)
-            .add(months: paket.durasi)
-            .dateTime;
+        return Jiffy.parseFromDateTime(
+          startDate,
+        ).add(months: paket.durasi).dateTime;
       case TipeDurasi.menit:
         return startDate.add(Duration(minutes: paket.durasi));
     }
@@ -192,6 +192,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
           tanggalBerakhir: tanggalBerakhir,
           status: _statusPembayaran,
           syncStatus: SyncStatus.write,
+          diperbarui: DateTime.now(),
         );
 
         try {
