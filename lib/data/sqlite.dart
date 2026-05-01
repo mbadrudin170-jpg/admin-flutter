@@ -24,7 +24,8 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'mydatabase.db');
     return await openDatabase(
       path,
-      version: 13, // diubah: Versi database dinaikkan untuk migrasi skema.
+      version:
+          14, // diubah: Versi dinaikkan untuk memastikan migrasi data lama.
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -92,18 +93,22 @@ class DatabaseHelper {
       );
     }
 
-    // DITAMBAHKAN: Logika migrasi untuk v12 untuk memperbaiki skema
     if (oldVersion < 12) {
-      // Hapus tabel lama yang mungkin memiliki skema salah
       await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
-      // Buat kembali tabel dengan skema yang benar
       await _createRiwayatLanggananTable(db);
     }
 
-    // ditambah: Logika migrasi untuk v13 untuk menambahkan kolom sync_status.
     if (oldVersion < 13) {
       await db.execute(
         "ALTER TABLE pelanggan_aktif ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'synced'",
+      );
+    }
+
+    // ditambah: Logika migrasi untuk v14 untuk memastikan data lama diisi.
+    if (oldVersion < 14) {
+      // Perintah ini akan mengisi kolom sync_status dengan 'synced' untuk semua baris lama yang nilainya masih NULL.
+      await db.execute(
+        'UPDATE pelanggan_aktif SET sync_status = \'synced\' WHERE sync_status IS NULL',
       );
     }
   }
@@ -167,7 +172,7 @@ class DatabaseHelper {
         status TEXT NOT NULL,
         diperbarui TEXT NOT NULL,
         status_sinkronisasi TEXT NOT NULL DEFAULT 'SINKRON',
-        sync_status TEXT NOT NULL DEFAULT 'synced', -- ditambah: Kolom untuk mencocokkan model data.
+        sync_status TEXT NOT NULL DEFAULT 'synced',
         FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE ON UPDATE CASCADE,
         FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE ON UPDATE CASCADE
       )
@@ -235,7 +240,7 @@ class DatabaseHelper {
           tanggal_berakhir TEXT NOT NULL,
           status TEXT NOT NULL,
           diperbarui TEXT,
-          diarsipkan TEXT, -- DIPERBAIKI: dari 'skan' menjadi 'diarsipkan'
+          diarsipkan TEXT,
           FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
           FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
         )

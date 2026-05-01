@@ -10,8 +10,9 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'firebase_options.dart';
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/splash_screen.dart';
-// import 'package:admin_wifi/data/operasi/pesan_operasi.dart'; // Import Operasi
-// import 'package:admin_wifi/server/server_lokal.dart'; // Import Server
+
+// [PERBAIKAN] Buat satu instance layanan sinkronisasi untuk seluruh aplikasi
+final SinkronisasiDatabase sinkronisasiDatabase = SinkronisasiDatabase();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,39 +22,22 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    // Inisialisasi Timezone
     tz.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
 
-    // 1. Siapkan Notifikasi (Pastikan ini sudah didefinisikan)
     final notifikasiServis = NotifikasiServis();
     await notifikasiServis.inisialisasi();
     await notifikasiServis.requestPermissions();
 
     await initializeDateFormatting('id_ID', null);
 
-    // 2. Siapkan Database & Operasi
     final dbHelper = DatabaseHelper.instance;
     await dbHelper.database;
-    // final pesanOperasi = PesanOperasi(dbHelper);
 
-    // 3. Jalankan ServerLokal
-    // final server = ServerLokal(pesanOperasi);
+    // [PERBAIKAN] Panggil metode startSync() yang baru
+    // Ini akan menangani sinkronisasi saat startup dan saat koneksi berubah.
+    sinkronisasiDatabase.startSync();
 
-    // PERBAIKAN: Gunakan nama fungsi 'tampilkanNotifikasiLangsung'
-    // // server.jalankanServer((pesananBaru) {
-    //   notifikasiServis.tampilkanNotifikasiLangsung(
-    //     id:
-    //         pesananBaru.id ??
-    //         DateTime.now().millisecond, // Gunakan ID dari DB atau unik
-    //     title: "Pesanan Masuk! 💰",
-    //     body: "${pesananBaru.idPelanggan} membeli ${pesananBaru.idPaket}",
-    //   );
-    // });
-
-    SinkronisasiDatabase().sinkronkanSemuaData().catchError((error) {
-      debugPrint("Gagal melakukan sinkronisasi otomatis: $error");
-    });
   } catch (e) {
     debugPrint("Terjadi kesalahan saat inisialisasi: $e");
   }
@@ -68,23 +52,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color primarySeedColor = Colors.deepPurple;
 
-    // Gunakan Oswald lokal untuk semua text theme
     final TextTheme appTextTheme = const TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: 'Roboto',
-        fontSize: 57,
-        fontWeight: FontWeight.bold,
-      ),
-      titleLarge: TextStyle(
-        fontFamily: 'Roboto',
-        fontSize: 22,
-        fontWeight: FontWeight.w500,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: 'Roboto',
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-      ),
+      displayLarge: TextStyle(fontFamily: 'Roboto', fontSize: 57, fontWeight: FontWeight.bold),
+      titleLarge: TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w500),
+      bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 14, fontWeight: FontWeight.w400),
     );
 
     final ThemeData lightTheme = ThemeData(
@@ -94,15 +65,11 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       textTheme: appTextTheme,
-      fontFamily: 'Roboto', // SET GLOBAL FONT FAMILY
+      fontFamily: 'Roboto',
       appBarTheme: const AppBarTheme(
         backgroundColor: primarySeedColor,
         foregroundColor: Colors.white,
-        titleTextStyle: TextStyle(
-          fontFamily: 'Roboto',
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
+        titleTextStyle: TextStyle(fontFamily: 'Roboto', fontSize: 24, fontWeight: FontWeight.bold),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -110,11 +77,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: primarySeedColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: const TextStyle(
-            fontFamily: 'Roboto',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
+          textStyle: const TextStyle(fontFamily: 'Roboto', fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ),
     );

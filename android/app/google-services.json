@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "816519063489-kuqnktv7f191qc5qtl5nr0p7aa20d19l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.adminwifi",
+            "certificate_hash": "d1b16438291ff4efc4fe06f2f69e9fff0e42516c"
+          }
+        },
+        {
           "client_id": "816519063489-uguscs9q40eiekfjigb6d5hbutac62v8.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -59,6 +67,35 @@
             "certificate_hash": "b779c6d54cb164cf86dd2337efff903c5c609052"
           }
         },
+        {
+          "client_id": "816519063489-uguscs9q40eiekfjigb6d5hbutac62v8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcXaRHRpoSDGS_ZcMAUSZLNy_64CvaADA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "816519063489-uguscs9q40eiekfjigb6d5hbutac62v8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816519063489:android:c966e20ba564fd59ce7140",
+        "android_client_info": {
+          "package_name": "com.pelanggannet.customer"
+        }
+      },
+      "oauth_client": [
         {
           "client_id": "816519063489-uguscs9q40eiekfjigb6d5hbutac62v8.apps.googleusercontent.com",
           "client_type": 3

@@ -1,9 +1,7 @@
 // lib/model/pelanggan_aktif_model.dart
-// File ini mendefinisikan model data untuk PelangganAktif, termasuk atribut dan metode untuk konversi data.
-
 import 'package:admin_wifi/model/enum/sync_status.dart';
 import 'package:uuid/uuid.dart';
-import 'enum/status_pembayaran.dart'; // Mengimpor enum terpusat
+import 'enum/status_pembayaran.dart';
 
 class PelangganAktif {
   final String id;
@@ -23,12 +21,36 @@ class PelangganAktif {
     required this.tanggalMulai,
     required this.tanggalBerakhir,
     required this.status,
-    required this.syncStatus,
+    this.syncStatus = SyncStatus.synced, // Default ke synced
     this.diperbarui,
     this.statusSinkronisasi = 'SINKRON',
   }) : id = id ?? const Uuid().v4();
 
-  // Konversi dari Map ke objek
+  // [FIXED] Menambahkan metode copyWith
+  PelangganAktif copyWith({
+    String? id,
+    String? idPelanggan,
+    String? idPaket,
+    DateTime? tanggalMulai,
+    DateTime? tanggalBerakhir,
+    StatusPembayaran? status,
+    SyncStatus? syncStatus,
+    DateTime? diperbarui,
+    String? statusSinkronisasi,
+  }) {
+    return PelangganAktif(
+      id: id ?? this.id,
+      idPelanggan: idPelanggan ?? this.idPelanggan,
+      idPaket: idPaket ?? this.idPaket,
+      tanggalMulai: tanggalMulai ?? this.tanggalMulai,
+      tanggalBerakhir: tanggalBerakhir ?? this.tanggalBerakhir,
+      status: status ?? this.status,
+      syncStatus: syncStatus ?? this.syncStatus,
+      diperbarui: diperbarui ?? this.diperbarui,
+      statusSinkronisasi: statusSinkronisasi ?? this.statusSinkronisasi,
+    );
+  }
+
   factory PelangganAktif.fromMap(Map<String, dynamic> map) {
     return PelangganAktif(
       id: map['id'],
@@ -51,7 +73,6 @@ class PelangganAktif {
     );
   }
 
-  // Konversi dari objek ke Map
   Map<String, dynamic> toMap() {
     return {
       'id': id,
