@@ -235,7 +235,10 @@ class DompetCard extends StatelessWidget {
         ),
         subtitle: Text(
           'Saldo: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(dompet.saldo)}',
-          style: const TextStyle(fontSize: 16, color: Colors.black54),
+          style: TextStyle(
+            fontSize: 16,
+            color: dompet.saldo < 0 ? Colors.red : Colors.black54,
+          ),
         ),
         onTap: onTap,
       ),
