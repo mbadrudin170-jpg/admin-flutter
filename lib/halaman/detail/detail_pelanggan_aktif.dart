@@ -119,7 +119,7 @@ class _DetailPelangganAktifState extends State<DetailPelangganAktif> {
     if (result == true) {
       final operasi = PelangganAktifOperasi();
       final updatedPelangganAktif = await operasi.ambilSatuPelangganAktif(
-        _pelangganAktif.id!,
+        _pelangganAktif.id,
       );
       if (mounted && updatedPelangganAktif != null) {
         setState(() {

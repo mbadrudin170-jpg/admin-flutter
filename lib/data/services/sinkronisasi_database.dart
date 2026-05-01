@@ -266,7 +266,7 @@ class SinkronisasiDatabase {
     final sekarang = DateTime.now();
 
     for (var p in semuaPelangganAktif) {
-      if (p.id == null) continue;
+      // if (p.id == null) continue;
 
       final dataPelanggan = await pelangganOperasi.getPelangganById(
         p.idPelanggan,

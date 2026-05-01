@@ -5,6 +5,7 @@ import 'dart:developer' as developer;
 import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
+import 'package:admin_wifi/model/enum/sync_status.dart';
 import 'package:admin_wifi/model/paket_model.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
 import 'package:admin_wifi/model/pelanggan_model.dart';
@@ -192,6 +193,7 @@ class _FormPelangganAktifState extends State<FormPelangganAktif> {
           tanggalMulai: tanggalMulai,
           tanggalBerakhir: tanggalBerakhir,
           status: _statusPembayaran,
+          syncStatus: SyncStatus.write,
         );
 
         try {

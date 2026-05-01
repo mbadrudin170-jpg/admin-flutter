@@ -36,7 +36,7 @@ class RiwayatLanggananModel {
   }) : id = id ?? const Uuid().v4();
 
   factory RiwayatLanggananModel.fromMap(Map<String, dynamic> map) {
-    DateTime? _parseDateTime(dynamic dateValue) {
+    DateTime? parseDateTime(dynamic dateValue) {
       if (dateValue == null) return null;
       if (dateValue is Timestamp) return dateValue.toDate();
       if (dateValue is String) return DateTime.tryParse(dateValue);
@@ -51,15 +51,15 @@ class RiwayatLanggananModel {
       hargaPaket: (map['harga_paket'] as num? ?? 0).toInt(),
       durasiPaket: (map['durasi_paket'] as num? ?? 0).toInt(),
       tipeDurasiPaket: map['tipe_durasi_paket'] ?? 'hari',
-      tanggalMulai: _parseDateTime(map['tanggal_mulai']) ?? DateTime.now(),
+      tanggalMulai: parseDateTime(map['tanggal_mulai']) ?? DateTime.now(),
       tanggalBerakhir:
-          _parseDateTime(map['tanggal_berakhir']) ?? DateTime.now(),
+          parseDateTime(map['tanggal_berakhir']) ?? DateTime.now(),
       status: StatusPembayaran.values.firstWhere(
         (e) => e.name == map['status'],
         orElse: () => StatusPembayaran.lunas,
       ),
-      diperbarui: _parseDateTime(map['diperbarui']),
-      diarsipkan: _parseDateTime(map['diarsipkan']),
+      diperbarui: parseDateTime(map['diperbarui']),
+      diarsipkan: parseDateTime(map['diarsipkan']),
     );
   }
 

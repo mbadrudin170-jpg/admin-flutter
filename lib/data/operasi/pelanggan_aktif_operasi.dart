@@ -1,6 +1,6 @@
-
-// path: lib/data/operasi/pelanggan_aktif_operasi.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sqflite/sqflite.dart';
+import 'dart:developer' as developer;
 
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
@@ -22,7 +22,7 @@ class PelangganAktifOperasi {
       data,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    
+
     // Jadwalkan notifikasi & kirim rincian paket
     await _jadwalkanNotifikasi(pelangganAktif);
     await PesanInfoPaket.kirimRincianPaket(pelangganAktif); // <- DITAMBAHKAN
@@ -62,7 +62,7 @@ class PelangganAktifOperasi {
       where: 'id = ?',
       whereArgs: [pelangganAktif.id],
     );
-    
+
     // Jadwalkan notifikasi & kirim rincian paket
     await _jadwalkanNotifikasi(pelangganAktif);
     await PesanInfoPaket.kirimRincianPaket(pelangganAktif); // <- DITAMBAHKAN
@@ -88,9 +88,27 @@ class PelangganAktifOperasi {
   }
 
   Future<void> hapusPelangganAktif(String id) async {
-    final db = await dbHelper.database;
-    await db.delete('pelanggan_aktif', where: 'id = ?', whereArgs: [id]);
-    await _notifikasiServis.batalNotifikasi(id.hashCode);
+    try {
+      final db = await dbHelper.database;
+      // Hapus dari SQLite
+      await db.delete('pelanggan_aktif', where: 'id = ?', whereArgs: [id]);
+
+      // Hapus dari Firebase
+      await FirebaseFirestore.instance
+          .collection('pelanggan_aktif')
+          .doc(id)
+          .delete();
+
+      // Batalkan notifikasi
+      await _notifikasiServis.batalNotifikasi(id.hashCode);
+
+      developer.log(
+        '✅ Berhasil menghapus pelanggan aktif dengan ID: $id dari lokal dan Firebase',
+      );
+    } catch (e) {
+      developer.log('❌ Gagal menghapus pelanggan aktif: $e');
+      rethrow; // Melempar ulang error untuk ditangani di lapisan atas
+    }
   }
 
   Future<void> hapusSemuaPelangganAktif() async {

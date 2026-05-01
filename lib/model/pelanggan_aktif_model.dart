@@ -1,16 +1,18 @@
 // lib/model/pelanggan_aktif_model.dart
 // File ini mendefinisikan model data untuk PelangganAktif, termasuk atribut dan metode untuk konversi data.
 
+import 'package:admin_wifi/model/enum/sync_status.dart';
 import 'package:uuid/uuid.dart';
 import 'enum/status_pembayaran.dart'; // Mengimpor enum terpusat
 
 class PelangganAktif {
-  final String? id;
+  final String id;
   final String idPelanggan;
   final String idPaket;
   final DateTime tanggalMulai;
   final DateTime tanggalBerakhir;
   final StatusPembayaran status;
+  final SyncStatus syncStatus;
   final DateTime? diperbarui;
   final String statusSinkronisasi;
 
@@ -21,8 +23,9 @@ class PelangganAktif {
     required this.tanggalMulai,
     required this.tanggalBerakhir,
     required this.status,
+    required this.syncStatus,
     this.diperbarui,
-    this.statusSinkronisasi = 'SINKRON', // Default value
+    this.statusSinkronisasi = 'SINKRON',
   }) : id = id ?? const Uuid().v4();
 
   // Konversi dari Map ke objek
@@ -36,6 +39,10 @@ class PelangganAktif {
       status: StatusPembayaran.values.firstWhere(
         (e) => e.name == map['status'],
         orElse: () => StatusPembayaran.lunas,
+      ),
+      syncStatus: SyncStatus.values.firstWhere(
+        (e) => e.name == (map['sync_status'] ?? 'synced'),
+        orElse: () => SyncStatus.synced,
       ),
       diperbarui: map['diperbarui'] != null
           ? DateTime.parse(map['diperbarui'])
@@ -53,6 +60,7 @@ class PelangganAktif {
       'tanggalMulai': tanggalMulai.toIso8601String(),
       'tanggalBerakhir': tanggalBerakhir.toIso8601String(),
       'status': status.name,
+      'sync_status': syncStatus.name,
       'diperbarui': diperbarui?.toIso8601String(),
       'status_sinkronisasi': statusSinkronisasi,
     };

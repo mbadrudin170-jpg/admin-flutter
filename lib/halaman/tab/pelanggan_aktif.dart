@@ -3,7 +3,7 @@
 
 import 'package:admin_wifi/data/operasi/paket_operasi.dart';
 import 'package:admin_wifi/data/operasi/riwayat_langganan_operasi.dart';
-import 'package:admin_wifi/data/repositori/pelanggan_aktif_repositori.dart';
+// import 'package:admin_wifi/data/repositori/pelanggan_aktif_repositori.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:admin_wifi/model/riwayat_langganan_model.dart';
 import 'package:admin_wifi/model/enum/status_pembayaran.dart';
@@ -43,8 +43,8 @@ class PelangganAktifPage extends StatefulWidget {
 class _PelangganAktifPageState extends State<PelangganAktifPage> {
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
   final PelangganOperasi _pelangganOperasi = PelangganOperasi();
-  final PelangganAktifRepositori _pelangganAktifRepositori =
-      PelangganAktifRepositori();
+  // final PelangganAktifRepositori _pelangganAktifRepositori =
+  //     PelangganAktifRepositori();
   final NotifikasiServis _notifikasiServis = NotifikasiServis();
   final RiwayatLanggananOperasi _riwayatLanggananOperasi =
       RiwayatLanggananOperasi();
@@ -78,58 +78,58 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     _applyFilterAndSort();
   }
 
-  Future<void> _unggahKeFirebase() async {
-    final isOnline = await KoneksiInternetService.cekKoneksi();
-    if (!mounted) return;
-    if (!isOnline) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Tidak ada koneksi internet untuk mengunggah data.'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
+  // Future<void> _unggahKeFirebase() async {
+  //   final isOnline = await KoneksiInternetService.cekKoneksi();
+  //   if (!mounted) return;
+  //   if (!isOnline) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Tidak ada koneksi internet untuk mengunggah data.'),
+  //         backgroundColor: Colors.orange,
+  //       ),
+  //     );
+  //     return;
+  //   }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Memulai proses unggah ke Firebase...'),
-        backgroundColor: Colors.blue,
-      ),
-    );
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(
+  //       content: Text('Memulai proses unggah ke Firebase...'),
+  //       backgroundColor: Colors.blue,
+  //     ),
+  //   );
 
-    try {
-      final semuaPelangganLokal = await _pelangganAktifOperasi
-          .ambilSemuaPelangganAktif();
+  //   try {
+  //     final semuaPelangganLokal = await _pelangganAktifOperasi
+  //         .ambilSemuaPelangganAktif();
 
-      if (!mounted) return;
-      if (semuaPelangganLokal.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Tidak ada data lokal untuk diunggah.')),
-        );
-        return;
-      }
-      for (final pelanggan in semuaPelangganLokal) {
-        await _pelangganAktifRepositori.simpanPelangganAktif(pelanggan);
-      }
+  //     if (!mounted) return;
+  //     if (semuaPelangganLokal.isEmpty) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Tidak ada data lokal untuk diunggah.')),
+  //       );
+  //       return;
+  //     }
+  //     for (final pelanggan in semuaPelangganLokal) {
+  //       await _pelangganAktifRepositori.simpanPelangganAktif(pelanggan);
+  //     }
 
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Semua data berhasil diunggah ke Firebase.'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal mengunggah data: $e'),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
-      );
-    }
-  }
+  //     if (!mounted) return;
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Semua data berhasil diunggah ke Firebase.'),
+  //         backgroundColor: Colors.green,
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     if (!mounted) return;
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Gagal mengunggah data: $e'),
+  //         backgroundColor: Theme.of(context).colorScheme.error,
+  //       ),
+  //     );
+  //   }
+  // }
 
   Future<void> _loadData({bool forceRefresh = false}) async {
     if (!mounted) return;
@@ -245,8 +245,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     final sekarang = DateTime.now();
 
     for (var p in pelanggan) {
-      if (p.id == null) continue;
-
       final namaPelanggan = _mapNamaPelanggan[p.idPelanggan] ?? 'Pelanggan';
       final tigaHariSebelumKadaluarsa = p.tanggalBerakhir.subtract(
         const Duration(days: 3),
@@ -277,7 +275,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   }
 
   Future<void> _hapusPelangganAktif(PelangganAktif pelangganAktif) async {
-    if (pelangganAktif.id == null) return;
+    // if (pelangganAktif.id == null) return;
 
     final bool? konfirmasi = await showDialog<bool>(
       context: context,
@@ -330,7 +328,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         }
         // 1. Buat entri riwayat dari pelanggan yang akan dihapus
         final riwayat = RiwayatLanggananModel(
-          id: pelangganAktif.id!,
+          id: pelangganAktif.id,
           idPelanggan: pelangganAktif.idPelanggan,
           idPaket: pelangganAktif.idPaket,
           namaPaket: paket.nama,
@@ -355,27 +353,27 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           (pelangganAktif.id.hashCode.abs() + 2),
         );
 
-        // 4. Hapus dari Firebase jika online
-        final isOnline = await KoneksiInternetService.cekKoneksi();
-        if (isOnline) {
-          await _pelangganAktifRepositori.hapusPelangganAktif(
-            pelangganAktif.id!,
-          );
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Mode offline: Data akan dihapus dari server saat online.',
-                ),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          }
-        }
+        // // 4. Hapus dari Firebase jika online
+        // final isOnline = await KoneksiInternetService.cekKoneksi();
+        // if (isOnline) {
+        //   // await _pelangganAktifRepositori.hapusPelangganAktif(
+        //     pelangganAktif.id!,
+        //   );
+        // } else {
+        //   if (mounted) {
+        //     ScaffoldMessenger.of(context).showSnackBar(
+        //       const SnackBar(
+        //         content: Text(
+        //           'Mode offline: Data akan dihapus dari server saat online.',
+        //         ),
+        //         backgroundColor: Colors.orange,
+        //       ),
+        //     );
+        //   }
+        // }
 
         // 5. Hapus dari database lokal
-        await _pelangganAktifOperasi.hapusPelangganAktif(pelangganAktif.id!);
+        await _pelangganAktifOperasi.hapusPelangganAktif(pelangganAktif.id);
 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -525,18 +523,18 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         );
 
         if (konfirmasi == true) {
-          final isOnline = await KoneksiInternetService.cekKoneksi();
-          if (isOnline) {
-            final semuaPelanggan = await _pelangganAktifOperasi
-                .ambilSemuaPelangganAktif();
-            for (var pelanggan in semuaPelanggan) {
-              if (pelanggan.id != null) {
-                await _pelangganAktifRepositori.hapusPelangganAktif(
-                  pelanggan.id!,
-                );
-              }
-            }
-          }
+          // final isOnline = await KoneksiInternetService.cekKoneksi();
+          // if (isOnline) {
+          //   final semuaPelanggan = await _pelangganAktifOperasi
+          //       .ambilSemuaPelangganAktif();
+          //   for (var pelanggan in semuaPelanggan) {
+          //     if (pelanggan.id != null) {
+          //       await _pelangganAktifRepositori.hapusPelangganAktif(
+          //         pelanggan.id!,
+          //       );
+          //     }
+          //   }
+          // }
           await _pelangganAktifOperasi.hapusSemuaPelangganAktif();
           _loadData(forceRefresh: true);
         }
@@ -544,19 +542,19 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       case OpsiHapusPilihan.hapusKadaluarsa:
         final isOnline = await KoneksiInternetService.cekKoneksi();
         if (isOnline) {
-          final semuaPelanggan = await _pelangganAktifOperasi
-              .ambilSemuaPelangganAktif();
-          final sekarang = DateTime.now();
-          final pelangganKadaluarsa = semuaPelanggan
-              .where((p) => p.tanggalBerakhir.isBefore(sekarang))
-              .toList();
-          for (var pelanggan in pelangganKadaluarsa) {
-            if (pelanggan.id != null) {
-              await _pelangganAktifRepositori.hapusPelangganAktif(
-                pelanggan.id!,
-              );
-            }
-          }
+          // final semuaPelanggan = await _pelangganAktifOperasi
+          //     .ambilSemuaPelangganAktif();
+          // final sekarang = DateTime.now();
+          // // final pelangganKadaluarsa = semuaPelanggan
+          //     .where((p) => p.tanggalBerakhir.isBefore(sekarang))
+          //     .toList();
+          // // for (var pelanggan in pelangganKadaluarsa) {
+          //   // if (pelanggan.id != null) {
+          //   //   await _pelangganAktifRepositori.hapusPelangganAktif(
+          //   //     pelanggan.id!,
+          //   //   );
+          //   // }
+          // }
         }
         final int jumlahDihapus = await _pelangganAktifOperasi
             .hapusPelangganKadaluarsa();
@@ -662,78 +660,79 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
           ? const Center(child: Text('Tidak ada pelanggan aktif ditemukan.'))
           : _hasilFilter.isEmpty && _searchController.text.isNotEmpty
           ? const Center(child: Text('Pelanggan tidak ditemukan.'))
-          : RefreshIndicator(
-              onRefresh: () => _unggahKeFirebase(),
-              child: ListView.builder(
-                itemCount: _hasilFilter.length,
-                itemBuilder: (context, index) {
-                  final pelanggan = _hasilFilter[index];
-                  final statusPembayaranText = pelanggan.status.displayName;
-                  final statusPembayaranColor =
-                      pelanggan.status == StatusPembayaran.lunas
-                      ? Colors.green
-                      : Colors.red;
+          //  : RefreshIndicator(
+          //     // onRefresh: () => _unggahKeFirebase(),
+          //     child:
+          : ListView.builder(
+              itemCount: _hasilFilter.length,
+              itemBuilder: (context, index) {
+                final pelanggan = _hasilFilter[index];
+                final statusPembayaranText = pelanggan.status.displayName;
+                final statusPembayaranColor =
+                    pelanggan.status == StatusPembayaran.lunas
+                    ? Colors.green
+                    : Colors.red;
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 7,
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onLongPress: () {
-                        _hapusPelangganAktif(pelanggan);
-                      },
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                DetailPelangganAktif(pelanggan: pelanggan),
-                          ),
-                        );
-                        _loadData(forceRefresh: true);
-                      },
-                      child: ListTile(
-                        title: NamaPelangganWidget(
-                          idPelanggan: pelanggan.idPelanggan,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                return Card(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 7,
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onLongPress: () {
+                      _hapusPelangganAktif(pelanggan);
+                    },
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DetailPelangganAktif(pelanggan: pelanggan),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            NamaPaketWidget(idPaket: pelanggan.idPaket),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Pembayaran: $statusPembayaranText',
-                              style: TextStyle(
-                                color: statusPembayaranColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Status: ${PerhitunganUtil.getTeksSisaMasaAktif(pelanggan.tanggalBerakhir)}',
-                              style: TextStyle(
-                                color: PerhitunganUtil.getWarnaSisaMasaAktif(
-                                  pelanggan.tanggalBerakhir,
-                                ),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Berakhir: ${FormatTanggal.formatTanggalBasic(pelanggan.tanggalBerakhir)} ${FormatJam.formatJamMenit(pelanggan.tanggalBerakhir)}',
-                            ),
-                          ],
-                        ),
-                        trailing: const Icon(Icons.chevron_right),
+                      );
+                      _loadData(forceRefresh: true);
+                    },
+                    child: ListTile(
+                      title: NamaPelangganWidget(
+                        idPelanggan: pelanggan.idPelanggan,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          NamaPaketWidget(idPaket: pelanggan.idPaket),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Pembayaran: $statusPembayaranText',
+                            style: TextStyle(
+                              color: statusPembayaranColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Status: ${PerhitunganUtil.getTeksSisaMasaAktif(pelanggan.tanggalBerakhir)}',
+                            style: TextStyle(
+                              color: PerhitunganUtil.getWarnaSisaMasaAktif(
+                                pelanggan.tanggalBerakhir,
+                              ),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Berakhir: ${FormatTanggal.formatTanggalBasic(pelanggan.tanggalBerakhir)} ${FormatJam.formatJamMenit(pelanggan.tanggalBerakhir)}',
+                          ),
+                        ],
+                      ),
+                      trailing: const Icon(Icons.chevron_right),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
+      // ),
       floatingActionButton: FloatingActionButton(
         onPressed: _tambahPelangganAktif,
         child: const Icon(Icons.add),
