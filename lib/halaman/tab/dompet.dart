@@ -3,6 +3,7 @@
 // dan daftar semua dompet yang tersedia. Pengguna dapat menambahkan dompet baru melalui
 // tombol floating action.
 
+import 'package:admin_wifi/utils/format_util.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:admin_wifi/data/operasi/dompet_operasi.dart';
@@ -183,26 +184,17 @@ class _RingkasanKeuanganState extends State<RingkasanKeuangan> {
     );
   }
 
-  Widget _buildInfo(String label, double amount, Color color) {
+  Widget _buildInfo(String label, double jumlah, Color warna) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 4),
         Text(
-          label,
-          style: const TextStyle(fontSize: 16, color: Colors.black54),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          NumberFormat.currency(
-            locale: 'id_ID',
-            symbol: 'Rp ',
-            decimalDigits: 0,
-          ).format(amount),
+          FormatUang.formatMataUang(jumlah),
           style: TextStyle(
-            fontSize: 20,
+            color: warna,
             fontWeight: FontWeight.bold,
-            color: color,
+            fontSize: 16,
           ),
         ),
       ],
