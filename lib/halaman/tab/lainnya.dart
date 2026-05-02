@@ -75,24 +75,22 @@ class _LainnyaTabState extends State<LainnyaPage> {
               title: 'Kritik & Saran',
               icon: Icons.feedback,
               onTap: () async {
+                // diubah: Ambil navigator sebelum operasi async
+                final navigator = Navigator.of(context);
+
                 // 1. Unduh data dari Firebase
                 final dataFromFirebase =
                     await KritikSaranOperasi.unduhDataDariFirebase();
 
-                // diubah/ditambah: periksa mounted setelah operasi async
-                if (!mounted) return;
-
-                // 2. Simpan data ke database lokal
+                // 2. Simpan data ke database lokal (jika ada)
                 if (dataFromFirebase.isNotEmpty) {
                   final operasi = KritikSaranOperasi();
                   await operasi.sisipkanAtauPerbaruiBatch(dataFromFirebase);
-                  // diubah/ditambah: periksa mounted setelah operasi async kedua
-                  if (!mounted) return;
                 }
 
-                // 3. Navigasi ke halaman setelah data disinkronkan
-                Navigator.push(
-                  context,
+                // 3. Setelah semua selesai, periksa mounted dan navigasi
+                if (!mounted) return;
+                await navigator.push(
                   MaterialPageRoute(
                       builder: (context) => const KritikSaranPage()),
                 );

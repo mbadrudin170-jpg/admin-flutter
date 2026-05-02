@@ -233,7 +233,7 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 **Fitur:** Pusat Pengaturan dan Navigasi. Halaman ini berfungsi sebagai hub untuk mengakses berbagai halaman manajemen lainnya.
 **Daftar Fungsi:**
 *   `_buildNavigationButton(...)`: Fungsi pembantu untuk membuat tombol navigasi yang konsisten.
-**Catatan:** Tombol "Kritik & Saran" pada halaman ini telah diperbarui. Saat diketuk, aplikasi akan terlebih dahulu mengunduh data dari Firebase, menyimpannya ke database lokal, baru kemudian menavigasi ke halaman `KritikSaranPage`. Ini memastikan data yang ditampilkan selalu yang terbaru.
+**Catatan:** Tombol "Kritik & Saran" pada halaman ini telah diperbarui. Saat diketuk, aplikasi akan terlebih dahulu mengunduh data dari Firebase, menyimpannya ke database lokal, baru kemudian menavigasi ke halaman `KritikSaranPage`. Ini memastikan data yang ditampilkan selalu yang terbaru. Telah ditambahkan pengecekan `mounted` untuk mencegah *error* saat navigasi setelah operasi *async*.
 **Rules:** Penambahan halaman manajemen baru harus disertai dengan penambahan tombol navigasi di file ini menggunakan `_buildNavigationButton` untuk menjaga konsistensi UI.
 
 ---
@@ -278,13 +278,12 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
-### Folder: lib/halaman/lainnya/
 **File:** `lib/halaman/lainnya/tentang_aplikasi.dart`
 **Fitur:** Menampilkan Informasi Detail Aplikasi
 **Daftar Fungsi:**
 - `_initInfo()`: Mengambil informasi paket (versi, build number) dan informasi perangkat (arsitektur CPU, versi Android) secara asynchronous.
 - `_buildInfoRow(String label, String value)`: Widget helper untuk membangun setiap baris informasi teknis agar konsisten.
-**Catatan:** Halaman ini telah diperbarui untuk menampilkan informasi teknis yang lebih lengkap seperti nomor build, minimal versi OS Android, dan arsitektur perangkat. Tampilan juga diubah menggunakan `ListView` agar konten tidak terpotong pada layar kecil.
+**Catatan:** Halaman ini menampilkan informasi teknis yang lebih lengkap seperti nomor build, minimal versi OS Android, dan arsitektur perangkat. Nilai minimal OS saat ini diatur secara manual ke 'Android 5.0 (Lollipop)' karena pengambilan data `minSdkVersion` dari `build.gradle` secara dinamis memerlukan implementasi *platform channel* yang kompleks. Tampilan juga diubah menggunakan `ListView` agar konten tidak terpotong pada layar kecil.
 **Rules:**
 - Selalu gunakan widget `_buildInfoRow` untuk menambahkan informasi teknis baru agar tata letak tetap rapi dan seragam.
 

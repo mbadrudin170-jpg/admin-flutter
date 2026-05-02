@@ -1,4 +1,3 @@
-
 // lib/splash_screen.dart
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
@@ -67,15 +66,16 @@ class _SplashScreenState extends State<SplashScreen> {
         setState(() => _loadingMessage = "Memeriksa & sinkronisasi data...");
         await InisialisasiDataService().inisialisasiDataAplikasi();
       } else {
-         setState(() => _loadingMessage = "Mode offline, melewati sinkronisasi...");
+        setState(
+          () => _loadingMessage = "Mode offline, melewati sinkronisasi...",
+        );
       }
 
       setState(() => _loadingMessage = "Selesai, membuka aplikasi...");
       await Future.delayed(const Duration(milliseconds: 250));
-
     } catch (e) {
-        debugPrint("Error saat inisialisasi: $e");
-         setState(() => _loadingMessage = "Terjadi error, tetap mencoba...");
+      debugPrint("Error saat inisialisasi: $e");
+      setState(() => _loadingMessage = "Terjadi error, tetap mencoba...");
     }
 
     // 5. Navigasi
@@ -89,7 +89,9 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!isOnline) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Anda dalam mode offline. Data mungkin tidak terbaru.'),
+            content: Text(
+              'Anda dalam mode offline. Data mungkin tidak terbaru.',
+            ),
             backgroundColor: Colors.orange,
           ),
         );
@@ -108,7 +110,11 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 24),
             const Text(
               'Admin WiFi',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, fontFamily: 'Oswald'),
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Roboto',
+              ),
             ),
             const SizedBox(height: 40),
             const CircularProgressIndicator(),
