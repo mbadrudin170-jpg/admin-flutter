@@ -1,41 +1,17 @@
 
 // lib/main.dart
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
-import 'package:admin_wifi/data/services/navigasi_servis.dart';
-import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:intl/date_symbol_data_local.dart';
-import 'firebase_options.dart';
-import 'package:admin_wifi/data/sqlite.dart';
+import 'package:admin_wifi/data/services/navigasi_servis.dart';
 import 'package:admin_wifi/splash_screen.dart';
+import 'firebase_options.dart';
 
 void main() async {
+  // Hanya inisialisasi yang paling krusial sebelum runApp
   WidgetsFlutterBinding.ensureInitialized();
-
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-
-    tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
-
-    final notifikasiServis = NotifikasiServis();
-    await notifikasiServis.inisialisasi();
-    await notifikasiServis.requestPermissions();
-
-    await initializeDateFormatting('id_ID', null);
-
-    // Pastikan database diinisialisasi
-    final dbHelper = DatabaseHelper.instance;
-    await dbHelper.database;
-
-  } catch (e) {
-    debugPrint("Terjadi kesalahan saat inisialisasi: $e");
-  }
-
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -46,7 +22,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color primarySeedColor = Colors.deepPurple;
 
-    // [PERBAIKAN] Kembali menggunakan font lokal yang didefinisikan di pubspec.yaml
     final TextTheme appTextTheme = const TextTheme(
       displayLarge: TextStyle(fontFamily: 'Oswald', fontSize: 57, fontWeight: FontWeight.bold),
       titleLarge: TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w500),
