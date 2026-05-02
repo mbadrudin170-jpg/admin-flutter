@@ -1,15 +1,70 @@
-// lib/halaman/tab/transaksi.dart
-// Halaman ini menampilkan daftar semua transaksi, dikelompokkan berdasarkan tanggal.
-// Ini juga mencakup ringkasan total pemasukan, pengeluaran, dan transfer.
-// Pengguna dapat menambahkan transaksi baru melalui tombol floating action.
+// path : lib/halaman/tab/transaksi.dart
+// Halaman ini menampilkan daftar semua transaksi dan ringkasannya.
+// Data diambil secara terpusat dan diteruskan ke widget yang relevan.
 
 import 'package:admin_wifi/utils/format_util.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
 import 'package:admin_wifi/halaman/form/form_transaksi.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
-
 import '../detail/detail_transaksi.dart';
+
+// diubah: RingkasanTransaksi sekarang menjadi StatelessWidget yang hanya menerima data.
+class RingkasanTransaksi extends StatelessWidget {
+  final double pemasukan;
+  final double pengeluaran;
+  final double total;
+
+  const RingkasanTransaksi({
+    super.key,
+    required this.pemasukan,
+    required this.pengeluaran,
+    required this.total,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildInfo(context, 'Pemasukan', pemasukan, Colors.green),
+            _buildInfo(context, 'Pengeluaran', pengeluaran, Colors.red),
+            _buildInfo(
+              context,
+              'Total',
+              total,
+              total >= 0 ? Colors.blue : Colors.red,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // untuk membangun tampilan info ringkasan
+  Widget _buildInfo(
+      BuildContext context, String label, double jumlah, Color warna) {
+    return Column(
+      children: [
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: 4),
+        Text(
+          FormatUang.formatMataUang(jumlah),
+          style: TextStyle(
+            color: warna,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 class TransaksiPage extends StatefulWidget {
   const TransaksiPage({super.key});
@@ -20,29 +75,46 @@ class TransaksiPage extends StatefulWidget {
 
 class _TransaksiPageState extends State<TransaksiPage> {
   final TransaksiOperasi _transaksiOperasi = TransaksiOperasi();
-  late Future<List<TransaksiModel>> _listaTransaksiFuture;
-  final GlobalKey<_RingkasanTransaksiState> _ringkasanKey = GlobalKey();
+  late Future<Map<String, dynamic>> _dataFuture;
 
   @override
   void initState() {
     super.initState();
-    _loadTransaksi();
+    // diubah: Inisialisasi Future secara langsung untuk menghindari LateInitializationError.
+    _dataFuture = _getData();
   }
 
-  void _loadTransaksi() {
+  // diubah: Menggabungkan semua pengambilan data ke dalam satu fungsi.
+  Future<Map<String, dynamic>> _getData() async {
+    final results = await Future.wait([
+      _transaksiOperasi.ambilSemuaTransaksi(),
+      _transaksiOperasi.getTotalPemasukan(),
+      _transaksiOperasi.getTotalPengeluaran(),
+      _transaksiOperasi.getNetTotal(),
+    ]);
+    return {
+      'transaksi': results[0] as List<TransaksiModel>,
+      'pemasukan': results[1] as double,
+      'pengeluaran': results[2] as double,
+      'total': results[3] as double,
+    };
+  }
+
+  // untuk memuat atau memuat ulang semua data dengan setState untuk memicu rebuild.
+  void _loadData() {
     setState(() {
-      _listaTransaksiFuture = _transaksiOperasi.ambilSemuaTransaksi();
-      _ringkasanKey.currentState?.refresh();
+      _dataFuture = _getData();
     });
   }
 
+  // untuk menavigasi ke halaman tambah transaksi dan memuat ulang data jika berhasil.
   void _tambahTransaksi() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const FormTransaksiPage()),
     );
     if (result == true) {
-      _loadTransaksi();
+      _loadData();
     }
   }
 
@@ -50,55 +122,42 @@ class _TransaksiPageState extends State<TransaksiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Transaksi')),
-      body: Column(
-        children: [
-          RingkasanTransaksi(key: _ringkasanKey),
-          Expanded(
-            child: FutureBuilder<List<TransaksiModel>>(
-              future: _listaTransaksiFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text('Tidak ada transaksi ditemukan.'),
-                  );
-                } else {
-                  final transaksiData = snapshot.data!;
-                  final groupedTransaksi = _groupTransaksiByDate(transaksiData);
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _dataFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text('Tidak ada data ditemukan.'));
+          }
 
-                  return ListView.builder(
-                    itemCount: groupedTransaksi.length,
-                    itemBuilder: (context, index) {
-                      final tanggal = groupedTransaksi.keys.elementAt(index);
-                      final transaksiPadaTanggal = groupedTransaksi[tanggal]!;
-                      final totalPadaTanggal = transaksiPadaTanggal.fold(
-                        0.0,
-                        (sum, item) =>
-                            sum +
-                            (item.tipe == TipeTransaksi.pemasukan
-                                ? item.jumlah
-                                : -item.jumlah),
-                      );
+          final data = snapshot.data!;
+          final pemasukan = data['pemasukan'] ?? 0.0;
+          final pengeluaran = data['pengeluaran'] ?? 0.0;
+          final total = data['total'] ?? 0.0;
+          final transaksiData = data['transaksi'] as List<TransaksiModel>;
 
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _bangunHeaderSeksi(tanggal, totalPadaTanggal),
-                          ...transaksiPadaTanggal.map(
-                            (transaksi) => _bangunItemTransaksi(transaksi),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              },
-            ),
-          ),
-        ],
+          return Column(
+            children: [
+              RingkasanTransaksi(
+                pemasukan: pemasukan,
+                pengeluaran: pengeluaran,
+                total: total,
+              ),
+              Expanded(
+                child: transaksiData.isEmpty
+                    ? const Center(
+                        child: Text('Tidak ada transaksi ditemukan.'),
+                      )
+                    : _buildTransaksiList(transaksiData),
+              ),
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _tambahTransaksi,
@@ -107,6 +166,38 @@ class _TransaksiPageState extends State<TransaksiPage> {
     );
   }
 
+  // untuk membangun daftar transaksi yang dikelompokkan berdasarkan tanggal.
+  Widget _buildTransaksiList(List<TransaksiModel> transaksiData) {
+    final groupedTransaksi = _groupTransaksiByDate(transaksiData);
+
+    return ListView.builder(
+      itemCount: groupedTransaksi.length,
+      itemBuilder: (context, index) {
+        final tanggal = groupedTransaksi.keys.elementAt(index);
+        final transaksiPadaTanggal = groupedTransaksi[tanggal]!;
+        final totalPadaTanggal = transaksiPadaTanggal.fold(
+          0.0,
+          (sum, item) =>
+              sum +
+              (item.tipe == TipeTransaksi.pemasukan
+                  ? item.jumlah
+                  : -item.jumlah),
+        );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _bangunHeaderSeksi(tanggal, totalPadaTanggal),
+            ...transaksiPadaTanggal.map(
+              (transaksi) => _bangunItemTransaksi(transaksi),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // untuk membangun header seksi per tanggal
   Widget _bangunHeaderSeksi(DateTime tanggal, double total) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -129,6 +220,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
     );
   }
 
+  // untuk membangun satu item dalam daftar transaksi
   Widget _bangunItemTransaksi(TransaksiModel transaksi) {
     IconData iconData;
     Color iconColor;
@@ -149,10 +241,10 @@ class _TransaksiPageState extends State<TransaksiPage> {
             MaterialPageRoute(
               builder: (context) => DetailTransaksiPage(transaksi: transaksi),
             ),
-          ).then((_) => _loadTransaksi());
+          ).then((_) => _loadData());
         },
         leading: CircleAvatar(
-          backgroundColor: iconColor.withAlpha(25), // Perbaikan di sini
+          backgroundColor: iconColor.withAlpha(25),
           child: Icon(iconData, color: iconColor),
         ),
         title: Text(
@@ -176,6 +268,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
     );
   }
 
+  // untuk mengelompokkan transaksi berdasarkan tanggal
   Map<DateTime, List<TransaksiModel>> _groupTransaksiByDate(
     List<TransaksiModel> transaksi,
   ) {
@@ -188,102 +281,5 @@ class _TransaksiPageState extends State<TransaksiPage> {
       grouped[date]!.add(t);
     }
     return grouped;
-  }
-}
-
-class RingkasanTransaksi extends StatefulWidget {
-  const RingkasanTransaksi({super.key});
-
-  @override
-  State<RingkasanTransaksi> createState() => _RingkasanTransaksiState();
-}
-
-class _RingkasanTransaksiState extends State<RingkasanTransaksi> {
-  final TransaksiOperasi _transaksiOperasi = TransaksiOperasi();
-  late Future<Map<String, double>> _summaryFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSummary();
-  }
-
-  void _loadSummary() {
-    _summaryFuture = _getSummaryData();
-  }
-
-  Future<Map<String, double>> _getSummaryData() async {
-    final results = await Future.wait([
-      _transaksiOperasi.getTotalPemasukan(),
-      _transaksiOperasi.getTotalPengeluaran(),
-      _transaksiOperasi.getNetTotal(),
-    ]);
-    return {
-      'pemasukan': results[0],
-      'pengeluaran': results[1],
-      'total': results[2],
-    };
-  }
-
-  void refresh() {
-    setState(() {
-      _loadSummary();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, double>>(
-      future: _summaryFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Padding(
-            padding: EdgeInsets.all(28.0),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        final pemasukan = snapshot.data?['pemasukan'] ?? 0.0;
-        final pengeluaran = snapshot.data?['pengeluaran'] ?? 0.0;
-        final total = snapshot.data?['total'] ?? 0.0;
-
-        return Card(
-          margin: const EdgeInsets.all(8.0),
-          elevation: 2,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildInfo('Pemasukan', pemasukan, Colors.green),
-                _buildInfo('Pengeluaran', pengeluaran, Colors.red),
-                _buildInfo(
-                  'Total',
-                  total,
-                  total >= 0 ? Colors.blue : Colors.red,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildInfo(String label, double jumlah, Color warna) {
-    return Column(
-      children: [
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: 4),
-        Text(
-          FormatUang.formatMataUang(jumlah),
-          style: TextStyle(
-            color: warna,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-      ],
-    );
   }
 }

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 
 // Asumsi TipeTransaksi sudah ada di file lain atau didefinisikan di sini
-enum TipeTransaksi { pemasukan, pengeluaran }
+enum TipeTransaksi { pemasukan, pengeluaran, transfer }
 
 class TransaksiModel {
   final String id;

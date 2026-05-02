@@ -1,4 +1,4 @@
-// lib/data/operasi/transaksi_operasi.dart
+// path : lib/data/operasi/transaksi_operasi.dart
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
 import 'package:sqflite/sqflite.dart';
@@ -56,8 +56,9 @@ class TransaksiOperasi {
   /// Menghitung total dari semua transaksi bertipe 'Pemasukan'.
   Future<double> getTotalPemasukan() async {
     final db = await dbHelper.database;
+    // diubah: Menggunakan 'pemasukan' (huruf kecil) untuk mencocokkan data di database.
     final result = await db.rawQuery(
-      "SELECT SUM(jumlah) as jumlah FROM transaksi WHERE tipe = 'Pemasukan'",
+      "SELECT SUM(jumlah) as jumlah FROM transaksi WHERE tipe = 'pemasukan'",
     );
     if (result.isNotEmpty && result.first['jumlah'] != null) {
       return (result.first['jumlah'] as num).toDouble();
@@ -68,11 +69,11 @@ class TransaksiOperasi {
   /// Menghitung total dari semua transaksi bertipe 'Pengeluaran'.
   Future<double> getTotalPengeluaran() async {
     final db = await dbHelper.database;
+    // diubah: Menggunakan 'pengeluaran' (huruf kecil) untuk mencocokkan data di database.
     final result = await db.rawQuery(
-      "SELECT SUM(jumlah) as total FROM transaksi WHERE tipe = 'Pengeluaran'",
+      "SELECT SUM(jumlah) as jumlah FROM transaksi WHERE tipe = 'pengeluaran'",
     );
     if (result.isNotEmpty && result.first['jumlah'] != null) {
-      // Perbaikan: Menggunakan alias 'total' yang benar
       return (result.first['jumlah'] as num).toDouble();
     }
     return 0.0;
