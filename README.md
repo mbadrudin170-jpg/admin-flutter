@@ -25,6 +25,10 @@ Berdasarkan analisis terhadap struktur dan aturan proyek, berikut adalah beberap
     *   **Saran**: Lakukan audit dependensi secara berkala dengan menjalankan `flutter pub outdated`. Segera perbarui paket yang usang untuk mendapatkan perbaikan bug, peningkatan performa, dan patch keamanan.
     *   **Manfaat**: Mencegah masalah yang disebabkan oleh paket yang tidak lagi didukung dan menjaga keamanan aplikasi dari kerentanan yang diketahui.
 
+6.  **Pencegahan Inkonsistensi Data (Case-Sensitivity)**:
+    *   **Saran**: Bug terakhir yang kita perbaiki disebabkan oleh perbedaan huruf besar/kecil (`'Pemasukan'` vs `'pemasukan'`) antara kode dan database. Untuk mencegah ini, hindari penggunaan string mentah di dalam query. Gunakan *prepared statements* dengan *arguments* yang berasal dari konstanta atau enum. Contoh: `db.rawQuery("... WHERE tipe = ?", [TipeTransaksi.pemasukan.name])`.
+    *   **Manfaat**: Menghilangkan seluruh kelas bug yang sulit dilacak yang disebabkan oleh ketidakkonsistenan data, typo, atau perbedaan *case*. Ini membuat query lebih aman dan dapat diandalkan.
+
 ---
 
 # **Dokumentasi Proyek Aplikasi Admin WiFi**
@@ -54,6 +58,20 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
+**File:** `lib/data/operasi/transaksi_operasi.dart`
+**Fitur:** Operasi CRUD dan Agregasi untuk Entitas Transaksi
+**Daftar Fungsi:**
+- `tambahTransaksi(TransaksiModel transaksi)`: Menyimpan transaksi baru.
+- `ambilSemuaTransaksi()`: Mengambil seluruh daftar transaksi.
+- `updateTransaksi(TransaksiModel transaksi)`: Memperbarui transaksi yang ada.
+- `deleteTransaksi(String id)`: Menghapus transaksi.
+- `getTotalPemasukan()`: Menghitung total pemasukan. Telah diperbaiki untuk menangani *case-sensitivity* dengan mencari `tipe = 'pemasukan'`.
+- `getTotalPengeluaran()`: Menghitung total pengeluaran. Telah diperbaiki untuk mencari `tipe = 'pengeluaran'`.
+- `getNetTotal()`: Menghitung selisih bersih antara pemasukan dan pengeluaran.
+**Catatan:** File ini adalah pusat logika untuk semua interaksi dengan tabel `transaksi`. Perbaikan krusial telah dilakukan pada fungsi agregasi (`getTotal...`) untuk memastikan perhitungan saldo yang akurat dengan mencocokkan string *case-sensitive* (`'pemasukan'`, `'pengeluaran'`) yang disimpan di database.
+**Rules:** Gunakan kelas ini untuk semua operasi data transaksi guna memastikan konsistensi dan akurasi perhitungan.
+
+---
 
 ## **Folder: lib/data**
 
@@ -196,10 +214,11 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 **File:** `lib/halaman/tab/transaksi.dart`
 **Fitur:** Riwayat dan Ringkasan Transaksi
 **Daftar Fungsi:**
-*   `_loadTransaksi()`: Memuat semua data transaksi dari database.
-*   `_groupTransaksiByDate(...)`: Mengelompokkan transaksi berdasarkan tanggal untuk tampilan.
-*   `_bangunRingkasan(...)`: Menghitung dan menampilkan total pemasukan, pengeluaran, dan transfer.
-**Catatan:** Halaman ini memberikan gambaran keuangan secara kronologis.
+- `_getData()`: Fungsi terpusat baru yang mengambil semua data (daftar transaksi, total pemasukan, pengeluaran, dan saldo bersih) secara efisien menggunakan `Future.wait`.
+- `_loadData()`: Memuat ulang semua data dengan memanggil ulang `_getData`, memastikan UI selalu sinkron.
+- `_groupTransaksiByDate(...)`: Mengelompokkan transaksi berdasarkan tanggal untuk tampilan.
+- `RingkasanTransaksi`: Widget `Stateless` baru yang bertanggung jawab murni untuk menampilkan data ringkasan yang diterimanya.
+**Catatan:** Arsitektur halaman ini telah di-refactor secara signifikan. Penggunaan satu `FutureBuilder` yang memanggil `_getData()` menyelesaikan masalah `LateInitializationError` dan memastikan data ringkasan (pemasukan, pengeluaran) ditampilkan dengan andal dan konsisten setelah setiap perubahan.
 **Rules:** Pemformatan nominal uang pada ringkasan dan daftar transaksi **wajib** menggunakan `FormatUang.formatMataUang()` dari `format_util.dart`.
 
 ---

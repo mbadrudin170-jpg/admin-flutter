@@ -1,4 +1,5 @@
 // path: lib/halaman/tab/lainnya.dart
+import 'package:admin_wifi/data/operasi/kritik_saran_operasi.dart';
 import 'package:flutter/material.dart';
 // import '../../data/services/notifikasi_servis.dart';
 import '../lainnya/kategori.dart';
@@ -71,13 +72,27 @@ class _LainnyaTabState extends State<LainnyaPage> {
             ),
           ),
           _buildNavigationButton(
-            title: 'Kritik & Saran',
-            icon: Icons.feedback,
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const KritikSaranPage()),
-            ),
-          ),
+              title: 'Kritik & Saran',
+              icon: Icons.feedback,
+              onTap: () async {
+                // 1. Unduh data dari Firebase
+                final dataFromFirebase =
+                    await KritikSaranOperasi.unduhDataDariFirebase();
+
+                // 2. Simpan data ke database lokal
+                if (dataFromFirebase.isNotEmpty) {
+                  final operasi = KritikSaranOperasi();
+                  await operasi.sisipkanAtauPerbaruiBatch(dataFromFirebase);
+                }
+
+                // 3. Navigasi ke halaman setelah data disinkronkan
+                if (!mounted) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const KritikSaranPage()),
+                );
+              }),
           _buildNavigationButton(
             title: 'Kelola Paket WiFi',
             icon: Icons.wifi,

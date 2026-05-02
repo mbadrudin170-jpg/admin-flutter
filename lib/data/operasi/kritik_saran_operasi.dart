@@ -2,6 +2,7 @@
 import 'dart:developer' as developer;
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/model/kritik_saran_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sqflite/sqflite.dart';
 
 // Kelas ini menangani semua operasi database untuk entitas KritikSaran.
@@ -174,6 +175,28 @@ class KritikSaranOperasi {
       }
     } catch (e) {
       developer.log('❌ Error debug: $e');
+    }
+  }
+
+  // ditambah: Fungsi untuk mengunduh semua data dari koleksi 'kritik_saran' di Firebase.
+  static Future<List<KritikSaranModel>> unduhDataDariFirebase() async {
+    try {
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('kritik_saran').get();
+      final List<KritikSaranModel> data = snapshot.docs
+          .map((doc) => KritikSaranModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      developer.log('Berhasil mengunduh ${data.length} data kritik dan saran dari Firebase.', name: 'KritikSaranOperasi.unduh');
+      return data;
+    } catch (e, stackTrace) {
+      developer.log(
+        'Gagal mengunduh data kritik dan saran dari Firebase.',
+        name: 'KritikSaranOperasi.unduh',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      // Mengembalikan list kosong jika terjadi error.
+      return [];
     }
   }
 }
