@@ -4,7 +4,7 @@ import 'package:admin_wifi/model/kategori_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class KategoriOperasi {
-  Future<void> create(Kategori kategori) async {
+  Future<void> createKategori(Kategori kategori) async {
     final db = await DatabaseHelper.instance.database;
     await db.insert(
       'kategori',

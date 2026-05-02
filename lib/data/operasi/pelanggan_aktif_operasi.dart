@@ -1,7 +1,7 @@
 // path: lib/data/operasi/pelanggan_aktif_operasi.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:developer' as developer;
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
@@ -15,9 +15,51 @@ class PelangganAktifOperasi {
   final NotifikasiServis _notifikasiServis = NotifikasiServis();
   final PelangganOperasi _pelangganOperasi = PelangganOperasi();
 
-  Future<bool> isDeviceConnected() async {
-    final connectivityResult = await Connectivity().checkConnectivity();
-    return !connectivityResult.contains(ConnectivityResult.none);
+  Future<void> unggahKeFirebase(PelangganAktif pelanggan) async {
+    // Hanya unggah jika statusnya adalah 'write'
+    if (pelanggan.syncStatus != SyncStatus.write) {
+      developer.log(
+        "[FIREBASE] Unggahan dilewati untuk pelanggan (ID: ${pelanggan.id}) karena status bukan 'write'.",
+        name: 'PelangganAktifOperasi',
+      );
+      return; // Berhenti jika status bukan write
+    }
+
+    final firestore = FirebaseFirestore.instance;
+    final docRef = firestore.collection('pelanggan_aktif').doc(pelanggan.id);
+
+    // Buat salinan data dan ubah status sinkronisasi untuk dikirim ke Firebase
+    final dataToUpload = pelanggan.toMap();
+    dataToUpload['sync_status'] = SyncStatus.synced.name;
+
+    try {
+      await docRef.set(dataToUpload);
+      developer.log(
+        '🚀 [FIREBASE] Berhasil mengunggah pelanggan aktif (ID: ${pelanggan.id}).',
+        name: 'PelangganAktifOperasi',
+      );
+    } catch (e) {
+      developer.log(
+        '🔥 [FIREBASE] Gagal mengunggah pelanggan aktif (ID: ${pelanggan.id}): $e',
+        name: 'PelangganAktifOperasi',
+        error: e,
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> tandaiSudahSinkron(String pelangganId) async {
+    final db = await dbHelper.database;
+    await db.update(
+      'pelanggan_aktif',
+      {'sync_status': SyncStatus.synced.name},
+      where: 'id = ?',
+      whereArgs: [pelangganId],
+    );
+    developer.log(
+      '🔄 [LOKAL] Pelanggan (ID: $pelangganId) ditandai sudah sinkron.',
+      name: 'PelangganAktifOperasi',
+    );
   }
 
   Future<int> unduhPelangganAktif(PelangganAktif pelangganAktif) async {
@@ -141,31 +183,6 @@ class PelangganAktifOperasi {
     await _notifikasiServis.batalNotifikasi(id.hashCode);
   }
 
-  Future<List<PelangganAktif>> ambilDataUntukSinkronisasi() async {
-    final db = await dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'pelanggan_aktif',
-      where: 'sync_status = ? OR sync_status = ?',
-      whereArgs: [SyncStatus.write.name, SyncStatus.deleted.name],
-    );
-    return List.generate(maps.length, (i) => PelangganAktif.fromMap(maps[i]));
-  }
-
-  Future<void> tandaiSudahSinkron(String id) async {
-    final db = await dbHelper.database;
-    await db.update(
-      'pelanggan_aktif',
-      {'sync_status': SyncStatus.synced.name},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
-  Future<void> hapusLokalPermanen(String id) async {
-    final db = await dbHelper.database;
-    await db.delete('pelanggan_aktif', where: 'id = ?', whereArgs: [id]);
-  }
-
   Future<void> _jadwalkanNotifikasi(PelangganAktif pelangganAktif) async {
     final pelanggan = await _pelangganOperasi.getPelangganById(
       pelangganAktif.idPelanggan,
@@ -204,30 +221,6 @@ class PelangganAktifOperasi {
     }
   }
 
-  Future<void> purgeDeletedLocalData() async {
-    final db = await DatabaseHelper.instance.database;
-
-    try {
-      final count = await db.delete(
-        'pelanggan_aktif',
-        where: 'sync_status = ?',
-        whereArgs: [SyncStatus.deleted.name],
-      );
-
-      developer.log(
-        'Purge $count data deleted lokal selesai',
-        name: 'PelangganAktifOperasi',
-      );
-    } catch (e) {
-      developer.log(
-        'Gagal purge data deleted: $e',
-        name: 'PelangganAktifOperasi',
-        error: e,
-      );
-      rethrow;
-    }
-  }
-
   Future<void> hapusSemuaPelangganAktif() async {
     final db = await dbHelper.database;
     await db.delete('pelanggan_aktif');
@@ -240,30 +233,5 @@ class PelangganAktifOperasi {
       where: 'tanggalBerakhir < ?',
       whereArgs: [DateTime.now().toIso8601String()],
     );
-  }
-
-  Future<List<PelangganAktif>> getPerubahan(DateTime since) async {
-    final db = await dbHelper.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'pelanggan_aktif',
-      where: 'diperbarui > ?',
-      whereArgs: [since.toIso8601String()],
-    );
-    return List.generate(maps.length, (i) => PelangganAktif.fromMap(maps[i]));
-  }
-
-  Future<void> sisipkanAtauPerbaruiBatch(List<PelangganAktif> items) async {
-    final db = await dbHelper.database;
-    final batch = db.batch();
-    for (var item in items) {
-      // Saat mengunduh, kita juga harus memastikan notifikasi dijadwalkan ulang
-      await _jadwalkanNotifikasi(item);
-      batch.insert(
-        'pelanggan_aktif',
-        item.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-    }
-    await batch.commit(noResult: true);
   }
 }

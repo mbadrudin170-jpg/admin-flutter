@@ -80,7 +80,7 @@ class SinkronisasiDatabase {
         .map((doc) => Kategori.fromMap(doc.data()))
         .toList();
     for (final kategori in kategoris) {
-      await _kategoriOperasi.create(kategori);
+      await _kategoriOperasi.createKategori(kategori);
     }
     developer.log(
       '${kategoris.length} kategori disinkronkan.',

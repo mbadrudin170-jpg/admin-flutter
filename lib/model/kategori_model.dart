@@ -28,6 +28,7 @@ class Kategori {
         (e) => e.name == map['tipe'],
         orElse: () => TipeKategori.pemasukan,
       ),
+      // Logika untuk membaca subKategori dari Map (misalnya dari Firebase) tetap dipertahankan
       subKategori: (map['subKategori'] as List<dynamic>? ?? [])
           .map((subMap) => SubKategori.fromMap(subMap as Map<String, dynamic>))
           .toList(),
@@ -37,13 +38,15 @@ class Kategori {
     );
   }
 
+  /// Mengonversi objek Kategori menjadi Map untuk **database SQLite**.
+  /// Properti subKategori dihilangkan karena disimpan di tabel terpisah.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'nama': nama,
       'tipe': tipe.name,
-      'subKategori': subKategori.map((sub) => sub.toMap()).toList(),
-      'diperbarui': diperbarui?.toIso8601String(), // <-- Kolom baru ditambahkan
+      'diperbarui': diperbarui?.toIso8601String(),
+      // Kolom 'subKategori' dihapus dari sini untuk menghindari error SQLite
     };
   }
 }
@@ -69,7 +72,7 @@ class SubKategori {
     return {
       'id': id,
       'nama': nama,
-      'diperbarui': diperbarui?.toIso8601String(), // <-- Kolom baru ditambahkan
+      'diperbarui': diperbarui?.toIso8601String(),
     };
   }
 }

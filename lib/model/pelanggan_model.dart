@@ -1,7 +1,10 @@
 // lib/model/pelanggan_model.dart
-// Model ini merepresentasikan data pelanggan.
-// Ini mencakup informasi seperti nama, telepon, alamat, dan detail login.
-// Digunakan untuk mengelola data pelanggan dari dan ke database.
+// Model ini merepresentasikan data pelanggan dengan soft delete.
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
+
+// Enum untuk status pelanggan, mendukung soft delete.
+enum StatusPelanggan { aktif, diarsip }
 
 class Pelanggan {
   final String id;
@@ -10,28 +13,44 @@ class Pelanggan {
   final String alamat;
   final String password;
   final String macAddress;
-  final String diperbarui;
+  final StatusPelanggan status;
+  final DateTime? diperbarui;
+  final DateTime? diarsipkan;
 
   Pelanggan({
-    required this.id,
+    String? id,
     required this.nama,
     required this.telepon,
     required this.alamat,
     required this.password,
-    required this.macAddress,
-    required this.diperbarui,
-  });
+    this.macAddress = '',
+    this.status = StatusPelanggan.aktif,
+    this.diperbarui,
+    this.diarsipkan,
+  }) : id = id ?? const Uuid().v4();
 
-  // Tambahkan metode fromMap dan toMap jika belum ada
+  // Helper untuk parsing tanggal dari berbagai format (Timestamp, String)
+  static DateTime? _parseDateTime(dynamic dateValue) {
+    if (dateValue == null) return null;
+    if (dateValue is Timestamp) return dateValue.toDate();
+    if (dateValue is String) return DateTime.tryParse(dateValue);
+    return null;
+  }
+
   factory Pelanggan.fromMap(Map<String, dynamic> map) {
     return Pelanggan(
       id: map['id'],
-      nama: map['nama'],
-      telepon: map['telepon'],
-      alamat: map['alamat'],
-      password: map['password'],
-      macAddress: map['mac_address'],
-      diperbarui: map['diperbarui'],
+      nama: map['nama'] ?? '',
+      telepon: map['telepon'] ?? '',
+      alamat: map['alamat'] ?? '',
+      password: map['password'] ?? '',
+      macAddress: map['mac_address'] ?? '',
+      status: StatusPelanggan.values.firstWhere(
+        (e) => e.name == map['status'],
+        orElse: () => StatusPelanggan.aktif, // Default ke aktif jika tidak ada
+      ),
+      diperbarui: _parseDateTime(map['diperbarui']),
+      diarsipkan: _parseDateTime(map['diarsipkan']),
     );
   }
 
@@ -43,7 +62,9 @@ class Pelanggan {
       'alamat': alamat,
       'password': password,
       'mac_address': macAddress,
-      'diperbarui': diperbarui,
+      'status': status.name,
+      'diperbarui': diperbarui?.toIso8601String(),
+      'diarsipkan': diarsipkan?.toIso8601String(),
     };
   }
 }

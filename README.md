@@ -1,57 +1,3 @@
-# **Aturan lainnya untuk AI**
-
-Berikut adalah serangkaian aturan yang harus diikuti oleh AI untuk menjaga konsistensi, kejelasan, dan kualitas dalam pengembangan proyek ini.
-
-1.  **Penggunaan Bahasa Indonesia**: Wajib menggunakan Bahasa Indonesia yang formal dan jelas dalam semua aspek pengembangan, termasuk penamaan fungsi, variabel, parameter, nama file, serta dalam setiap interaksi verbal dan tulisan.
-
-2.  **Komentar Path File**: Setiap file yang dibuat atau dimodifikasi harus memiliki komentar di baris paling atas yang menunjukkan path lengkap file tersebut. Format: `// path: lib/nama_folder/nama_file.dart`.
-
-3.  **Prosedur Awal Pengerjaan**: Sebelum memulai tugas pengembangan apa pun, AI diwajibkan untuk membaca dan memahami keseluruhan isi dari file `README.md` ini. Tujuannya adalah untuk menyelaraskan pemahaman mengenai alur kerja, standar, dan dokumentasi proyek yang berlaku.
-
-4.  **Dokumentasi Perubahan**: Setelah menyelesaikan modifikasi pada sebuah file, AI harus menambahkan atau memperbarui bagian dokumentasi file tersebut di dalam `README.md`. Ini mencakup deskripsi fitur, daftar fungsi, dan catatan relevan lainnya.
-
-5.  **Protokol Proses Build**:
-    *   Sebelum memulai proses build, lakukan analisis terhadap file `README.md` untuk mengidentifikasi apakah perubahan yang dilakukan merupakan penambahan fitur baru atau hanya perbaikan bug.
-    *   Jika perubahan hanya berupa perbaikan bug, hanya nomor `buildNumber` di `pubspec.yaml` yang boleh dinaikkan. Versi aplikasi (`version`) harus tetap.
-    *   Proses build hanya boleh dilakukan atas perintah eksplisit dari saya.
-    *   Ketika diperintahkan, jalankan perintah berikut secara berurutan: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
-
-6.  **Menjaga Konsistensi**: AI bertanggung jawab untuk menjaga konsistensi kode, struktur proyek, dan pola desain di seluruh aplikasi.
-
-7.  **Pembaruan Dokumentasi README.md**: Setelah menyelesaikan pekerjaan, segera perbarui bagian dokumentasi yang relevan di dalam file `README.md`. Fokus pada deskripsi tujuan file, fitur yang diimplementasikan, dan daftar fungsi. Hindari menyertakan contoh kode yang ambigu atau berpotensi menimbulkan error.
-
-8.  **Komentar Perubahan Kode**: Setiap baris kode yang dihapus, diubah, atau ditambahkan harus disertai dengan komentar yang jelas mengenai alasannya. Gunakan format berikut:
-    *   `// dihapus: [alasan penghapusan]`
-    *   `// diubah: [alasan perubahan]`
-    *   `// ditambah: [alasan penambahan]`
-
-9.  **Analisis Kode Statis**: Setelah menyelesaikan modifikasi kode, jalankan perintah `flutter analyze` di terminal untuk memastikan tidak ada error atau *warning* yang tersisa.
-
-10. **Mekanisme Konfirmasi**: Sebelum melakukan tindakan atau modifikasi apa pun, AI harus memberikan penjelasan rinci mengenai rencana kerjanya. Pekerjaan hanya boleh dilanjutkan setelah mendapatkan konfirmasi eksplisit dari saya (misalnya: `setuju`, `oke`, `ok`, `ya`, `yes`). Jika saya merespons dengan negasi (misalnya: `jangan`, `tidak`, `nggak`), AI harus membatalkan rencana tersebut.
-
-11. **Dokumentasi Fungsi**: Setiap fungsi yang dibuat harus memiliki komentar di atasnya yang menjelaskan tujuan dan kegunaan fungsi tersebut secara singkat dan jelas. Contoh: `// untuk menavigasi pengguna ke halaman pengaturan profil.`
-
-12. **Komentar Penjelas Kode**: Tambahkan komentar-komentar informatif di dalam blok kode yang kompleks atau penting untuk membantu pemahaman mengenai logika atau alur kerja kode tersebut.
-
-13. **Perintah `clean`**: Jika saya memberikan instruksi `clean`, AI harus segera menjalankan perintah `flutter clean && flutter pub get` di terminal.
-
-14. **Menghindari Asumsi**: AI dilarang keras membuat asumsi yang tidak didasarkan pada instruksi atau dokumentasi yang ada. Hal ini untuk memastikan semua komponen proyek tetap sinkron dan selaras.
-
-15. **Pola Pemrograman Asinkron**: Setiap fungsi yang berinteraksi dengan operasi I/O (input/output), permintaan jaringan (*network request*), atau akses database wajib diimplementasikan menggunakan pola *Asynchronous* (`async`/`await`) dan mengembalikan objek `Future`. Hindari penggunaan metode `.then()` yang berantai untuk menjaga keterbacaan kode.
-
-16. **Format Standar Pembaruan README.md**: Saat memperbarui dokumentasi file di `README.md` setelah pengerjaan, kelompokkan dokumentasi berdasarkan direktori dan gunakan format terstruktur berikut:
-    ```
-    File: lib/path/ke/nama_file.dart
-    Fitur: [Nama Fitur Utama yang Dikerjakan]
-    Daftar Fungsi:
-    - namaFungsiA(): Penjelasan singkat, jelas, dan padat mengenai kegunaan fungsi.
-    - namaFungsiB(): Penjelasan singkat, jelas, dan padat mengenai kegunaan fungsi.
-    Catatan: [Informasi tambahan, dependensi, atau konteks penting lainnya jika ada.]
-    Rules: [Aturan spesifik yang harus diikuti saat menggunakan atau memodifikasi file ini. Contoh: "Untuk format tanggal dan angka, wajib menggunakan utilitas dari 'lib/utils/format_util.dart' agar konsisten."]
-    ```
-
----
-
 # **Kritik dan Saran untuk Peningkatan Proyek**
 
 Berdasarkan analisis terhadap struktur dan aturan proyek, berikut adalah beberapa saran yang dapat dipertimbangkan untuk meningkatkan profesionalisme, efisiensi, dan kualitas aplikasi Anda:
@@ -87,6 +33,28 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
+## **Folder: lib/data/operasi**
+
+**File:** `lib/data/operasi/pelanggan_aktif_operasi.dart`
+**Fitur:** Operasi CRUD dan Sinkronisasi untuk Pelanggan Aktif
+**Daftar Fungsi:**
+*   `unggahKeFirebase(PelangganAktif pelanggan)`: Mengunggah data pelanggan ke Firestore. Fungsi ini hanya akan memproses pelanggan dengan status `SyncStatus.write`. Sebelum mengirim, fungsi ini akan mengubah status `sync_status` dalam data yang dikirim menjadi `synced`.
+*   `tandaiSudahSinkron(String pelangganId)`: Memperbarui status sinkronisasi pelanggan di database lokal menjadi `synced`.
+*   `unduhPelangganAktif(PelangganAktif pelangganAktif)`: Menyimpan pelanggan aktif dari server ke database lokal dengan status `synced`.
+*   `createPelangganAktif(PelangganAktif pelangganAktif)`: Membuat pelanggan aktif baru di database lokal dengan status `write`.
+*   `ambilSemuaPelangganAktif()`: Mengambil semua pelanggan aktif dari database lokal yang tidak ditandai untuk dihapus.
+*   `ambilSatuPelangganAktif(String id)`: Mengambil satu pelanggan aktif berdasarkan ID.
+*   `updatePelangganAktif(PelangganAktif pelangganAktif)`: Memperbarui pelanggan aktif di database lokal dan menandainya dengan status `write`.
+*   `hapusPelangganAktif(String id)`: Menandai pelanggan aktif untuk dihapus dengan mengubah statusnya menjadi `deleted`.
+*   `_jadwalkanNotifikasi(PelangganAktif pelangganAktif)`: Menjadwalkan notifikasi lokal untuk pengingat masa berlaku paket.
+*   `hapusSemuaPelangganAktif()`: Menghapus semua data pelanggan aktif dari database lokal.
+*   `hapusPelangganKadaluarsa()`: Menghapus pelanggan aktif yang sudah melewati tanggal masa berlakunya.
+**Catatan:** File ini menangani seluruh alur kerja sinkronisasi, mulai dari pengunggahan data hingga pembaruan status di database lokal.
+**Rules:** Gunakan kelas ini untuk semua interaksi dengan tabel `pelanggan_aktif` untuk memastikan konsistensi dan integritas data.
+
+---
+
+
 ## **Folder: lib/data**
 
 **File:** `lib/data/sqlite.dart`
@@ -100,8 +68,21 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 *   `_createKritikSaranTable(Database db)`: Membuat tabel `kritik_saran`.
 *   `_createRiwayatLanggananTable(Database db)`: Membuat tabel `riwayat_langganan`.
 *   `_createPesananTable(Database db)`: Membuat tabel `pesanan`.
-**Catatan:** File ini adalah satu-satunya titik akses untuk semua operasi database. Ini menangani pembuatan, migrasi, dan koneksi ke database SQLite. Perubahan skema terbaru adalah penambahan kolom `sync_status` ke tabel `pelanggan_aktif` untuk menyelaraskannya dengan model `PelangganAktif`.
+**Catatan:** File ini adalah satu-satunya titik akses untuk semua operasi database. Versi database saat ini adalah **16**. Perubahan terakhir adalah perbaikan skema tabel `transaksi` untuk menggunakan format `snake_case` (misal: `id_dompet`), agar sinkron sepenuhnya dengan `transaksi_model.dart`. Proses migrasi di `_onUpgrade` telah diperbarui untuk menangani perubahan ini dengan aman.
 **Rules:** Setiap perubahan skema tabel harus disertai dengan kenaikan versi database di `_initDB()` dan logika migrasi yang sesuai di `_onUpgrade()`.
+
+---
+
+## **Folder: lib/model**
+
+**File:** `lib/model/transaksi_model.dart`
+**Fitur:** Model Data untuk Entitas Transaksi
+**Daftar Fungsi:**
+- `TransaksiModel()`: Konstruktor untuk membuat atau memperbarui objek transaksi. Menggunakan `Uuid` untuk ID unik jika tidak disediakan.
+- `fromMap(Map<String, dynamic> map)`: Factory constructor yang membuat instance `TransaksiModel` dari data Map (biasanya dari SQLite atau Firestore).
+- `toMap()`: Mengonversi instance `TransaksiModel` menjadi Map, siap untuk ditulis ke database.
+**Catatan:** Model ini adalah cetak biru untuk setiap data transaksi. Ini menerapkan denormalisasi dengan menyimpan nama-nama terkait (seperti `nama_dompet`, `nama_kategori`) untuk mengurangi query yang kompleks dan meningkatkan performa baca. Semua properti dan kunci Map menggunakan format `snake_case` sebagai standar.
+**Rules:** Wajib gunakan model ini untuk semua operasi CRUD yang terkait dengan transaksi untuk menjamin konsistensi, keamanan tipe, dan struktur data yang benar.
 
 ---
 
@@ -129,6 +110,17 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
+## **Folder: lib/widget**
+
+**File:** `lib/widget/thousands_input_formatter.dart`
+**Fitur:** Pemformat Angka dengan Dukungan Negatif
+**Daftar Fungsi:**
+- `formatEditUpdate(oldValue, newValue)`: Memformat input teks secara real-time untuk menampilkan pemisah ribuan dan mengizinkan tanda minus ('-') di awal.
+**Catatan:** Kelas ini menggantikan implementasi sebelumnya yang hanya mendukung angka positif. Nama kelas diubah menjadi `ThousandsAndNegativeInputFormatter` untuk merefleksikan fungsionalitas barunya.
+**Rules:** Gunakan formatter ini pada `TextFormField` yang memerlukan input angka (termasuk negatif) dengan format ribuan yang jelas. Pastikan `keyboardType` pada `TextFormField` diatur ke `TextInputType.numberWithOptions(signed: true)`.
+
+---
+
 ## **Folder: lib/halaman/detail**
 
 **File:** `lib/halaman/detail/detail_pelanggan_aktif.dart`
@@ -142,6 +134,34 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 ---
 
 ## **Folder: lib/halaman/form**
+
+**File:** `lib/halaman/form/form_dompet.dart`
+**Fitur:** Formulir Tambah dan Edit Dompet
+**Daftar Fungsi:**
+- `_simpanForm()`: Memvalidasi input dan menangani logika untuk membuat dompet baru atau memperbarui dompet yang sudah ada.
+**Catatan:** Formulir ini sekarang mendukung input saldo negatif berkat penggunaan `ThousandsAndNegativeInputFormatter`. Validator juga telah disesuaikan untuk menangani input tanda minus.
+**Rules:**
+- Nama dompet tidak boleh kosong.
+- Saldo harus berupa angka yang valid.
+- Pemformatan saldo menggunakan `ThousandsAndNegativeInputFormatter` untuk konsistensi.
+
+---
+
+**File:** `lib/halaman/form/form_transaksi.dart`
+**Fitur:** Formulir Tambah Transaksi
+**Daftar Fungsi:**
+- `_loadInitialData()`: Memuat data awal yang diperlukan seperti daftar dompet dan kategori.
+- `_filterKategori()`: Memfilter daftar kategori berdasarkan tipe transaksi yang dipilih (Pemasukan/Pengeluaran).
+- `_pilihTanggal(BuildContext context)`: Menampilkan dialog pemilih tanggal.
+- `_pilihWaktu(BuildContext context)`: Menampilkan dialog pemilih waktu untuk memilih jam dan menit.
+- `_simpanForm()`: Memvalidasi dan menyimpan data transaksi baru ke database.
+**Catatan:** Formulir ini telah diperbarui untuk memungkinkan pengguna memilih tidak hanya tanggal tetapi juga waktu transaksi secara spesifik, memberikan kontrol yang lebih detail.
+**Rules:**
+- Semua field wajib diisi sebelum menyimpan.
+- Format tanggal dan jam yang ditampilkan harus konsisten, menggunakan format `yyyy-MM-dd HH:mm`.
+- Pemilihan kategori disesuaikan secara dinamis berdasarkan tipe transaksi yang dipilih.
+
+---
 
 **File:** `lib/halaman/form/form_pelanggan_aktif.dart`
 **Fitur:** Formulir Aktivasi dan Edit Pelanggan
@@ -161,14 +181,15 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 ## **Folder: lib/halaman/tab**
 
 **File:** `lib/halaman/tab/pelanggan_aktif.dart`
-**Fitur:** Manajemen Daftar Pelanggan Aktif
+**Fitur:** Manajemen Daftar Pelanggan Aktif & Sinkronisasi
 **Daftar Fungsi:**
-*   `_loadPelangganAktif()`: Memuat dan mengurutkan daftar pelanggan aktif.
-*   `_hapusPelangganAktif(PelangganAktif pelanggan)`: Menangani logika penghapusan satu pelanggan.
-*   `_urutkanList(OpsiUrutkan pilihan)`: Mengurutkan daftar berdasarkan kriteria yang dipilih.
+*   `_loadData()`: Memuat data pelanggan aktif dari database lokal.
+*   `_sinkronkanDataKeFirebase()`: Memeriksa koneksi internet, mengumpulkan semua data dengan status `SyncStatus.write`, mengunggahnya ke Firebase, memperbarui status lokal menjadi `synced`, dan memuat ulang data di UI. Fungsi ini dipicu saat pengguna melakukan *pull-to-refresh*.
+*   `_hapusPelangganAktif(PelangganAktif pelanggan)`: Menangani logika untuk mengarsipkan pelanggan ke riwayat dan menghapusnya dari daftar aktif.
+*   `_applyFilterAndSort()`: Menerapkan logika filter (pencarian, status sinkronisasi) dan urutan pada daftar pelanggan yang ditampilkan.
 *   `_periksaDanJadwalkanNotifikasi(...)`: Menangani penjadwalan notifikasi lokal untuk paket yang akan berakhir.
-**Catatan:** Ini adalah halaman utama untuk manajemen pelanggan aktif, mencakup operasi CRUD (Create, Read, Update, Delete) melalui navigasi dan dialog.
-**Rules:** Setiap operasi yang memodifikasi data (tambah, edit, hapus) harus memanggil `_loadPelangganAktif()` pada akhirnya untuk memastikan data yang ditampilkan selalu sinkron. Tampilan sisa masa aktif dan status **wajib** menggunakan `PerhitunganUtil`.
+**Catatan:** Halaman ini adalah pusat manajemen pelanggan aktif. Fungsi `_sinkronkanDataKeFirebase` sekarang menangani seluruh alur sinkronisasi, memberikan umpan balik visual langsung kepada pengguna setelah selesai.
+**Rules:** Penggunaan `PerhitunganUtil` dan `FormatUtil` wajib untuk konsistensi tampilan. Refresh data dari database lokal dilakukan dengan menavigasi kembali ke halaman atau setelah melakukan edit/tambah.
 
 ---
 
@@ -238,7 +259,7 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 - `_showEditDeleteDialog(Paket paket)`: Menampilkan dialog kontekstual saat item paket ditekan lama, memberikan opsi untuk "Edit" atau "Hapus".
 - `_showDeleteConfirmationDialog(Paket paket)`: Menampilkan dialog konfirmasi untuk mencegah penghapusan paket yang tidak disengaja.
 - `_hapusSemuaPaket()`: Menangani logika untuk menghapus semua data paket dari database, dengan dialog konfirmasi sebelumnya.
-**Catatan:** Halaman ini menggunakan `FutureBuilder` untuk menangani pemuatan data secara asinkron. Setiap operasi yang mengubah data (tambah, edit, hapus) akan memicu `_refreshPaketList()` untuk konsistensi data.
+**Catatn:** Halaman ini menggunakan `FutureBuilder` untuk menangani pemuatan data secara asinkron. Setiap operasi yang mengubah data (tambah, edit, hapus) akan memicu `_refreshPaketList()` untuk konsistensi data.
 **Rules:** 
 - Navigasi ke halaman pembuatan atau edit (`FormPaket`) harus memanggil `_refreshPaketList` setelah kembali untuk menampilkan data yang diperbarui.
 - Penghapusan paket, baik tunggal maupun semua, harus selalu didahului oleh dialog konfirmasi untuk mencegah kehilangan data.

@@ -1,20 +1,19 @@
-// lib/halaman/form/form_dompet.dart
+// path: lib/halaman/form/form_dompet.dart
 // Halaman ini menyediakan formulir untuk menambah atau mengedit dompet.
 
 import 'package:admin_wifi/data/operasi/dompet_operasi.dart';
 import 'package:admin_wifi/model/dompet_model.dart';
+// diubah: Menggunakan formatter baru yang mendukung angka negatif.
 import 'package:admin_wifi/widget/thousands_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:developer' as developer;
-import 'package:intl/intl.dart'; // Impor untuk formatting angka
+import 'package:intl/intl.dart';
 
 class FormDompet extends StatefulWidget {
-  // 1. Tambahkan properti dompet opsional untuk mode edit
   final Dompet? dompet;
 
-  // 2. Perbarui konstruktor untuk menerima dompet
   const FormDompet({super.key, this.dompet});
 
   @override
@@ -30,7 +29,6 @@ class _FormDompetState extends State<FormDompet> {
   late FocusNode _namaFocusNode;
   late FocusNode _saldoFocusNode;
 
-  // 3. Buat flag untuk mengecek apakah ini mode edit
   bool get _isEditMode => widget.dompet != null;
 
   @override
@@ -39,10 +37,8 @@ class _FormDompetState extends State<FormDompet> {
     _namaFocusNode = FocusNode();
     _saldoFocusNode = FocusNode();
 
-    // 4. Jika mode edit, isi field formulir dengan data yang ada
     if (_isEditMode) {
       _namaController.text = widget.dompet!.namaDompet;
-      // Gunakan NumberFormat untuk memastikan konsistensi tampilan
       _saldoController.text = NumberFormat(
         '#,##0',
         'id_ID',
@@ -59,7 +55,6 @@ class _FormDompetState extends State<FormDompet> {
     super.dispose();
   }
 
-  // 5. Perbarui fungsi _simpanForm untuk menangani UPDATE dan CREATE
   void _simpanForm() async {
     _namaFocusNode.unfocus();
     _saldoFocusNode.unfocus();
@@ -71,9 +66,8 @@ class _FormDompetState extends State<FormDompet> {
         );
 
         if (_isEditMode) {
-          // --- LOGIKA UPDATE ---
           final updatedDompet = Dompet(
-            id: widget.dompet!.id, // Gunakan ID yang ada
+            id: widget.dompet!.id,
             namaDompet: _namaController.text,
             saldo: saldo,
             diperbarui: DateTime.now(),
@@ -81,7 +75,6 @@ class _FormDompetState extends State<FormDompet> {
           await _dompetOperasi.updateDompet(updatedDompet);
 
           if (!mounted) return;
-          // Pop halaman form, kembalikan nilai true untuk refresh
           Navigator.pop(context, true);
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -91,9 +84,8 @@ class _FormDompetState extends State<FormDompet> {
             ),
           );
         } else {
-          // --- LOGIKA CREATE ---
           final nuevoDompet = Dompet(
-            id: const Uuid().v4(), // Buat ID baru
+            id: const Uuid().v4(),
             namaDompet: _namaController.text,
             saldo: saldo,
             diperbarui: DateTime.now(),
@@ -130,7 +122,6 @@ class _FormDompetState extends State<FormDompet> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 6. Atur judul AppBar secara dinamis
       appBar: AppBar(
         title: Text(_isEditMode ? 'Edit Dompet' : 'Tambah Dompet'),
       ),
@@ -168,12 +159,12 @@ class _FormDompetState extends State<FormDompet> {
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.attach_money),
                 ),
-                // 7. Izinkan angka negatif dengan keyboardType yang tepat
                 keyboardType: const TextInputType.numberWithOptions(
                   signed: true,
                 ),
                 inputFormatters: <TextInputFormatter>[
-                  ThousandsInputFormatter(),
+                  // diubah: Menggunakan formatter baru yang mendukung angka negatif.
+                  ThousandsAndNegativeInputFormatter(),
                 ],
                 textInputAction: TextInputAction.done,
                 onFieldSubmitted: (_) => _simpanForm(),
@@ -181,10 +172,12 @@ class _FormDompetState extends State<FormDompet> {
                   if (value == null || value.isEmpty) {
                     return 'Saldo tidak boleh kosong';
                   }
+                  // diubah: Penambahan logika untuk menangani tanda '-' saat validasi.
                   if (double.tryParse(
-                        value.replaceAll('.', '').replaceAll(',', ''),
-                      ) ==
-                      null) {
+                            value.replaceAll('.', '').replaceAll(',', ''),
+                          ) ==
+                          null &&
+                      value != '-') {
                     return 'Format saldo tidak valid';
                   }
                   return null;

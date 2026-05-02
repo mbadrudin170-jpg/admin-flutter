@@ -52,12 +52,12 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   List<PelangganAktif> _hasilFilter = [];
   Map<String, String> _mapNamaPelanggan = {};
   bool _isLoading = true;
+  bool _isSyncing = false;
 
   // State untuk UI
   OpsiUrutkan _urutanAktif = OpsiUrutkan.tanggalBerakhir;
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
-  // ditambah: State untuk mengontrol filter data yang belum sinkron
   bool _tampilkanBelumSinkron = false;
 
   @override
@@ -76,6 +76,78 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
   void _onSearchChanged() {
     _applyFilterAndSort();
+  }
+
+  Future<void> _sinkronkanDataKeFirebase() async {
+    // Cek koneksi internet terlebih dahulu
+    final isOnline = await KoneksiInternetService.cekKoneksi();
+    if (!isOnline) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Tidak ada koneksi internet.'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      _isSyncing = true;
+    });
+
+    try {
+      final dataUntukDiunggah = _semuaPelanggan
+          .where((p) => p.syncStatus == SyncStatus.write)
+          .toList();
+
+      if (dataUntukDiunggah.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Tidak ada data baru untuk diunggah.'),
+              backgroundColor: Colors.blue,
+            ),
+          );
+        }
+        return;
+      }
+
+      for (final pelanggan in dataUntukDiunggah) {
+        await _pelangganAktifOperasi.unggahKeFirebase(pelanggan);
+        await _pelangganAktifOperasi.tandaiSudahSinkron(pelanggan.id);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '${dataUntukDiunggah.length} item berhasil disinkronkan.',
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+
+      // Muat ulang data untuk memperbarui UI dan menghilangkan ikon sinkronisasi
+      await _loadData(forceRefresh: true);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal sinkronisasi data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSyncing = false;
+        });
+      }
+    }
   }
 
   Future<void> _loadData({bool forceRefresh = false}) async {
@@ -115,7 +187,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
   void _applyFilterAndSort() {
     List<PelangganAktif> tempResult;
 
-    // 1. Filter berdasarkan pencarian
     final query = _searchController.text.toLowerCase();
     if (query.isNotEmpty) {
       tempResult = _semuaPelanggan.where((pelanggan) {
@@ -127,14 +198,12 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       tempResult = List.of(_semuaPelanggan);
     }
 
-    // ditambah: Filter berdasarkan status sinkronisasi jika diaktifkan
     if (_tampilkanBelumSinkron) {
       tempResult = tempResult.where((pelanggan) {
         return pelanggan.syncStatus == SyncStatus.write;
       }).toList();
     }
 
-    // 2. Urutkan hasil filter
     int Function(PelangganAktif, PelangganAktif) comparator;
 
     switch (_urutanAktif) {
@@ -148,7 +217,7 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
         comparator = (a, b) {
           final dateA = a.diperbarui ?? a.tanggalMulai;
           final dateB = b.diperbarui ?? b.tanggalMulai;
-          return dateB.compareTo(dateA); // Terbaru di atas
+          return dateB.compareTo(dateA);
         };
         break;
       case OpsiUrutkan.namaAZ:
@@ -187,7 +256,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
     tempResult.sort(comparator);
 
-    // 3. Perbarui state UI
     if (mounted) {
       setState(() {
         _hasilFilter = tempResult;
@@ -481,6 +549,13 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
     return AppBar(
       title: _isSearching ? _buildSearchField() : const Text('Pelanggan Aktif'),
       actions: _isSearching ? _buildSearchActions() : _buildDefaultActions(),
+      // diubah/ditambah: Menampilkan indikator progress di bawah AppBar
+      bottom: _isSyncing
+          ? const PreferredSize(
+              preferredSize: Size.fromHeight(4.0),
+              child: LinearProgressIndicator(),
+            )
+          : null,
     );
   }
 
@@ -528,7 +603,6 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
 
   List<Widget> _buildDefaultActions() {
     return [
-      // ditambah: Tombol untuk filter data yang belum sinkron
       IconButton(
         icon: Icon(
           _tampilkanBelumSinkron ? Icons.sync_problem : Icons.sync,
@@ -574,95 +648,105 @@ class _PelangganAktifPageState extends State<PelangganAktifPage> {
       appBar: _buildAppBar(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _semuaPelanggan.isEmpty
-          ? const Center(child: Text('Tidak ada pelanggan aktif ditemukan.'))
-          : _hasilFilter.isEmpty &&
-                (_searchController.text.isNotEmpty || _tampilkanBelumSinkron)
-          ? Center(
-              child: Text(
-                _tampilkanBelumSinkron
-                    ? 'Tidak ada data yang belum sinkron.'
-                    : 'Pelanggan tidak ditemukan.',
-              ),
-            )
-          : ListView.builder(
-              itemCount: _hasilFilter.length,
-              itemBuilder: (context, index) {
-                final pelanggan = _hasilFilter[index];
-                final statusPembayaranText = pelanggan.status.displayName;
-                final statusPembayaranColor =
-                    pelanggan.status == StatusPembayaran.lunas
-                    ? Colors.green
-                    : Colors.red;
+          : RefreshIndicator(
+              onRefresh: _sinkronkanDataKeFirebase,
+              child: _semuaPelanggan.isEmpty
+                  ? const Center(
+                      child: Text('Tidak ada pelanggan aktif ditemukan.'),
+                    )
+                  : _hasilFilter.isEmpty &&
+                        (_searchController.text.isNotEmpty ||
+                            _tampilkanBelumSinkron)
+                  ? Center(
+                      child: Text(
+                        _tampilkanBelumSinkron
+                            ? 'Tidak ada data yang belum sinkron.'
+                            : 'Pelanggan tidak ditemukan.',
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _hasilFilter.length,
+                      itemBuilder: (context, index) {
+                        final pelanggan = _hasilFilter[index];
+                        final statusPembayaranText =
+                            pelanggan.status.displayName;
+                        final statusPembayaranColor =
+                            pelanggan.status == StatusPembayaran.lunas
+                            ? Colors.green
+                            : Colors.red;
 
-                return Card(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 7,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: InkWell(
-                    onLongPress: () {
-                      _hapusPelangganAktif(pelanggan);
-                    },
-                    onTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              DetailPelangganAktif(pelanggan: pelanggan),
-                        ),
-                      );
-                      _loadData(forceRefresh: true);
-                    },
-                    child: ListTile(
-                      // ditambah: Indikator visual untuk status sinkronisasi
-                      leading: pelanggan.syncStatus == SyncStatus.write
-                          ? const Tooltip(
-                              message: 'Perubahan belum diunggah',
-                              child: Icon(
-                                Icons.sync_problem,
-                                color: Colors.orange,
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 7,
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            onLongPress: () {
+                              _hapusPelangganAktif(pelanggan);
+                            },
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailPelangganAktif(
+                                    pelanggan: pelanggan,
+                                  ),
+                                ),
+                              );
+                              _loadData(forceRefresh: true);
+                            },
+                            child: ListTile(
+                              leading: pelanggan.syncStatus == SyncStatus.write
+                                  ? const Tooltip(
+                                      message: 'Perubahan belum diunggah',
+                                      child: Icon(
+                                        Icons.sync_problem,
+                                        color: Colors.orange,
+                                      ),
+                                    )
+                                  : null,
+                              title: NamaPelangganWidget(
+                                idPelanggan: pelanggan.idPelanggan,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            )
-                          : null,
-                      title: NamaPelangganWidget(
-                        idPelanggan: pelanggan.idPelanggan,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          NamaPaketWidget(idPaket: pelanggan.idPaket),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Pembayaran: $statusPembayaranText',
-                            style: TextStyle(
-                              color: statusPembayaranColor,
-                              fontWeight: FontWeight.bold,
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  NamaPaketWidget(idPaket: pelanggan.idPaket),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Pembayaran: $statusPembayaranText',
+                                    style: TextStyle(
+                                      color: statusPembayaranColor,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Status: ${PerhitunganUtil.getTeksSisaMasaAktif(pelanggan.tanggalBerakhir)}',
+                                    style: TextStyle(
+                                      color:
+                                          PerhitunganUtil.getWarnaSisaMasaAktif(
+                                            pelanggan.tanggalBerakhir,
+                                          ),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Berakhir: ${FormatTanggal.formatTanggalBasic(pelanggan.tanggalBerakhir)} ${FormatJam.formatJamMenit(pelanggan.tanggalBerakhir)}',
+                                  ),
+                                ],
+                              ),
+                              trailing: const Icon(Icons.chevron_right),
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Status: ${PerhitunganUtil.getTeksSisaMasaAktif(pelanggan.tanggalBerakhir)}',
-                            style: TextStyle(
-                              color: PerhitunganUtil.getWarnaSisaMasaAktif(
-                                pelanggan.tanggalBerakhir,
-                              ),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Berakhir: ${FormatTanggal.formatTanggalBasic(pelanggan.tanggalBerakhir)} ${FormatJam.formatJamMenit(pelanggan.tanggalBerakhir)}',
-                          ),
-                        ],
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
+                        );
+                      },
                     ),
-                  ),
-                );
-              },
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: _tambahPelangganAktif,

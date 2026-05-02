@@ -7,45 +7,46 @@ import 'package:admin_wifi/model/paket_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 class PaketOperasi {
-  // Perbaikan: Gunakan instance singleton
   final dbHelper = DatabaseHelper.instance;
 
-  // Fungsi untuk membuat paket baru di database
+  // Fungsi untuk membuat atau memperbarui paket di database (Upsert)
   Future<int> createPaket(Paket paket) async {
     try {
       developer.log("Mencoba mendapatkan database...");
       final db = await dbHelper.database;
       developer.log("Database didapatkan. Menyiapkan data...");
 
-      final now = DateTime.now();
-      final data = paket.toMap()..['diperbarui'] = now.toIso8601String();
+      final data = paket.toMap();
 
-      // Cetak data untuk memastikan isinya benar
-      developer.log("Data yang akan di-insert: $data");
+      // PERBAIKAN: Hanya set 'diperbarui' jika belum ada (data baru lokal).
+      // Jika data dari sinkronisasi, timestamp asli akan dipertahankan.
+      if (paket.diperbarui == null) {
+        data['diperbarui'] = DateTime.now().toIso8601String();
+      }
 
-      developer.log("Melakukan insert ke tabel 'paket'...");
-      // Perbaikan: Menggunakan ID String dari model
-      final result = await db.insert('paket', data);
-      developer.log("Insert berhasil dengan ID: $result");
+      developer.log("Data yang akan di-insert/update: $data");
+
+      developer.log("Melakukan insert/update ke tabel 'paket'...");
+      final result = await db.insert(
+        'paket',
+        data,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      developer.log("Insert/update berhasil dengan ID: $result");
 
       return result;
     } catch (e, stacktrace) {
-      // Ini akan mencetak error apa pun yang terjadi di dalam blok try
       developer.log(
         "TERJADI ERROR di createPaket",
         error: e,
         stackTrace: stacktrace,
       );
-
-      // Kembalikan nilai yang menandakan kegagalan, misalnya -1
       return -1;
     }
   }
 
-  // diubah: Mengubah query untuk mengurutkan berdasarkan masa aktif paket dari yang terpendek ke terlama.
   Future<List<Paket>> getPaket() async {
     final db = await dbHelper.database;
-    // diubah: Menggunakan rawQuery untuk menambahkan logika sorting custom berdasarkan durasi.
     final List<Map<String, dynamic>> maps = await db.rawQuery('''
       SELECT *,
         CASE tipe
@@ -62,7 +63,6 @@ class PaketOperasi {
     });
   }
 
-  // ditambahkan: Fungsi untuk mengambil satu paket berdasarkan ID
   Future<Paket?> getPaketById(String id) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -77,7 +77,6 @@ class PaketOperasi {
     return null;
   }
 
-  // Perbaikan: Menambahkan kembali metode updatePaket yang hilang
   Future<void> updatePaket(Paket paket) async {
     final db = await dbHelper.database;
     final now = DateTime.now();
@@ -94,7 +93,6 @@ class PaketOperasi {
     final db = await dbHelper.database;
     await db.delete('paket');
   }
-  // == METODE BARU UNTUK SINKRONISASI INKREMENTAL ==
 
   Future<List<Paket>> getPerubahan(DateTime since) async {
     final db = await dbHelper.database;

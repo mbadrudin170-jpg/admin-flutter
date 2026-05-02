@@ -80,12 +80,8 @@ class CekLanggananKadaluarsaService {
           name: 'CekLangganan',
         );
 
-        // 3. Perbarui status pelanggan aktif menjadi 'deleted'
-        final PelangganAktif pelangganDiperbarui = pelanggan.copyWith(
-          syncStatus: SyncStatus.deleted,
-          diperbarui: now,
-        );
-        await _pelangganAktifOperasi.updatePelangganAktif(pelangganDiperbarui);
+        // 3. Tandai pelanggan aktif sebagai 'deleted' dan batalkan notifikasinya
+        await _pelangganAktifOperasi.hapusPelangganAktif(pelanggan.id);
         log(
           'Status PelangganAktif ID ${pelanggan.id} diubah menjadi "deleted".',
           name: 'CekLangganan',

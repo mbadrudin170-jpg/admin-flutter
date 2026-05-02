@@ -45,8 +45,16 @@ class DetailTransaksiPage extends StatelessWidget {
             ),
             _buildDetailRow('Tipe', transaksi.tipe.toString().split('.').last),
             _buildDetailRow('Nama Dompet', transaksi.namaDompet),
-            _buildDetailRow('Kategori', transaksi.kategori.nama),
-            _buildDetailRow('Sub Kategori', transaksi.subKategori.nama),
+            _buildDetailRow('Kategori', transaksi.namaKategori), // Perbaikan
+            _buildDetailRow(
+              'Sub Kategori',
+              transaksi.namaSubKategori ?? '-',
+            ), // Perbaikan
+            // Menampilkan detail pelanggan dan paket jika ada
+            if (transaksi.namaPelanggan != null)
+              _buildDetailRow('Pelanggan', transaksi.namaPelanggan!),
+            if (transaksi.namaPaket != null)
+              _buildDetailRow('Paket', transaksi.namaPaket!),
           ],
         ),
       ),
@@ -60,7 +68,7 @@ class DetailTransaksiPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(value),
+          Flexible(child: Text(value, textAlign: TextAlign.end)),
         ],
       ),
     );

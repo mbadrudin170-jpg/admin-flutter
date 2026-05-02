@@ -80,9 +80,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                             sum +
                             (item.tipe == TipeTransaksi.pemasukan
                                 ? item.jumlah
-                                : (item.tipe == TipeTransaksi.pengeluaran
-                                      ? -item.jumlah
-                                      : 0)),
+                                : -item.jumlah),
                       );
 
                       return Column(
@@ -132,6 +130,16 @@ class _TransaksiPageState extends State<TransaksiPage> {
   }
 
   Widget _bangunItemTransaksi(TransaksiModel transaksi) {
+    IconData iconData;
+    Color iconColor;
+    if (transaksi.tipe == TipeTransaksi.pemasukan) {
+      iconData = Icons.arrow_downward;
+      iconColor = Colors.green;
+    } else {
+      iconData = Icons.arrow_upward;
+      iconColor = Colors.red;
+    }
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
@@ -143,13 +151,14 @@ class _TransaksiPageState extends State<TransaksiPage> {
             ),
           ).then((_) => _loadTransaksi());
         },
-        // leading: CircleAvatar(
-        //   child: Icon(transaksi.kategori.iconData),
-        // ),
+        leading: CircleAvatar(
+          backgroundColor: iconColor.withAlpha(25), // Perbaikan di sini
+          child: Icon(iconData, color: iconColor),
+        ),
         title: Text(
           transaksi.keterangan.isNotEmpty
               ? transaksi.keterangan
-              : transaksi.kategori.nama,
+              : transaksi.namaKategori,
         ),
         subtitle: Text(transaksi.namaDompet),
         trailing: Column(
@@ -158,14 +167,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
           children: [
             Text(
               FormatUang.formatMataUang(transaksi.jumlah),
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: transaksi.tipe == TipeTransaksi.pemasukan
-                    ? Colors.green
-                    : (transaksi.tipe == TipeTransaksi.pengeluaran
-                          ? Colors.red
-                          : Colors.blue),
-              ),
+              style: TextStyle(fontWeight: FontWeight.bold, color: iconColor),
             ),
             Text(FormatJam.formatJamMenit(transaksi.tanggal)),
           ],
@@ -211,7 +213,6 @@ class _RingkasanTransaksiState extends State<RingkasanTransaksi> {
   }
 
   Future<Map<String, double>> _getSummaryData() async {
-    // Panggil semua future secara bersamaan untuk efisiensi
     final results = await Future.wait([
       _transaksiOperasi.getTotalPemasukan(),
       _transaksiOperasi.getTotalPengeluaran(),
@@ -242,7 +243,6 @@ class _RingkasanTransaksiState extends State<RingkasanTransaksi> {
           );
         }
 
-        // Ambil data dari snapshot, jika tidak ada, gunakan 0.0
         final pemasukan = snapshot.data?['pemasukan'] ?? 0.0;
         final pengeluaran = snapshot.data?['pengeluaran'] ?? 0.0;
         final total = snapshot.data?['total'] ?? 0.0;
@@ -257,7 +257,6 @@ class _RingkasanTransaksiState extends State<RingkasanTransaksi> {
               children: [
                 _buildInfo('Pemasukan', pemasukan, Colors.green),
                 _buildInfo('Pengeluaran', pengeluaran, Colors.red),
-                // Tampilkan total dengan warna dinamis
                 _buildInfo(
                   'Total',
                   total,
