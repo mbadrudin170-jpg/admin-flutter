@@ -105,6 +105,36 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 
 ---
 
+## **Folder: lib/data/operasi**
+
+**File:** `lib/data/operasi/pelanggan_aktif_operasi.dart`
+**Fitur:** Operasi Data Pelanggan Aktif
+**Daftar Fungsi:**
+- `createPelangganAktif(PelangganAktif pelangganAktif)`: Menambah pelanggan aktif baru dan menandainya `write` untuk sinkronisasi.
+- `ambilSemuaPelangganAktif()`: Mengambil semua pelanggan aktif yang tidak ditandai `deleted`.
+- `ambilSatuPelangganAktif(String id)`: Mengambil satu pelanggan aktif berdasarkan ID.
+- `updatePelangganAktif(PelangganAktif pelangganAktif)`: Memperbarui data pelanggan aktif dan menandainya `write` untuk sinkronisasi.
+- `updateSyncStatusToDeleted(String id)`: Melakukan soft delete dengan mengubah `sync_status` menjadi `deleted` dan memperbarui timestamp `diperbarui`.
+- `hapusPelangganAktif(String id)`: Wrapper yang memanggil `updateSyncStatusToDeleted` untuk melakukan soft delete.
+- `ambilDataUntukSinkronisasi()`: Mengambil semua data yang perlu disinkronkan (`write` atau `deleted`).
+- `tandaiSudahSinkron(String id)`: Mengubah `sync_status` menjadi `synced` setelah berhasil diunggah.
+- `hapusLokalPermanen(String id)`: Menghapus data secara fisik dari database lokal.
+**Catatan:** Kelas ini mengelola semua logika CRUD untuk Pelanggan Aktif dan merupakan komponen kunci dalam strategi sinkronisasi data offline-first.
+**Rules:** Semua operasi yang mengubah data (`create`, `update`, `delete`) harus memperbarui `sync_status` dan `diperbarui` dengan benar untuk memastikan integritas proses sinkronisasi.
+
+---
+
+## **Folder: lib/services**
+
+**File:** `lib/services/cek_langganan_kadaluarsa_service.dart`
+**Fitur:** Layanan Otomatis Pengarsipan Langganan Kadaluarsa
+**Daftar Fungsi:**
+- `prosesLanggananKadaluarsa()`: Memeriksa semua pelanggan aktif, memindahkan yang kadaluarsa ke riwayat, dan menandainya untuk dihapus menggunakan `updateSyncStatusToDeleted`.
+**Catatan:** Layanan ini berjalan saat aplikasi dimulai untuk memastikan data pelanggan aktif selalu relevan. Logika ini sekarang menggunakan metode `soft delete` yang terpusat.
+**Rules:** Layanan ini harus diinisialisasi pada saat startup aplikasi untuk menjalankan fungsinya secara efektif.
+
+---
+
 ## **Folder: lib/utils**
 
 **File:** `lib/utils/perhitungan_util.dart`
@@ -163,12 +193,12 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 **File:** `lib/halaman/tab/pelanggan_aktif.dart`
 **Fitur:** Manajemen Daftar Pelanggan Aktif
 **Daftar Fungsi:**
-*   `_loadPelangganAktif()`: Memuat dan mengurutkan daftar pelanggan aktif.
-*   `_hapusPelangganAktif(PelangganAktif pelanggan)`: Menangani logika penghapusan satu pelanggan.
-*   `_urutkanList(OpsiUrutkan pilihan)`: Mengurutkan daftar berdasarkan kriteria yang dipilih.
+*   `_loadData()`: Memuat dan mengurutkan daftar pelanggan aktif.
+*   `_hapusPelangganAktif(PelangganAktif pelanggan)`: Menangani logika pengarsipan. Proses ini memindahkan data ke riwayat dan melakukan `soft delete` dengan memanggil `_pelangganAktifOperasi.hapusPelangganAktif()`.
+*   `_applyFilterAndSort()`: Mengurutkan dan memfilter daftar berdasarkan kriteria yang dipilih.
 *   `_periksaDanJadwalkanNotifikasi(...)`: Menangani penjadwalan notifikasi lokal untuk paket yang akan berakhir.
-**Catatan:** Ini adalah halaman utama untuk manajemen pelanggan aktif, mencakup operasi CRUD (Create, Read, Update, Delete) melalui navigasi dan dialog.
-**Rules:** Setiap operasi yang memodifikasi data (tambah, edit, hapus) harus memanggil `_loadPelangganAktif()` pada akhirnya untuk memastikan data yang ditampilkan selalu sinkron. Tampilan sisa masa aktif dan status **wajib** menggunakan `PerhitunganUtil`.
+**Catatan:** Ini adalah halaman utama untuk manajemen pelanggan aktif. Logika penghapusan telah disederhanakan untuk menggunakan metode `soft delete` dari lapisan operasi data, memastikan konsistensi.
+**Rules:** Setiap operasi yang memodifikasi data (tambah, edit, hapus) harus memanggil `_loadData()` pada akhirnya untuk memastikan data yang ditampilkan selalu sinkron. Tampilan sisa masa aktif dan status **wajib** menggunakan `PerhitunganUtil`.
 
 ---
 

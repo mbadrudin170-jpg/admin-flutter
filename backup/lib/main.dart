@@ -6,9 +6,13 @@ import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'data/services/sinkronisasi_database.dart';
 import 'firebase_options.dart';
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/splash_screen.dart';
+
+// [PERBAIKAN] Buat satu instance layanan sinkronisasi untuk seluruh aplikasi
+final SinkronisasiDatabase sinkronisasiDatabase = SinkronisasiDatabase();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,10 +31,12 @@ void main() async {
 
     await initializeDateFormatting('id_ID', null);
 
-    // Pastikan database diinisialisasi
     final dbHelper = DatabaseHelper.instance;
     await dbHelper.database;
 
+    // [PERBAIKAN] Panggil metode startSync() yang baru
+    // Ini akan menangani sinkronisasi saat startup dan saat koneksi berubah.
+    sinkronisasiDatabase.startSync();
   } catch (e) {
     debugPrint("Terjadi kesalahan saat inisialisasi: $e");
   }
@@ -46,9 +52,21 @@ class MyApp extends StatelessWidget {
     const Color primarySeedColor = Colors.deepPurple;
 
     final TextTheme appTextTheme = const TextTheme(
-      displayLarge: TextStyle(fontFamily: 'Roboto', fontSize: 57, fontWeight: FontWeight.bold),
-      titleLarge: TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w500),
-      bodyMedium: TextStyle(fontFamily: 'Roboto', fontSize: 14, fontWeight: FontWeight.w400),
+      displayLarge: TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 57,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
     );
 
     final ThemeData lightTheme = ThemeData(
@@ -62,7 +80,11 @@ class MyApp extends StatelessWidget {
       appBarTheme: const AppBarTheme(
         backgroundColor: primarySeedColor,
         foregroundColor: Colors.white,
-        titleTextStyle: TextStyle(fontFamily: 'Roboto', fontSize: 24, fontWeight: FontWeight.bold),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Roboto',
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -70,7 +92,11 @@ class MyApp extends StatelessWidget {
           backgroundColor: primarySeedColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: const TextStyle(fontFamily: 'Roboto', fontSize: 16, fontWeight: FontWeight.w500),
+          textStyle: const TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );

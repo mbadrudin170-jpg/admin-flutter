@@ -1,6 +1,5 @@
 
 import 'dart:async';
-import 'package:admin_wifi/data/services/inisialisasi_data_service.dart';
 import 'package:flutter/material.dart';
 import 'package:admin_wifi/halaman_utama.dart';
 import 'package:admin_wifi/services/cek_koneksi_internet.dart';
@@ -15,23 +14,17 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final InisialisasiDataService _inisialisasiDataService = InisialisasiDataService();
-
   @override
   void initState() {
     super.initState();
-    _startApp();
+    _startNavigation();
   }
 
-  Future<void> _startApp() async {
-    // Jalankan inisialisasi data
-    await _inisialisasiDataService.inisialisasiDataAplikasi();
-    
-    // Cek koneksi dan status langganan
+  Future<void> _startNavigation() async {
+
     final bool isOnline = await KoneksiInternetService.cekKoneksi();
     await CekLanggananKadaluarsaService().prosesLanggananKadaluarsa();
 
-    // Tunda navigasi untuk menampilkan splash screen
     Timer(const Duration(seconds: 3), () {
       if (!mounted) return;
 

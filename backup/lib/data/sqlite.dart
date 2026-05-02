@@ -1,0 +1,262 @@
+// path: lib/data/sqlite.dart
+import 'dart:io';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
+
+// Kelas ini berfungsi sebagai pusat pengelolaan koneksi dan skema database SQLite.
+class DatabaseHelper {
+  static final DatabaseHelper instance = DatabaseHelper._internal();
+  static Database? _database;
+
+  DatabaseHelper._internal();
+
+  // Fungsi untuk mendapatkan instance database, atau menginisialisasi jika belum ada.
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    _database = await _initDB();
+    return _database!;
+  }
+
+  // Fungsi untuk menginisialisasi database.
+  Future<Database> _initDB() async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, 'mydatabase.db');
+    return await openDatabase(
+      path,
+      version:
+          14, // diubah: Versi dinaikkan untuk memastikan migrasi data lama.
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
+  }
+
+  // Fungsi yang dipanggil saat database dibuat untuk pertama kalinya.
+  Future<void> _onCreate(Database db, int version) async {
+    await _createTables(db);
+  }
+
+  // Fungsi untuk menangani migrasi skema saat versi database berubah.
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 5) {
+      await db.execute("DROP TABLE IF EXISTS kategori");
+      await db.execute("DROP TABLE IF EXISTS sub_kategori");
+      await db.execute("DROP TABLE IF EXISTS paket");
+      await db.execute("DROP TABLE IF EXISTS pelanggan");
+      await db.execute("DROP TABLE IF EXISTS pelanggan_aktif");
+      await db.execute("DROP TABLE IF EXISTS transaksi");
+      await db.execute("DROP TABLE IF EXISTS dompet");
+      await db.execute("DROP TABLE IF EXISTS kritik_saran");
+      await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
+      await db.execute("DROP TABLE IF EXISTS pesanan");
+      await _createTables(db);
+      return;
+    }
+
+    if (oldVersion < 6) {
+      await _createKritikSaranTable(db);
+    }
+
+    if (oldVersion < 7) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS riwayat_langganan(
+          id TEXT PRIMARY KEY,
+          id_pelanggan TEXT NOT NULL,
+          id_paket TEXT NOT NULL,
+          tanggalMulai TEXT NOT NULL,
+          tanggalBerakhir TEXT NOT NULL,
+          status TEXT NOT NULL,
+          diperbarui TEXT,
+          FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
+          FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
+        )
+      ''');
+    }
+
+    if (oldVersion < 8) {
+      await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
+      await _createRiwayatLanggananTable(db);
+    }
+
+    if (oldVersion < 9) {
+      await _createPesananTable(db);
+    }
+
+    if (oldVersion < 10) {
+      await db.execute("DROP TABLE IF EXISTS pesanan");
+      await _createPesananTable(db);
+    }
+
+    if (oldVersion < 11) {
+      await db.execute(
+        'ALTER TABLE riwayat_langganan ADD COLUMN diarsipkan TEXT',
+      );
+    }
+
+    if (oldVersion < 12) {
+      await db.execute("DROP TABLE IF EXISTS riwayat_langganan");
+      await _createRiwayatLanggananTable(db);
+    }
+
+    if (oldVersion < 13) {
+      await db.execute(
+        "ALTER TABLE pelanggan_aktif ADD COLUMN sync_status TEXT NOT NULL DEFAULT 'synced'",
+      );
+    }
+
+    // ditambah: Logika migrasi untuk v14 untuk memastikan data lama diisi.
+    if (oldVersion < 14) {
+      // Perintah ini akan mengisi kolom sync_status dengan 'synced' untuk semua baris lama yang nilainya masih NULL.
+      await db.execute(
+        'UPDATE pelanggan_aktif SET sync_status = \'synced\' WHERE sync_status IS NULL',
+      );
+    }
+  }
+
+  Future<void> _createTables(Database db) async {
+    // ... (kode tabel lain tetap sama) ...
+    // 1. Kategori
+    await db.execute('''
+      CREATE TABLE kategori(
+        id TEXT PRIMARY KEY,
+        nama TEXT NOT NULL,
+        tipe TEXT NOT NULL,
+        diperbarui TEXT NOT NULL
+      )
+    ''');
+
+    // 2. Sub Kategori
+    await db.execute('''
+      CREATE TABLE sub_kategori(
+        id TEXT PRIMARY KEY,
+        nama TEXT NOT NULL,
+        id_kategori TEXT NOT NULL,
+        diperbarui TEXT NOT NULL,
+        FOREIGN KEY (id_kategori) REFERENCES kategori (id) ON DELETE CASCADE
+      )
+    ''');
+
+    // 3. Paket
+    await db.execute('''
+      CREATE TABLE paket(
+        id TEXT PRIMARY KEY,
+        nama TEXT NOT NULL,
+        harga INTEGER NOT NULL,
+        durasi INTEGER NOT NULL,
+        tipe TEXT NOT NULL,
+        diperbarui TEXT NOT NULL
+      )
+    ''');
+
+    // 4. Pelanggan
+    await db.execute('''
+      CREATE TABLE pelanggan(
+        id TEXT PRIMARY KEY,
+        nama TEXT NOT NULL,
+        telepon TEXT NOT NULL,
+        alamat TEXT NOT NULL,
+        password TEXT NOT NULL,
+        mac_address TEXT NOT NULL,
+        diperbarui TEXT NOT NULL
+      )
+    ''');
+
+    // 5. Pelanggan Aktif
+    await db.execute('''
+      CREATE TABLE pelanggan_aktif(
+        id TEXT PRIMARY KEY,
+        id_pelanggan TEXT NOT NULL,
+        id_paket TEXT NOT NULL,
+        tanggalMulai TEXT NOT NULL,
+        tanggalBerakhir TEXT NOT NULL,
+        status TEXT NOT NULL,
+        diperbarui TEXT NOT NULL,
+        status_sinkronisasi TEXT NOT NULL DEFAULT 'SINKRON',
+        sync_status TEXT NOT NULL DEFAULT 'synced',
+        FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE ON UPDATE CASCADE
+      )
+    ''');
+
+    // 6. Transaksi
+    await db.execute('''
+      CREATE TABLE transaksi(
+        id TEXT PRIMARY KEY,
+        keterangan TEXT NOT NULL,
+        tanggal TEXT NOT NULL,
+        jumlah REAL NOT NULL,
+        tipe TEXT NOT NULL,
+        namaDompet TEXT NOT NULL,
+        id_kategori TEXT NOT NULL,
+        id_sub_kategori TEXT NOT NULL,
+        diperbarui TEXT NOT NULL,
+        FOREIGN KEY (id_kategori) REFERENCES kategori (id),
+        FOREIGN KEY (id_sub_kategori) REFERENCES sub_kategori (id)
+      )
+    ''');
+
+    // 7. Dompet
+    await db.execute('''
+      CREATE TABLE dompet(
+        id TEXT PRIMARY KEY,
+        namaDompet TEXT NOT NULL,
+        saldo REAL NOT NULL,
+        diperbarui TEXT NOT NULL
+      )
+    ''');
+
+    await _createKritikSaranTable(db);
+    await _createRiwayatLanggananTable(db);
+    await _createPesananTable(db);
+  }
+
+  Future<void> _createKritikSaranTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS kritik_saran(
+        id TEXT PRIMARY KEY,
+        isi TEXT NOT NULL,
+        tanggal TEXT NOT NULL,
+        userId TEXT NOT NULL,
+        diperbarui TEXT NOT NULL,
+        FOREIGN KEY (userId) REFERENCES pelanggan (id) ON DELETE CASCADE
+      )
+    ''');
+  }
+
+  Future<void> _createRiwayatLanggananTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS riwayat_langganan(
+          id TEXT PRIMARY KEY,
+          id_pelanggan TEXT NOT NULL,
+          id_paket TEXT NOT NULL,
+          
+          -- Snapshot data paket
+          nama_paket TEXT NOT NULL,
+          harga_paket INTEGER NOT NULL,
+          durasi_paket INTEGER NOT NULL,
+          tipe_durasi_paket TEXT NOT NULL,
+
+          tanggal_mulai TEXT NOT NULL,
+          tanggal_berakhir TEXT NOT NULL,
+          status TEXT NOT NULL,
+          diperbarui TEXT,
+          diarsipkan TEXT,
+          FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
+          FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
+        )
+    ''');
+  }
+
+  Future<void> _createPesananTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS pesanan(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id_pelanggan TEXT NOT NULL,
+        id_paket TEXT NOT NULL,
+        tanggal TEXT NOT NULL,
+        FOREIGN KEY (id_pelanggan) REFERENCES pelanggan (id) ON DELETE CASCADE,
+        FOREIGN KEY (id_paket) REFERENCES paket (id) ON DELETE CASCADE
+      )
+    ''');
+  }
+}
