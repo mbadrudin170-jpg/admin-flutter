@@ -48,6 +48,7 @@ dependencies:
   url_launcher: ^6.3.2
   font_awesome_flutter: ^11.0.0
   jiffy: ^6.4.4
+  google_fonts: ^8.1.0
 
 dev_dependencies:
   flutter_test:
