@@ -15,17 +15,17 @@ class InisialisasiDataService {
     developer.log('Memulai proses inisialisasi data...', name: 'InisialisasiData');
 
     try {
-      // [REFACTOR] Cek semua kondisi tabel terlebih dahulu.
+      // [PERBAIKAN] Tambahkan pengecekan untuk tabel paket.
       final bool perluSinkronisasi = 
           await _pengecekanTabelService.isPelangganEmpty() ||
           await _pengecekanTabelService.isKategoriEmpty() ||
           await _pengecekanTabelService.isTransaksiEmpty() ||
-          await _pengecekanTabelService.isPelangganAktifEmpty();
+          await _pengecekanTabelService.isPelangganAktifEmpty() ||
+          await _pengecekanTabelService.isPaketEmpty(); // Tambahkan ini
 
-      // [REFACTOR] Jika salah satu tabel kosong, jalankan sinkronisasi sekali saja.
       if (perluSinkronisasi) {
         developer.log(
-          'Satu atau lebih tabel data kosong. Memulai sinkronisasi dari Firebase...',
+          'Satu atau lebih tabel data (termasuk paket) kosong. Memulai sinkronisasi dari Firebase...',
           name: 'InisialisasiData',
         );
         await _sinkronisasiService.sinkronisasiData();

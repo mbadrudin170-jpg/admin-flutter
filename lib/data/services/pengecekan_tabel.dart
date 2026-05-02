@@ -46,4 +46,11 @@ class PengecekanTabelService {
     int count = Sqflite.firstIntValue(result) ?? 0;
     return count == 0;
   }
+
+  Future<bool> isPaketEmpty() async {
+    final db = await dbHelper.database;
+    final result = await db.rawQuery('SELECT COUNT(*) FROM paket');
+    int count = Sqflite.firstIntValue(result) ?? 0;
+    return count == 0;
+  }
 }

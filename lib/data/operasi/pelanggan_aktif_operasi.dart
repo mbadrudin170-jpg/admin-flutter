@@ -20,6 +20,34 @@ class PelangganAktifOperasi {
     return !connectivityResult.contains(ConnectivityResult.none);
   }
 
+  Future<int> unduhPelangganAktif(PelangganAktif pelangganAktif) async {
+    final db = await dbHelper.database;
+    final now = DateTime.now();
+
+    final pelangganAktifWithStatus = pelangganAktif.copyWith(
+      syncStatus: SyncStatus.synced,
+      diperbarui: now,
+    );
+
+    final data = pelangganAktifWithStatus.toMap();
+    // SOLUSI: Pastikan sync_status selalu disimpan sebagai string
+    data['sync_status'] = SyncStatus.synced.name;
+
+    final result = await db.insert(
+      'pelanggan_aktif',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    await _jadwalkanNotifikasi(pelangganAktifWithStatus);
+    await PesanInfoPaket.kirimRincianPaket(pelangganAktifWithStatus);
+
+    developer.log(
+      '✅ [LOKAL] Pelanggan aktif (ID: ${pelangganAktif.id}) dibuat dan ditandai untuk diunggah.',
+    );
+    return result;
+  }
+
   Future<int> createPelangganAktif(PelangganAktif pelangganAktif) async {
     final db = await dbHelper.database;
     final now = DateTime.now();

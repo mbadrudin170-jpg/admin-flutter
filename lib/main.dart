@@ -1,17 +1,12 @@
-
 // lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:admin_wifi/data/services/navigasi_servis.dart';
 import 'package:admin_wifi/splash_screen.dart';
-import 'firebase_options.dart';
 
-void main() async {
-  // Hanya inisialisasi yang paling krusial sebelum runApp
+// [OPTIMASI PERFORMA] Jadikan main() sinkron dan secepat mungkin.
+// Pekerjaan berat seperti inisialisasi Firebase dipindahkan ke SplashScreen.
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
   runApp(const MyApp());
 }
 
@@ -23,8 +18,16 @@ class MyApp extends StatelessWidget {
     const Color primarySeedColor = Colors.deepPurple;
 
     final TextTheme appTextTheme = const TextTheme(
-      displayLarge: TextStyle(fontFamily: 'Oswald', fontSize: 57, fontWeight: FontWeight.bold),
-      titleLarge: TextStyle(fontFamily: 'Roboto', fontSize: 22, fontWeight: FontWeight.w500),
+      displayLarge: TextStyle(
+        fontFamily: 'Oswald',
+        fontSize: 57,
+        fontWeight: FontWeight.bold,
+      ),
+      titleLarge: TextStyle(
+        fontFamily: 'Roboto',
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+      ),
       bodyMedium: TextStyle(fontFamily: 'Open Sans', fontSize: 14),
     );
 
@@ -38,7 +41,11 @@ class MyApp extends StatelessWidget {
       appBarTheme: const AppBarTheme(
         backgroundColor: primarySeedColor,
         foregroundColor: Colors.white,
-        titleTextStyle: TextStyle(fontFamily: 'Oswald', fontSize: 24, fontWeight: FontWeight.bold),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Oswald',
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -46,7 +53,11 @@ class MyApp extends StatelessWidget {
           backgroundColor: primarySeedColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: const TextStyle(fontFamily: 'Roboto', fontSize: 16, fontWeight: FontWeight.w500),
+          textStyle: const TextStyle(
+            fontFamily: 'Roboto',
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );

@@ -1,10 +1,8 @@
-// lib/halaman_utama.dart
-// File ini adalah kerangka utama aplikasi yang berisi BottomNavigationBar
-// untuk navigasi antar halaman utama seperti Pelanggan Aktif, Dompet,
-// Transaksi, dan Lainnya.
 
-import 'package:admin_wifi/halaman/tab/lainnya.dart';
+// lib/halaman_utama.dart
+import 'package:admin_wifi/services/cek_langganan_kadaluarsa_service.dart';
 import 'package:flutter/material.dart';
+import 'package:admin_wifi/halaman/tab/lainnya.dart';
 import 'package:admin_wifi/halaman/tab/pelanggan_aktif.dart';
 import 'package:admin_wifi/halaman/tab/dompet.dart';
 import 'package:admin_wifi/halaman/tab/transaksi.dart';
@@ -33,11 +31,21 @@ class _HalamanUtamaState extends State<HalamanUtama> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    // [OPTIMASI] Jalankan tugas pemeliharaan di latar belakang setelah UI utama ditampilkan.
+    // Ini tidak memblokir UI dan berjalan diam-diam.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      CekLanggananKadaluarsaService().prosesLanggananKadaluarsa();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(child: _widgetOptions.elementAt(_selectedIndex)),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed, // Memastikan perilaku konsisten
+        type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.person_pin_circle),
@@ -55,9 +63,7 @@ class _HalamanUtamaState extends State<HalamanUtama> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Theme.of(
-          context,
-        ).colorScheme.onSurface.withAlpha(179), // Perbaikan dari withOpacity
+        unselectedItemColor: Theme.of(context).colorScheme.onSurface.withAlpha(179),
         onTap: _onItemTapped,
         showUnselectedLabels: true,
       ),

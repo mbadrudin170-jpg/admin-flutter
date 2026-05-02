@@ -3,10 +3,12 @@ import 'package:admin_wifi/data/operasi/pelanggan_operasi.dart';
 import 'package:admin_wifi/data/operasi/kategori_operasi.dart';
 import 'package:admin_wifi/data/operasi/transaksi_operasi.dart';
 import 'package:admin_wifi/data/operasi/pelanggan_aktif_operasi.dart';
+import 'package:admin_wifi/data/operasi/paket_operasi.dart'; // Impor operasi paket
 import 'package:admin_wifi/model/pelanggan_model.dart';
 import 'package:admin_wifi/model/kategori_model.dart';
 import 'package:admin_wifi/model/transaksi_model.dart';
 import 'package:admin_wifi/model/pelanggan_aktif_model.dart';
+import 'package:admin_wifi/model/paket_model.dart'; // Impor model paket
 import 'dart:developer' as developer;
 
 class SinkronisasiDatabase {
@@ -15,6 +17,7 @@ class SinkronisasiDatabase {
   final KategoriOperasi _kategoriOperasi = KategoriOperasi();
   final TransaksiOperasi _transaksiOperasi = TransaksiOperasi();
   final PelangganAktifOperasi _pelangganAktifOperasi = PelangganAktifOperasi();
+  final PaketOperasi _paketOperasi = PaketOperasi(); // Tambahkan operasi paket
 
   Future<void> sinkronisasiData() async {
     developer.log(
@@ -26,6 +29,7 @@ class SinkronisasiDatabase {
       await _sinkronisasiKategori();
       await _sinkronisasiTransaksi();
       await _sinkronisasiPelangganAktif();
+      await _sinkronisasiPaket(); // Panggil sinkronisasi paket
       developer.log(
         'Sinkronisasi data berhasil.',
         name: 'SinkronisasiDatabase',
@@ -40,6 +44,20 @@ class SinkronisasiDatabase {
       // Rethrow the exception to be handled by the caller if needed
       rethrow;
     }
+  }
+
+  Future<void> _sinkronisasiPaket() async {
+    final snapshot = await _firestore.collection('paket').get();
+    final List<Paket> pakets = snapshot.docs
+        .map((doc) => Paket.fromMap(doc.data()))
+        .toList();
+    for (final paket in pakets) {
+      await _paketOperasi.createPaket(paket);
+    }
+    developer.log(
+      '${pakets.length} paket disinkronkan.',
+      name: 'SinkronisasiDatabase',
+    );
   }
 
   Future<void> _sinkronisasiPelanggan() async {
@@ -90,7 +108,7 @@ class SinkronisasiDatabase {
         .map((doc) => PelangganAktif.fromMap(doc.data()))
         .toList();
     for (final pelangganAktif in pelangganAktifs) {
-      await _pelangganAktifOperasi.createPelangganAktif(pelangganAktif);
+      await _pelangganAktifOperasi.unduhPelangganAktif(pelangganAktif);
     }
     developer.log(
       '${pelangganAktifs.length} pelanggan aktif disinkronkan.',

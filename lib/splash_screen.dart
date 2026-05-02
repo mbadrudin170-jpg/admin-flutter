@@ -1,17 +1,18 @@
-// lib/splash_screen.dart
 
+// lib/splash_screen.dart
 import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'package:admin_wifi/firebase_options.dart';
 import 'package:admin_wifi/halaman_utama.dart';
 import 'package:admin_wifi/data/services/inisialisasi_data_service.dart';
 import 'package:admin_wifi/data/services/notifikasi_servis.dart';
 import 'package:admin_wifi/data/sqlite.dart';
 import 'package:admin_wifi/services/cek_koneksi_internet.dart';
-import 'package:admin_wifi/services/cek_langganan_kadaluarsa_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,7 +27,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Memulai semua pekerjaan berat setelah frame pertama di-render
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeAndNavigate();
     });
@@ -36,6 +36,12 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isOnline = false;
 
     try {
+      // [OPTIMASI PERFORMA] Langkah 0: Inisialisasi Firebase
+      setState(() => _loadingMessage = "Menghubungkan ke layanan Google...");
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+
       // 1. Inisialisasi Lokal (Cepat)
       setState(() => _loadingMessage = "Menginisialisasi zona waktu...");
       tz.initializeTimeZones();
@@ -53,32 +59,23 @@ class _SplashScreenState extends State<SplashScreen> {
       setState(() => _loadingMessage = "Membuka database lokal...");
       await DatabaseHelper.instance.database;
 
-      // 3. Pengecekan Koneksi & Sinkronisasi Data (Pekerjaan Paling Berat)
+      // 3. Pengecekan Koneksi & Sinkronisasi Data
       setState(() => _loadingMessage = "Mengecek koneksi internet...");
       isOnline = await KoneksiInternetService.cekKoneksi();
 
       if (isOnline) {
         setState(() => _loadingMessage = "Memeriksa & sinkronisasi data...");
-        // [FIX] Create an instance before calling the method
         await InisialisasiDataService().inisialisasiDataAplikasi();
       } else {
-        setState(
-          () => _loadingMessage = "Mode offline, melewati sinkronisasi...",
-        );
+         setState(() => _loadingMessage = "Mode offline, melewati sinkronisasi...");
       }
 
-      // 4. Proses Bisnis Lanjutan
-      setState(() => _loadingMessage = "Memeriksa status langganan...");
-      await CekLanggananKadaluarsaService().prosesLanggananKadaluarsa();
-
       setState(() => _loadingMessage = "Selesai, membuka aplikasi...");
-      await Future.delayed(
-        const Duration(milliseconds: 500),
-      ); // Sedikit jeda agar pesan terbaca
+      await Future.delayed(const Duration(milliseconds: 250));
+
     } catch (e) {
-      // Jika terjadi error, tetap coba navigasi tapi tampilkan pesan
-      debugPrint("Error saat inisialisasi: $e");
-      setState(() => _loadingMessage = "Terjadi error, tetap mencoba...");
+        debugPrint("Error saat inisialisasi: $e");
+         setState(() => _loadingMessage = "Terjadi error, tetap mencoba...");
     }
 
     // 5. Navigasi
@@ -90,12 +87,9 @@ class _SplashScreenState extends State<SplashScreen> {
     ).then((_) {
       if (!mounted) return;
       if (!isOnline) {
-        // Menampilkan pesan offline setelah halaman utama siap
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-              'Anda dalam mode offline. Data mungkin tidak terbaru.',
-            ),
+            content: Text('Anda dalam mode offline. Data mungkin tidak terbaru.'),
             backgroundColor: Colors.orange,
           ),
         );
@@ -114,11 +108,7 @@ class _SplashScreenState extends State<SplashScreen> {
             const SizedBox(height: 24),
             const Text(
               'Admin WiFi',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Oswald',
-              ),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, fontFamily: 'Oswald'),
             ),
             const SizedBox(height: 40),
             const CircularProgressIndicator(),
