@@ -181,12 +181,20 @@ class KritikSaranOperasi {
   // ditambah: Fungsi untuk mengunduh semua data dari koleksi 'kritik_saran' di Firebase.
   static Future<List<KritikSaranModel>> unduhDataDariFirebase() async {
     try {
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('kritik_saran').get();
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('kritik_saran')
+          .get();
       final List<KritikSaranModel> data = snapshot.docs
-          .map((doc) => KritikSaranModel.fromMap(doc.data() as Map<String, dynamic>))
+          .map(
+            (doc) =>
+                KritikSaranModel.fromMap(doc.data() as Map<String, dynamic>),
+          )
           .toList();
 
-      developer.log('Berhasil mengunduh ${data.length} data kritik dan saran dari Firebase.', name: 'KritikSaranOperasi.unduh');
+      developer.log(
+        'Berhasil mengunduh ${data.length} data kritik dan saran dari Firebase.',
+        name: 'KritikSaranOperasi.unduh',
+      );
       return data;
     } catch (e, stackTrace) {
       developer.log(

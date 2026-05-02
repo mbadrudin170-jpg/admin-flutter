@@ -79,14 +79,18 @@ class _LainnyaTabState extends State<LainnyaPage> {
                 final dataFromFirebase =
                     await KritikSaranOperasi.unduhDataDariFirebase();
 
+                // diubah/ditambah: periksa mounted setelah operasi async
+                if (!mounted) return;
+
                 // 2. Simpan data ke database lokal
                 if (dataFromFirebase.isNotEmpty) {
                   final operasi = KritikSaranOperasi();
                   await operasi.sisipkanAtauPerbaruiBatch(dataFromFirebase);
+                  // diubah/ditambah: periksa mounted setelah operasi async kedua
+                  if (!mounted) return;
                 }
 
                 // 3. Navigasi ke halaman setelah data disinkronkan
-                if (!mounted) return;
                 Navigator.push(
                   context,
                   MaterialPageRoute(

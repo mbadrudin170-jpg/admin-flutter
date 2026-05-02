@@ -1,36 +1,3 @@
-# **Kritik dan Saran untuk Peningkatan Proyek**
-
-Berdasarkan analisis terhadap struktur dan aturan proyek, berikut adalah beberapa saran yang dapat dipertimbangkan untuk meningkatkan profesionalisme, efisiensi, dan kualitas aplikasi Anda:
-
-1.  **Implementasi Pengujian Otomatis (Testing)**:
-    *   **Saran**: Mulai mengadopsi *unit testing* untuk memverifikasi logika bisnis (misalnya, fungsi di `perhitungan_util.dart`) dan *widget testing* untuk memastikan komponen UI berfungsi seperti yang diharapkan.
-    *   **Manfaat**: Ini akan secara drastis mengurangi regresi (bug yang muncul kembali) setiap kali ada perubahan, meningkatkan kepercayaan diri saat merilis versi baru, dan menjadikan proyek lebih profesional dan andal.
-
-2.  **Manajemen State yang Lebih Terstruktur**:
-    *   **Saran**: Saat ini, manajemen state masih bersifat lokal (`setState`). Seiring bertambahnya kompleksitas, pertimbangkan untuk mengadopsi solusi manajemen state yang lebih terpusat dan skalabel seperti **Riverpod** atau **Provider**.
-    *   **Manfaat**: Memisahkan logika bisnis dari UI, membuat kode lebih mudah diuji (*testable*), dikelola (*maintainable*), dan dipahami oleh anggota tim lain di masa depan.
-
-3.  **Struktur Proyek Berbasis Fitur (Feature-Driven)**:
-    *   **Saran**: Kelompokkan file tidak hanya berdasarkan tipe (misalnya, `halaman`, `model`), tetapi juga berdasarkan fitur. Contoh: folder `lib/fitur/pelanggan/` akan berisi `halaman/`, `model/`, dan `operasi/` yang khusus untuk fitur pelanggan.
-    *   **Manfaat**: Membuat proyek lebih mudah dinavigasi saat skala aplikasi membesar dan memungkinkan pengembangan fitur secara lebih modular dan independen.
-
-4.  **Penerapan Version Control Semantik (Semantic Versioning)**:
-    *   **Saran**: Adopsi standar *Semantic Versioning* (MAJOR.MINOR.PATCH) secara disiplin.
-        *   **MAJOR**: Untuk perubahan yang tidak kompatibel (API breaking changes).
-        *   **MINOR**: Untuk penambahan fitur baru yang kompatibel.
-        *   **PATCH**: Untuk perbaikan bug yang kompatibel.
-    *   **Manfaat**: Memberikan kejelasan kepada tim dan pengguna mengenai signifikansi setiap rilis versi baru.
-
-5.  **Pengelolaan Dependensi dan Keamanan**:
-    *   **Saran**: Lakukan audit dependensi secara berkala dengan menjalankan `flutter pub outdated`. Segera perbarui paket yang usang untuk mendapatkan perbaikan bug, peningkatan performa, dan patch keamanan.
-    *   **Manfaat**: Mencegah masalah yang disebabkan oleh paket yang tidak lagi didukung dan menjaga keamanan aplikasi dari kerentanan yang diketahui.
-
-6.  **Pencegahan Inkonsistensi Data (Case-Sensitivity)**:
-    *   **Saran**: Bug terakhir yang kita perbaiki disebabkan oleh perbedaan huruf besar/kecil (`'Pemasukan'` vs `'pemasukan'`) antara kode dan database. Untuk mencegah ini, hindari penggunaan string mentah di dalam query. Gunakan *prepared statements* dengan *arguments* yang berasal dari konstanta atau enum. Contoh: `db.rawQuery("... WHERE tipe = ?", [TipeTransaksi.pemasukan.name])`.
-    *   **Manfaat**: Menghilangkan seluruh kelas bug yang sulit dilacak yang disebabkan oleh ketidakkonsistenan data, typo, atau perbedaan *case*. Ini membuat query lebih aman dan dapat diandalkan.
-
----
-
 # **Dokumentasi Proyek Aplikasi Admin WiFi**
 
 Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen ini berfungsi sebagai panduan utama untuk memahami arsitektur, fungsionalitas, dan alur kerja pengembangan aplikasi.
@@ -70,6 +37,20 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 - `getNetTotal()`: Menghitung selisih bersih antara pemasukan dan pengeluaran.
 **Catatan:** File ini adalah pusat logika untuk semua interaksi dengan tabel `transaksi`. Perbaikan krusial telah dilakukan pada fungsi agregasi (`getTotal...`) untuk memastikan perhitungan saldo yang akurat dengan mencocokkan string *case-sensitive* (`'pemasukan'`, `'pengeluaran'`) yang disimpan di database.
 **Rules:** Gunakan kelas ini untuk semua operasi data transaksi guna memastikan konsistensi dan akurasi perhitungan.
+
+---
+**File:** `lib/data/operasi/kritik_saran_operasi.dart`
+**Fitur:** Operasi CRUD dan Sinkronisasi untuk Kritik & Saran
+**Daftar Fungsi:**
+- `createKritikSaran(KritikSaranModel kritikSaran)`: Menyimpan data baru ke database lokal.
+- `getKritikSaran()`: Mengambil semua data dari database lokal.
+- `getKritikSaranById(String id)`: Mengambil satu data berdasarkan ID.
+- `getPerubahan(DateTime lastSync)`: Mengambil data yang berubah sejak sinkronisasi terakhir.
+- `sisipkanAtauPerbaruiBatch(List<KritikSaranModel> daftarKritikSaran)`: Menyisipkan atau memperbarui banyak data sekaligus ke database lokal. Sangat efisien untuk sinkronisasi.
+- `hapusKritikSaran(String id)`: Menghapus data berdasarkan ID.
+- `unduhDataDariFirebase()`: **(Baru)** Fungsi statis untuk mengunduh semua data kritik dan saran dari koleksi `kritik_saran` di Firestore.
+**Catatan:** Kelas ini sekarang menjadi pusat untuk operasi lokal dan sinkronisasi data kritik dan saran dari Firebase.
+**Rules:** Gunakan fungsi `unduhDataDariFirebase()` dilanjutkan dengan `sisipkanAtauPerbaruiBatch()` untuk melakukan sinkronisasi data dari server ke database lokal.
 
 ---
 
@@ -249,13 +230,10 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 ---
 
 **File:** `lib/halaman/tab/lainnya.dart`
-**Fitur:** Pusat Pengaturan dan Navigasi. Halaman ini berfungsi sebagai hub untuk mengakses berbagai halaman manajemen lainnya dan untuk menguji fungsionalitas notifikasi.
+**Fitur:** Pusat Pengaturan dan Navigasi. Halaman ini berfungsi sebagai hub untuk mengakses berbagai halaman manajemen lainnya.
 **Daftar Fungsi:**
-*   `_initNotifikasi()`: Menginisialisasi layanan notifikasi.
-*   `_tampilkanNotifikasiLangsung()`: Mengirim notifikasi tes secara langsung.
-*   `_jadwalkanNotifikasi()`: Menjadwalkan notifikasi tes untuk 10 detik ke depan.
 *   `_buildNavigationButton(...)`: Fungsi pembantu untuk membuat tombol navigasi yang konsisten.
-**Catatan:** Halaman ini berisi daftar navigasi ke semua halaman pengaturan dan manajemen penting dalam aplikasi, termasuk halaman 'Daftar Pesanan'.
+**Catatan:** Tombol "Kritik & Saran" pada halaman ini telah diperbarui. Saat diketuk, aplikasi akan terlebih dahulu mengunduh data dari Firebase, menyimpannya ke database lokal, baru kemudian menavigasi ke halaman `KritikSaranPage`. Ini memastikan data yang ditampilkan selalu yang terbaru.
 **Rules:** Penambahan halaman manajemen baru harus disertai dengan penambahan tombol navigasi di file ini menggunakan `_buildNavigationButton` untuk menjaga konsistensi UI.
 
 ---
@@ -278,7 +256,7 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 - `_showEditDeleteDialog(Paket paket)`: Menampilkan dialog kontekstual saat item paket ditekan lama, memberikan opsi untuk "Edit" atau "Hapus".
 - `_showDeleteConfirmationDialog(Paket paket)`: Menampilkan dialog konfirmasi untuk mencegah penghapusan paket yang tidak disengaja.
 - `_hapusSemuaPaket()`: Menangani logika untuk menghapus semua data paket dari database, dengan dialog konfirmasi sebelumnya.
-**Catatn:** Halaman ini menggunakan `FutureBuilder` untuk menangani pemuatan data secara asinkron. Setiap operasi yang mengubah data (tambah, edit, hapus) akan memicu `_refreshPaketList()` untuk konsistensi data.
+**Catatan:** Halaman ini menggunakan `FutureBuilder` untuk menangani pemuatan data secara asinkron. Setiap operasi yang mengubah data (tambah, edit, hapus) akan memicu `_refreshPaketList()` untuk konsistensi data.
 **Rules:** 
 - Navigasi ke halaman pembuatan atau edit (`FormPaket`) harus memanggil `_refreshPaketList` setelah kembali untuk menampilkan data yang diperbarui.
 - Penghapusan paket, baik tunggal maupun semua, harus selalu didahului oleh dialog konfirmasi untuk mencegah kehilangan data.
@@ -297,3 +275,37 @@ Selamat datang di dokumentasi resmi untuk proyek Aplikasi Admin WiFi. Dokumen in
 *   `_periksaDanJadwalkanNotifikasi(...)`: Menangani penjadwalan notifikasi untuk paket yang akan berakhir (fungsionalitas bawaan dari "Pelanggan Aktif").
 **Catatan:** Halaman ini merupakan duplikat fungsional dari "Pelanggan Aktif" dan ditempatkan di menu "Lainnya" untuk menyediakan akses penuh terhadap data riwayat, termasuk kemampuan untuk menambah, mengubah, dan menghapus data.
 **Rules:** Karena merupakan salinan, semua aturan yang berlaku di `lib/halaman/tab/pelanggan_aktif.dart` juga berlaku di sini, terutama penggunaan `PerhitunganUtil` dan `FormatUtil` untuk konsistensi tampilan data. Setiap perubahan data harus diikuti dengan pemuatan ulang daftar.
+
+---
+
+### Folder: lib/halaman/lainnya/
+**File:** `lib/halaman/lainnya/tentang_aplikasi.dart`
+**Fitur:** Menampilkan Informasi Detail Aplikasi
+**Daftar Fungsi:**
+- `_initInfo()`: Mengambil informasi paket (versi, build number) dan informasi perangkat (arsitektur CPU, versi Android) secara asynchronous.
+- `_buildInfoRow(String label, String value)`: Widget helper untuk membangun setiap baris informasi teknis agar konsisten.
+**Catatan:** Halaman ini telah diperbarui untuk menampilkan informasi teknis yang lebih lengkap seperti nomor build, minimal versi OS Android, dan arsitektur perangkat. Tampilan juga diubah menggunakan `ListView` agar konten tidak terpotong pada layar kecil.
+**Rules:**
+- Selalu gunakan widget `_buildInfoRow` untuk menambahkan informasi teknis baru agar tata letak tetap rapi dan seragam.
+
+---
+
+# **Kritik dan Saran untuk Peningkatan Proyek**
+
+Berdasarkan analisis terbaru dan implementasi fitur sinkronisasi, berikut adalah beberapa rekomendasi lanjutan:
+
+1.  **Optimalkan Proses Sinkronisasi**:
+    *   **Saran**: Daripada mengunduh *seluruh* data setiap kali, pertimbangkan untuk hanya mengunduh data yang berubah sejak sinkronisasi terakhir. Ini bisa dicapai dengan menyimpan *timestamp* sinkronisasi terakhir dan menggunakannya untuk memfilter query di Firebase.
+    *   **Manfaat**: Mengurangi penggunaan *bandwidth* dan mempercepat proses sinkronisasi, terutama saat jumlah data sudah sangat besar.
+
+2.  **Berikan Umpan Balik Visual Saat Sinkronisasi**:
+    *   **Saran**: Saat pengguna menekan tombol "Kritik & Saran" dan proses sinkronisasi berjalan, tampilkan indikator loading (misalnya, `CircularProgressIndicator` di dalam `AlertDialog` atau `SnackBar`).
+    *   **Manfaat**: Memberikan umpan balik yang jelas kepada pengguna bahwa aplikasi sedang bekerja, mencegah kebingungan atau penekanan tombol berulang kali.
+
+3.  **Pemisahan Logika Sinkronisasi**:
+    *   **Saran**: Buat sebuah kelas `SinkronisasiService` terpusat yang bertanggung jawab untuk semua logika sinkronisasi (baik unggah maupun unduh) untuk semua model data (pelanggan, kritik saran, dll.).
+    *   **Manfaat**: Membuat kode lebih rapi (tidak mencampur logika UI dan sinkronisasi di `onTap` button), lebih mudah dikelola, dan dapat digunakan kembali di berbagai bagian aplikasi.
+
+4.  **Implementasi Sinkronisasi Otomatis**:
+    *   **Saran**: Pertimbangkan untuk menjalankan proses sinkronisasi secara otomatis di latar belakang pada interval waktu tertentu atau saat aplikasi pertama kali dibuka (setelah login).
+    *   **Manfaat**: Memastikan data di perangkat pengguna selalu *up-to-date* tanpa memerlukan interaksi manual, meningkatkan pengalaman pengguna secara keseluruhan.

@@ -1,55 +1,38 @@
-Baik, berikut aturan yang telah diperbarui dengan penomoran dan bahasa yang lebih formal dan jelas, siap untuk ditambahkan ke file README.md Anda:
+# **Aturan lainnya untuk AI**
 
-# **Aturan Lainnya untuk AI**
-
-1.  **Penggunaan Bahasa**: Seluruh penamaan dalam kode, termasuk namun tidak terbatas pada fungsi, variabel, parameter, dan nama file, wajib menggunakan Bahasa Indonesia. Bahasa Indonesia juga wajib digunakan dalam setiap sesi komunikasi atau percakapan.
-
-2.  **Komentar Path File**: Setiap file kode wajib memiliki komentar yang menunjukkan path atau lokasi file tersebut. Komentar ini harus diletakkan di bagian paling atas file dengan format: `// path : lib/path/nama_file.dart`.
-
-3.  **Konsultasi Proyek**: Sebelum memulai eksekusi tugas apa pun, sistem diharuskan untuk membaca dan memahami keseluruhan isi dari file `README.md` guna mengetahui alur kerja, aturan, serta konteks proyek secara menyeluruh.
-
-4.  **Dokumentasi Pasca Pengerjaan**: Setelah menyelesaikan pengerjaan pada suatu file, sistem wajib menambahkan atau memperbarui keterangan mengenai fungsi dan fitur yang terdapat di dalam file yang telah dikerjakan. Keterangan ini harus ditulis per file di dalam `README.md` untuk memudahkan identifikasi dan pemeliharaan.
-
-5.  **Prosedur Build**: Sebelum melakukan build proyek, sistem wajib membaca file `README.md` terlebih dahulu untuk mengidentifikasi apakah perubahan yang dilakukan berupa fitur baru atau hanya perbaikan bug. Apabila hanya perbaikan bug, tingkatkan hanya nomor build, bukan versi pada file `pubspec.yaml`. Proses build hanya boleh dilakukan setelah mendapatkan perintah eksplisit dari pengguna, dengan menjalankan perintah: `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
-
-6.  **Konsistensi dan Kejelasan**: Sistem wajib menjaga konsistensi dan kejelasan dalam setiap aspek proyek, termasuk penulisan kode, dokumentasi, dan komunikasi, setiap saat.
-
-7.  **Format Pembaruan README.md**: Setelah pengerjaan file selesai, sistem wajib mengedit atau menambahkan bagian dokumentasi file di `README.md` berdasarkan folder tempat file tersebut berada. Penulisan dokumentasi harus mengikuti format rinci di bawah ini agar rekan kerja dapat memahami aturan dan isi proyek tanpa kebingungan:
-    ```
+1.  Selalu gunakan Bahasa Indonesia untuk penamaan fungsi, variabel, parameter, nama file, dan saat berkomunikasi dengan pengguna.
+2.  Selalu tambahkan komentar berupa *path* file di bagian paling atas isi sebuah file dengan format: `// path: lib/utama.dart`.
+3.  Sebelum memulai pekerjaan, AI diwajibkan membaca file `README.md` untuk memahami alur kerja proyek.
+4.  Setelah menyelesaikan tugas pada suatu file, AI wajib memperbarui atau menambahkan keterangan fitur dan fungsi yang ada pada file tersebut di dalam `README.md`. Keterangan ditulis per file agar mudah diidentifikasi.
+5.  Sebelum melakukan *build*, baca terlebih dahulu `README.md` untuk mengetahui apakah terdapat fitur baru atau hanya perbaikan *bug*.
+    *   Jika hanya perbaikan *bug*, naikkan hanya nomor *build* saja (jangan naikkan versi) di `pubspec.yaml`, lalu jalankan perintah `flutter clean && flutter pub get && flutter build apk --release --split-per-abi`.
+    *   Jangan pernah melakukan *build* sebelum diperintahkan oleh pengguna.
+6.  Selalu jaga konsistensi dan kejelasan dalam seluruh aspek proyek.
+7.  Setelah menyelesaikan pekerjaan pada suatu file, perbarui isi `README.md` berdasarkan file yang dikerjakan saja. Isi `README.md` harus memuat keterangan tujuan file, fitur, fungsi, dan hindari format yang tidak jelas (contoh: `file lib/home.dart fitur: tombol tambah, fungsi: untuk menghapus`). Sebagai gantinya, gunakan format dokumentasi yang lebih terstruktur.
+8.  Pada setiap perubahan kode yang dilakukan, berikan komentar di samping atau di atas kode tersebut dengan struktur: `// diubah: [alasan perubahan]` atau `// ditambah: [alasan penambahan]` atau `// dihapus: [alasan penghapusan]`.
+9.  Setelah menyelesaikan pekerjaan, wajib menjalankan perintah `flutter analyze` di terminal untuk memastikan kode bebas dari *error* dan *warning*.
+10. Sebelum memulai eksekusi pekerjaan, AI wajib memberikan penjelasan mengenai rencana kerja dan alasan di baliknya untuk mendapatkan konfirmasi dari pengguna.
+    *   Konfirmasi positif: setuju, oke, ok, ya, yes.
+    *   Konfirmasi negatif: jangan, tidak, nggk, nggak.
+11. Tambahkan komentar keterangan di atas setiap fungsi untuk menjelaskan tujuan pembuatan kode tersebut. Format: `// [Penjelasan singkat fungsi]`.
+12. Sebisa mungkin, tambahkan komentar pada bagian-bagian kode yang penting atau rentan membingungkan di dalam isi file.
+13. Jika pengguna memerintahkan `clean`, AI harus menjalankan perintah `flutter clean && flutter pub get` di terminal.
+14. AI dilarang berasumsi liar; pastikan semua file dan modul dalam proyek selalu saling sinkron.
+15. Setiap kali membuat fungsi yang melibatkan operasi I/O, *network request*, atau akses *database*, wajib menggunakan pola *asynchronous* (`async`/`await`) dan membungkus hasilnya dalam objek `Future`. Hindari penggunaan `.then()` berantai.
+16. **Format Pembaruan README.md**: Setelah pengerjaan file selesai, perbarui bagian dokumentasi file di `README.md` dan kelompokkan berdasarkan folder dengan format berikut agar lebih rinci dan mudah dipahami rekan kerja:
+    ```markdown
     File: lib/path/nama_file.dart
-    Fitur: [Nama Fitur]
+    Fitur: [Nama Fitur Utama]
     Daftar Fungsi:
-    namaFungsiA(): [Penjelasan singkat kegunaan fungsi.]
-    namaFungsiB(): [Penjelasan singkat kegunaan fungsi.]
-    Catatan: [Informasi tambahan jika ada.]
-    Rules: [Ketentuan atau aturan spesifik yang berlaku pada file ini, misalnya format tanggal, jam, atau angka.]
+    - namaFungsiA(): [Penjelasan singkat kegunaan fungsi].
+    - namaFungsiB(): [Penjelasan singkat kegunaan fungsi].
+    Catatan: [Informasi tambahan jika ada].
+    Rules: [Aturan khusus, misalnya untuk format tanggal, jam, dan angka wajib menggunakan format yang ada di file lib/path/nama_file.dart].
     ```
-
-8.  **Komentar Perubahan Kode**: Setiap perubahan yang dilakukan pada kode (baik penghapusan, perubahan, maupun penambahan) wajib diberi komentar di samping atau di atas baris kode terkait dengan struktur penjelasan berikut: `// [dihapus/diubah/ditambah]: [alasan perubahan dilakukan].`
-
-9.  **Analisis Statis**: Setelah menyelesaikan seluruh tugas pada suatu sesi pengerjaan, sistem wajib menjalankan perintah `flutter analyze` di terminal untuk memastikan bahwa kode telah terbebas dari galat (*error*) dan peringatan (*warning*).
-
-10. **Konfirmasi Pekerjaan**: Sebelum memulai eksekusi teknis, sistem wajib memberikan penjelasan mengenai alasan dan rencana pekerjaan yang akan dilakukan. Eksekusi hanya boleh dilanjutkan setelah mendapatkan konfirmasi eksplisit dari pengguna melalui respons positif (contoh: "setuju", "oke", "ok", "ya", "yes"). Sebaliknya, jika pengguna memberikan respons negatif (contoh: "jangan", "tidak", "nggk", "nggak"), pekerjaan tidak boleh dilaksanakan.
-
-11. **Dokumentasi Fungsi**: Setiap fungsi yang dibuat atau diubah wajib dilengkapi dengan komentar penjelas yang menerangkan tujuan atau alasan pembuatan fungsi tersebut. Komentar diletakkan di atas deklarasi fungsi dengan format: `// [Penjelasan tujuan atau alasan fungsi dibuat.]`
-
-12. **Komentar Tambahan pada Kode**: Sistem diharapkan untuk menambahkan komentar secukupnya pada bagian-bagian kode yang kompleks atau krusial di dalam file, guna mengurangi potensi kebingungan saat membaca atau memelihara kode di masa mendatang.
-
-13. **Perintah Clean**: Apabila pengguna memberikan perintah "clean", sistem wajib menjalankan perintah `flutter clean && flutter pub get` di terminal untuk membersihkan dan memperbarui dependensi proyek.
-
-14. **Larangan Berasumsi**: Sistem dilarang keras membuat asumsi liar terkait logika, implementasi, atau ketergantungan antar-file. Setiap file harus dipastikan selaras dan sinkron satu sama lain berdasarkan implementasi yang telah dikonfirmasi.
-
-15. **Pola Pemrograman Asynchronous**: Setiap fungsi yang melibatkan operasi I/O, network request, atau akses basis data wajib menggunakan pola Asynchronous (`async/await`) dan membungkus hasilnya dalam objek `Future`. Penggunaan metode `.then()` secara berantai tidak diperkenankan.
-
-16. **Pratinjau Kode Sebelum Eksekusi**: Sebelum mengeksekusi perubahan pada suatu file, sistem wajib menampilkan potongan atau blok kode spesifik yang akan diperbarui (bukan keseluruhan isi file) untuk ditinjau dan dikonfirmasi oleh pengguna.
-
-17. **Pengecekan Mounted pada Widget**: Dalam konteks operasi asynchronous pada StatefulWidget, sistem wajib menggunakan pengecekan `if (!mounted) return;` setelah operasi `await` untuk mencegah potensi galat akibat widget sudah tidak berada di dalam widget tree.
-
-**Kritik dan Saran untuk Peningkatan Profesionalisme Proyek:**
-
-*   **Fitur**: Disarankan untuk mengadopsi mekanisme state management yang lebih terstruktur (seperti Provider, Riverpod, atau BLoC) ketika kompleksitas proyek meningkat. Hal ini memisahkan logika UI dari logika bisnis secara lebih bersih. Selain itu, terapkanlah sistem penanganan galat global yang menyajikan dialog atau notifikasi yang informatif kepada pengguna untuk setiap kegagalan yang tidak tertangani, guna meningkatkan pengalaman pengguna.
-*   **Pengelolaan**: Aturan penulisan kode yang ketat akan lebih optimal jika diselaraskan dengan berkas `analysis_options.yaml`. Konfigurasikan linter agar dapat mengawasi dan menegakkan aturan penamaan, format, dan praktik terbaik secara otomatis, sehingga mengurangi ketergantungan pada pemeriksaan manual. Proyek juga akan terlihat lebih profesional jika memiliki panduan gaya kode (style guide) tertulis yang menjadi acuan bersama seluruh tim.
-*   **Efisiensi**: Konfigurasikan alur Continuous Integration (CI) dasar yang secara otomatis menjalankan `flutter analyze` dan `flutter test` pada setiap pull request atau commit. Langkah ini memastikan bahwa semua aturan yang telah disepakati dipatuhi secara konsisten tanpa perlu diingat secara manual, serta secara signifikan meningkatkan keandalan dan stabilitas kode sebelum digabungkan ke cabang utama.
+17. Setelah memperbarui isi `README.md`, tambahkan bagian **Kritik dan Saran** untuk pengguna di bawah aturan ini. Bagian ini bertujuan untuk memberikan masukan agar proyek lebih profesional dari segi fitur, pengelolaan, efisiensi, dan aspek lainnya.
+18. Sebelum mengerjakan tugas, AI wajib menunjukkan potongan kode yang akan diperbarui, menunjukkan kode yang salah dan kode perbaikannya, untuk dikonfirmasi oleh pengguna.
+19. Untuk menghindari kesalahan pada komponen yang sudah tidak terpasang (*unmounted*), wajib gunakan pengecekan `if (!mounted) return;` sebelum menggunakan `context` atau melakukan operasi yang bergantung pada *lifecycle* *widget*.
+```
 
 __________________________________________
 
